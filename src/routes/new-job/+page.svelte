@@ -13,7 +13,7 @@
   import * as Field from "$lib/components/ui/field/index";
   import { Input } from "$lib/components/ui/input/index";
   import * as Popover from "$lib/components/ui/popover/index";
-  import { mapNewJobErrors, newJobSchema } from "$lib/schemas/jobs";
+  import { mapNewJobErrors, newJobSchema } from "$lib/schemas/valid-job";
 
   type FormErrors = {
     name?: string;
