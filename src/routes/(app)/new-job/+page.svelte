@@ -45,7 +45,6 @@
     errors = {};
     console.log("Success", parsed.data);
     // insert into database
-    await db.insert()
     toast.success("Job created");
   }
 </script>
