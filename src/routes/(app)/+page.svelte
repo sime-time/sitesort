@@ -1,9 +1,21 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import { onMount } from "svelte";
   import BottomButton from "$lib/components/BottomButton.svelte";
   import JobCard from "$lib/components/JobCard.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
+  import { listJobsByUser } from "$lib/sql/client/crud/job-list";
+  import type { SelectJob } from "$lib/sql/client/schema.js";
+
+  let { data } = $props();
+
+  let jobs = $state<SelectJob[]>([]);
+
+  onMount(async () => {
+    const jobList = await listJobsByUser(data.userId);
+    jobs = jobList;
+  });
 </script>
 
 <TopBar />
@@ -25,7 +37,14 @@
       <h2 class="font-heading font-medium text-2xl uppercase">Active Jobs</h2>
       <p class="font-semibold text-primary">4 TOTAL</p>
     </section>
-    <JobCard priority={true} />
+    {#each jobs as job}
+      <JobCard
+        name={job.name}
+        address={job.address}
+        startDate={job.startDate}
+        priority={true}
+      />
+    {/each}
   </Tabs.Content>
 
   <Tabs.Content value="completed">

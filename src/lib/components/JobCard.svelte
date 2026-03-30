@@ -4,7 +4,13 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Card from "$lib/components/ui/card/index";
 
-  let { priority }: { priority?: boolean } = $props();
+  let {
+    name,
+    startDate,
+    address,
+    priority,
+  }: { name: string; startDate: string; address: string; priority?: boolean } =
+    $props();
 </script>
 
 <Card.Root
@@ -26,10 +32,10 @@
         class="text-muted-foreground"
       /></Button
     >
-    <Card.Title>Shenoy Job</Card.Title>
+    <Card.Title>{name}</Card.Title>
     <Card.Description class="flex gap-1 items-center">
       <Icon icon="material-symbols:date-range-rounded" />
-      <span> Started Oct 12, 2025</span>
+      <span>Started {startDate}</span>
     </Card.Description>
   </Card.Header>
   <Card.Content>
@@ -42,7 +48,7 @@
 			}}
     >
       <Icon icon="material-symbols:moved-location" />
-      <span>7237 Bradford Woods Way</span>
+      <span>{address}</span>
     </Button>
     <div class="flex justify-end items-center gap-1 text-primary">
       <p class="uppercase tracking-widest font-medium text-xs">Continue</p>

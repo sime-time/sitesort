@@ -6,6 +6,7 @@
     today,
   } from "@internationalized/date";
   import { toast } from "svelte-sonner";
+  import { goto } from "$app/navigation";
   import BottomButton from "$lib/components/BottomButton.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
@@ -14,6 +15,8 @@
   import { Input } from "$lib/components/ui/input/index";
   import * as Popover from "$lib/components/ui/popover/index";
   import { mapNewJobErrors, newJobSchema } from "$lib/schemas/valid-job";
+  import { createJob } from "$lib/sql/client/crud/job-create";
+  import type { PageProps } from "./$types";
 
   type FormErrors = {
     name?: string;
@@ -21,14 +24,15 @@
     address?: string;
   };
 
-  let calendarOpen = $state(false);
+  let { data }: PageProps = $props();
 
   let jobName = $state<string>("");
   let jobDate = $state<CalendarDate>(today(getLocalTimeZone()));
   let jobAddress = $state<string>("");
   let errors = $state<FormErrors>({});
+  let calendarOpen = $state(false);
 
-  function handleSubmit(e: SubmitEvent) {
+  async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
     const parsed = newJobSchema.safeParse({
@@ -41,11 +45,30 @@
       errors = mapNewJobErrors(parsed.error);
       return;
     }
-
     errors = {};
+
     console.log("Success", parsed.data);
-    // insert into database
+    console.log("UserID", data.userId);
+
+    try {
+      await createJob({
+        userId: data.userId,
+        name: parsed.data.name,
+        address: parsed.data.address,
+        date: parsed.data.date,
+      });
+    } catch (error) {
+      console.error("Create Job Error", error);
+      toast.error("Failed to create new job");
+      return;
+    }
+
+    // Reset job form on success
     toast.success("Job created");
+    jobName = "";
+    jobAddress = "";
+    jobDate = today(getLocalTimeZone());
+    goto("/");
   }
 </script>
 

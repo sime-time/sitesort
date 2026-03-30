@@ -12,4 +12,5 @@ export class Connector {
       token: PUBLIC_POWERSYNC_DEV_TOKEN,
     };
   }
+  async uploadData(database) {}
 }
