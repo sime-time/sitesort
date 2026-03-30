@@ -1,9 +1,10 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { toast } from "svelte-sonner";
-  import Badge from "$lib/components/ui/badge/badge.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Card from "$lib/components/ui/card/index";
+
+  let { priority }: { priority?: boolean } = $props();
 </script>
 
 <Card.Root
@@ -11,14 +12,19 @@
   onclick={() => console.log("Card clicked")}
 >
   <Card.Header class="relative">
-    <Badge
-      variant="destructive"
+    <Button
+      variant="outline"
+      size="icon-sm"
       class="absolute right-4 top-0 uppercase text-xs z-10"
       onclick={(e) => {
 				e.stopPropagation();
+				priority = !priority;
 				console.log("Badge clicked");
 			}}
-      >Priority</Badge
+      ><Icon
+        icon={priority ? "ph:push-pin-bold" : "ph:push-pin-slash-bold"}
+        class="text-muted-foreground"
+      /></Button
     >
     <Card.Title>Shenoy Job</Card.Title>
     <Card.Description class="flex gap-1 items-center">
@@ -35,7 +41,7 @@
 				toast.success("Address Copied");
 			}}
     >
-      <Icon icon="material-symbols:content-copy-outline" />
+      <Icon icon="material-symbols:moved-location" />
       <span>7237 Bradford Woods Way</span>
     </Button>
     <div class="flex justify-end items-center gap-1 text-primary">

@@ -25,7 +25,7 @@
       <h2 class="font-heading font-medium text-2xl uppercase">Active Jobs</h2>
       <p class="font-semibold text-primary">4 TOTAL</p>
     </section>
-    <JobCard />
+    <JobCard priority={true} />
   </Tabs.Content>
 
   <Tabs.Content value="completed">

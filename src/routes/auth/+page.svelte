@@ -1,45 +1,39 @@
 <script lang="ts">
+  import Icon from "@iconify/svelte";
   import type {
     BetterAuthSession,
     BetterAuthUser,
   } from "@neondatabase/neon-js/auth/types";
+  import { toast } from "svelte-sonner";
   import Button from "$lib/components/ui/button/button.svelte";
-  import Input from "$lib/components/ui/input/input.svelte";
+  import Spinner from "$lib/components/ui/spinner/spinner.svelte";
   import { authClient } from "$lib/sql/client/auth";
 
   let session = $state<BetterAuthSession | null>(null);
   let user = $state<BetterAuthUser | null>(null);
-  let name = $state("");
-  let email = $state("");
-  let password = $state("");
-  let isSignUp = $state(true);
   let loading = $state(true);
 
   $effect(() => {
-    authClient.getSession().then((result) => {
-      if (result.data?.session && result.data?.user) {
-        session = result.data.session;
-        user = result.data.user;
+    authClient.getSession().then(({ data }) => {
+      console.log(data);
+      if (data?.session) {
+        user = data.user;
+        session = data.session;
       }
       loading = false;
     });
   });
 
-  async function handleSubmit(e: SubmitEvent) {
+  async function handleGoogleSignIn(e: SubmitEvent) {
     e.preventDefault();
-    const result = isSignUp
-      ? await authClient.signUp.email({ name, email, password })
-      : await authClient.signIn.email({ email, password });
-
-    if (result.error) {
-      alert(result.error.message);
-      return;
-    }
-
-    const sessionResult = await authClient.getSession();
-    if (sessionResult.data?.session && sessionResult.data?.user) {
-      session = sessionResult.data.session;
-      user = sessionResult.data.user;
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/auth",
+      });
+    } catch (error) {
+      toast.error("Error signing in with Google");
+      console.error("Google sign-in error:", error);
     }
   }
 
@@ -50,50 +44,46 @@
   }
 </script>
 
-{#if loading}
-  <div>Loading...</div>
-{:else if session && user}
-  <div>
-    <h1>Logged in as {user.email}</h1>
-    <Button onclick={handleSignOut}>Sign Out</Button>
-  </div>
-{:else}
-  <form onsubmit={handleSubmit}>
-    <h1 class="text-2xl font-bold text-center">
-      {isSignUp ? "Sign Up" : "Sign In"}
-    </h1>
-    <Input type="text" placeholder="Name" bind:value={name} />
-    <Input type="email" placeholder="Email" bind:value={email} />
-    <Input type="password" placeholder="Password" bind:value={password} />
-    <Button type="submit">{isSignUp ? "Sign Up" : "Sign Out"}</Button>
-    {#if isSignUp}
-      <p>
-        Already have an account?{' '}
-        <button
-          type="button"
-          class="underline"
-          onclick={(e) => {
-            e.preventDefault();
-            isSignUp = false;
-          }}
+<div class="w-full h-100 flex items-center justify-center gap-1">
+  {#if loading}
+    <Spinner />
+    <span>Loading...</span>
+  {:else if session && user}
+    <div>
+      <h1
+        class="text-2xl font-bold text-center mb-4 font-heading flex flex-col"
+      >
+        <span>Logged in as</span>
+        <span class="text-primary">{user.email}</span>
+      </h1>
+      <div class="flex justify-between">
+        <Button type="button" href="/" size="lg" variant="secondary"
+          >Go to App</Button
         >
-          Sign in
-        </button>
-      </p>
-    {:else}
-      <p>
-        Don't have an account?{' '}
-        <button
+        <Button
           type="button"
-          class="underline"
-          onclick={(e) => {
-            e.preventDefault();
-            isSignUp = true;
-          }}
+          variant="destructiveSoft"
+          size="lg"
+          onclick={handleSignOut}
         >
-          Sign up
-        </button>
-      </p>
-    {/if}
-  </form>
-{/if}
+          Sign Out
+        </Button>
+      </div>
+    </div>
+  {:else}
+    <form onsubmit={handleGoogleSignIn}>
+      <h1 class="text-2xl font-bold text-center mb-4 font-heading">
+        Welcome to SiteSort
+      </h1>
+      <Button
+        type="submit"
+        variant="secondary"
+        class="font-sans tracking-normal normal-case"
+        size="xl"
+      >
+        <Icon icon="ri:google-fill" />
+        Continue with Google
+      </Button>
+    </form>
+  {/if}
+</div>

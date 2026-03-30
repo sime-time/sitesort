@@ -14,6 +14,8 @@
           "bg-linear-to-b from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-primary-foreground shadow-xs hover:brightness-105 active:brightness-95",
         destructive:
           "bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 text-white shadow-xs",
+        destructiveSoft:
+          "bg-destructive/10 [a]:hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive dark:bg-destructive/20",
         outline:
           "bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border border-input shadow-xs",
         secondary:
