@@ -27,8 +27,8 @@ export function mapNewJobErrors(error: ZodError<NewJobInput>) {
 export const crudEntrySchema = z.object({
   id: z.uuid(),
   op: z.enum(["PUT", "PATCH", "DELETE"]),
-  table: z.literal("jobs"),
-  opData: z.record(z.string(), z.unknown()).optional(),
+  type: z.literal("jobs"),
+  data: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const uploadBodySchema = z.object({

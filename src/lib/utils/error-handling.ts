@@ -21,3 +21,11 @@ export function getErrorCode(err: unknown): string | null {
   }
   return null;
 }
+
+// For data uploads
+export class UnauthorizedUploadError extends Error {
+  constructor(message = "Unauthorized operation") {
+    super(message);
+    this.name = "UnauthorizedUploadError";
+  }
+}

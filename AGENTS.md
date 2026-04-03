@@ -18,12 +18,14 @@ Primary product goal:
 - Framework: SvelteKit (Svelte 5 runes)
 - Styling/UI: Tailwind + shadcn-svelte style components
 - Validation: Zod + `sveltekit-superforms`
-- Build target: static SPA with fallback routing
+- Runtime/deploy target: Node server (`@sveltejs/adapter-node`)
+- Client data layer: PowerSync Web SDK + Drizzle driver + wa-sqlite
 
 Key config choices:
-- `src/routes/+layout.svelte` has `export const ssr = false;`
-- `svelte.config.js` uses `@sveltejs/adapter-static`
-- Static adapter fallback is set to `index.html`
+- `src/routes/(app)/+layout.ts` sets `export const ssr = false;` for app dashboard routes
+- SSR is still available for non-`(app)` routes and server endpoints
+- `svelte.config.js` uses `@sveltejs/adapter-node`
+- `vite.config.ts` includes `vite-plugin-wasm` (+ top-level await plugin) and excludes `@journeyapps/wa-sqlite` / `@powersync/web` from optimizeDeps
 
 ## Architectural Direction
 
@@ -42,7 +44,7 @@ Implications:
 ## Backend and Service Boundaries
 
 Recommended service split:
-1. Frontend app (`sitesort`) as static SPA
+1. Frontend app (`sitesort`) served by SvelteKit Node runtime
 2. Dedicated backend for PowerSync auth/sync endpoints
 3. Postgres as system-of-record backend store
 
@@ -57,6 +59,7 @@ PowerSync-style backend endpoints (external service):
 Notes:
 - Keep frontend and backend as separate deployable services (can still share a monorepo).
 - Framework choice for backend (Express vs Hono) is less important than stable endpoint contracts and security.
+- In local/dev, uploads currently go through `src/routes/api/upload/+server.ts`.
 
 ## Forms and Validation
 
@@ -64,7 +67,7 @@ Known schema location:
 - `src/lib/schemas/valid-job.ts`
 
 Current new-job route:
-- `src/routes/new-job/+page.svelte`
+- `src/routes/(app)/new-job/+page.svelte`
 
 Guidance for job creation flow:
 - Validate with shared Zod schema on client
@@ -103,8 +106,9 @@ Interaction priorities:
 ## Deployment Notes
 
 Frontend:
-- Static output with SPA fallback (`index.html`) generated at build time
-- Do not manually create `index.html` in `src`
+- Adapter is `@sveltejs/adapter-node` (server runtime)
+- App dashboard remains SPA-like by disabling SSR in `src/routes/(app)/+layout.ts`
+- Keep WASM-capable Vite config for PowerSync/wa-sqlite support
 
 Backend:
 - Should be owned in your own repo/fork (not long-term pinned to demo source)
@@ -113,8 +117,9 @@ Backend:
 ## Important Repo Context
 
 - This repo currently includes only a small set of routes/components.
-- There are no active `+server.ts` endpoints in `src/routes` at this moment.
-- At least one form currently still posts with `method="POST"`; for static offline-first flow, prefer client-handled submit logic.
+- Active upload endpoint exists at `src/routes/api/upload/+server.ts` for PowerSync CRUD upload handling.
+- Client writes are local-first via PowerSync local DB, then uploaded through connector `uploadData()`.
+- New-job form is client-handled in `src/routes/(app)/new-job/+page.svelte`.
 
 ## Decisions to Preserve
 

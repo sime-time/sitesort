@@ -43,8 +43,6 @@ export class Connector implements PowerSyncBackendConnector {
 
   async fetchCredentials(): Promise<PowerSyncCredentials> {
     const token = await this.getSessionToken();
-    console.log("Token", token);
-    console.log("Endpoint", PUBLIC_POWERSYNC_URL);
 
     return {
       endpoint: PUBLIC_POWERSYNC_URL,

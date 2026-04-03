@@ -1,25 +1,59 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
+import { dev } from "$app/environment";
+import {
+  NEON_AUTH_AUDIENCE,
+  NEON_AUTH_ISSUER,
+  NEON_AUTH_JWKS_URL,
+} from "$env/static/private";
 import { uploadBodySchema } from "$lib/schemas/valid-job";
 import { db } from "$lib/sql/server/db";
 import { type InsertJob, jobInsertSchema, jobs } from "$lib/sql/server/schema";
-import { getErrorCode } from "$lib/utils/error-handling";
+import {
+  getErrorCode,
+  UnauthorizedUploadError,
+} from "$lib/utils/error-handling";
+
+const JWKS = createRemoteJWKSet(new URL(NEON_AUTH_JWKS_URL));
+
+async function verifyBearerToken(token: string): Promise<{ user_id: string }> {
+  const { payload } = await jwtVerify(token, JWKS, {
+    issuer: NEON_AUTH_ISSUER,
+    audience: NEON_AUTH_AUDIENCE,
+  });
+
+  if (typeof payload.sub !== "string" || payload.sub.length === 0) {
+    throw new Error("Token missing subject");
+  }
+
+  return { user_id: payload.sub };
+}
 
 export const POST: RequestHandler = async ({ request }) => {
   const authHeader = request.headers.get("authorization");
+  const bearerLabel = "Bearer ";
 
-  if (!authHeader?.startsWith("Bearer")) {
+  if (!authHeader?.startsWith(bearerLabel)) {
+    return json({ ok: false, message: "Invalid auth header" }, { status: 401 });
+  }
+
+  const token = authHeader?.slice(bearerLabel.length).trim();
+  if (!token) {
     return json(
-      { ok: false, message: "Invalid authorization header" },
+      { ok: false, message: "Missing bearer token" },
       { status: 401 },
     );
   }
 
-  const token = authHeader.slice("Bearer ".length).trim();
-  if (!token) {
+  let auth: { user_id: string };
+
+  try {
+    auth = await verifyBearerToken(token);
+  } catch {
     return json(
-      { ok: false, message: "Missing bearer token" },
+      { ok: false, message: "Invalid or expired token" },
       { status: 401 },
     );
   }
@@ -55,7 +89,12 @@ export const POST: RequestHandler = async ({ request }) => {
       for (const entry of crud) {
         switch (entry.op) {
           case "PUT": {
-            const parsed = jobInsertSchema.parse(entry.opData);
+            const parsed = jobInsertSchema.parse(entry.data);
+
+            if (parsed.user_id !== auth.user_id) {
+              throw new UnauthorizedUploadError();
+            }
+
             const row: InsertJob = {
               id: entry.id,
               user_id: parsed.user_id,
@@ -86,17 +125,33 @@ export const POST: RequestHandler = async ({ request }) => {
             break;
           }
           case "PATCH": {
-            const parsed = jobInsertSchema.parse(entry.opData);
+            const parsed = jobInsertSchema.parse(entry.data);
             const patch: Partial<InsertJob> = {
               ...parsed,
               updated_at: parsed.updated_at ?? new Date().toISOString(),
             };
-            await tx.update(jobs).set(patch).where(eq(jobs.id, entry.id));
+            const updated = await tx
+              .update(jobs)
+              .set(patch)
+              .where(and(eq(jobs.id, entry.id), eq(jobs.user_id, auth.user_id)))
+              .returning({ id: jobs.id });
+
+            if (updated.length === 0) {
+              throw new UnauthorizedUploadError();
+            }
             break;
           }
-          case "DELETE":
-            await tx.delete(jobs).where(eq(jobs.id, entry.id));
+          case "DELETE": {
+            const deleted = await tx
+              .delete(jobs)
+              .where(and(eq(jobs.id, entry.id), eq(jobs.user_id, auth.user_id)))
+              .returning({ id: jobs.id });
+
+            if (deleted.length === 0) {
+              throw new UnauthorizedUploadError();
+            }
             break;
+          }
 
           default:
             break;
@@ -114,8 +169,24 @@ export const POST: RequestHandler = async ({ request }) => {
       });
     }
 
+    if (err instanceof UnauthorizedUploadError) {
+      return json(
+        { ok: false, message: err.message, errorCode: "42501" },
+        { status: 200 },
+      );
+    }
+
     const errorCode = getErrorCode(err);
     const message = err instanceof Error ? err.message : "Upload failed";
+
+    if (dev) {
+      console.error("[upload] transaction failed", {
+        crudCount: crud.length,
+        errorCode,
+        message,
+        errName: err instanceof Error ? err.name : null,
+      });
+    }
 
     if (errorCode) {
       return json({ ok: false, message, errorCode });
@@ -124,7 +195,8 @@ export const POST: RequestHandler = async ({ request }) => {
     return json(
       {
         ok: false,
-        message: "Transient upload failure",
+        message: dev ? message : "Transient upload failure",
+        errorCode: errorCode ?? undefined,
       },
       { status: 500 },
     );
