@@ -22,3 +22,17 @@ export function mapNewJobErrors(error: ZodError<NewJobInput>) {
     address: flat.fieldErrors.address?.[0],
   };
 }
+
+// CRUD upload validation
+export const insertJobSchema = createInsertSchema(jobs);
+export const putJobDataSchema = insertJobSchema.omit({ id: true });
+export const crudEntrySchema = z.object({
+  id: z.uuid(),
+  op: z.enum(["PUT", "PATCH", "DELETE"]),
+  table: z.literal("jobs"),
+  opData: z.record(z.string(), z.unknown()).optional(),
+});
+
+export const uploadBodySchema = z.object({
+  crud: z.array(crudEntrySchema),
+});

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-orm/zod";
 
 export const jobs = pgTable(
   "jobs",
@@ -25,3 +26,7 @@ export const jobs = pgTable(
 
 export type InsertJob = typeof jobs.$inferInsert;
 export type SelectJob = typeof jobs.$inferSelect;
+
+// Zod Validation Schemas
+export const jobInsertSchema = createInsertSchema(jobs);
+export const jobSelectSchema = createSelectSchema(jobs);

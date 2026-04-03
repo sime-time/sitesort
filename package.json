@@ -25,7 +25,7 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "bits-ui": "^2.16.3",
     "clsx": "^2.1.1",
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "1.0.0-beta.20",
     "mode-watcher": "^1.1.0",
     "svelte": "^5.51.0",
     "svelte-check": "^4.4.2",
@@ -48,7 +48,7 @@
     "@powersync/web": "^1.37.0",
     "@tailwindcss/vite": "^4.2.1",
     "dotenv": "^17.3.1",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "1.0.0-beta.20",
     "pg": "^8.20.0",
     "tailwindcss": "^4.2.1",
     "zod": "^4.3.6"

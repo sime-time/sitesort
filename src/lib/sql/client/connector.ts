@@ -5,6 +5,7 @@ import type {
   PowerSyncCredentials,
 } from "@powersync/web";
 import { PUBLIC_POWERSYNC_URL } from "$env/static/public";
+import { getErrorCode } from "$lib/utils/error-handling";
 import { authClient } from "./auth";
 
 interface UploadResponse {
@@ -27,14 +28,6 @@ const FATAL_RESPONSE_CODES = [
 
 function isFatalResponse(code: string): boolean {
   return FATAL_RESPONSE_CODES.some((regex) => regex.test(code));
-}
-
-function getErrorCode(err: unknown): string | null {
-  if (typeof err === "object" && err !== null && "code" in err) {
-    const code = (err as { code?: unknown }).code;
-    return typeof code === "string" ? code : null;
-  }
-  return null;
 }
 
 export class Connector implements PowerSyncBackendConnector {
@@ -96,15 +89,17 @@ export class Connector implements PowerSyncBackendConnector {
 
       // Non-retryable path: don't block queue forever
       const code = body?.errorCode;
-      const isFatalCode = code ? isFatalResponse(code) : false;
-      const isFatalStatus = response.status >= 400 && response.status < 500;
+      const fatalCode = code ? isFatalResponse(code) : false;
 
-      if (isFatalCode || isFatalStatus) {
-        console.error(
-          "Data upload fatal/non-retryable error - discarding:",
-          lastOp,
-          body,
-        );
+      if (response.ok) {
+        if (body?.ok === false) {
+          if (fatalCode) {
+            // Discard only explicit fatal issue
+            await transaction.complete();
+          }
+          throw new Error(body?.message ?? "Upload rejected");
+        }
+
         await transaction.complete();
         return;
       }
