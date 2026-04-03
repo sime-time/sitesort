@@ -13,3 +13,11 @@ export function ok<T>(data: T): Result<T, never> {
 export function err<E extends { reason: string }>(error: E): Result<never, E> {
   return [null, error];
 }
+
+export function getErrorCode(err: unknown): string | null {
+  if (typeof err === "object" && err !== null && "code" in err) {
+    const code = (err as { code?: unknown }).code;
+    return typeof code === "string" ? code : null;
+  }
+  return null;
+}

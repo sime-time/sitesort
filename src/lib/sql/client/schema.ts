@@ -3,13 +3,13 @@ import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const jobs = sqliteTable("jobs", {
   id: text("id").primaryKey().notNull(),
-  userId: text("user_id").notNull(),
+  user_id: text("user_id").notNull(),
   name: text("name").notNull(),
   address: text("address").notNull(),
-  startDate: text("start_date").notNull(),
-  endDate: text("end_date"),
-  createdAt: text("created_at").notNull(),
-  updatedAt: text("updated_at").notNull(),
+  start_date: text("start_date").notNull(),
+  end_date: text("end_date"),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull(),
 });
 
 export type InsertJob = typeof jobs.$inferInsert;

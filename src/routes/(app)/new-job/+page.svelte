@@ -37,7 +37,7 @@
 
     const parsed = newJobSchema.safeParse({
       name: jobName,
-      date: jobDate.toDate(getLocalTimeZone()),
+      start_date: jobDate.toDate(getLocalTimeZone()),
       address: jobAddress,
     });
 
@@ -48,14 +48,14 @@
     errors = {};
 
     console.log("Success", parsed.data);
-    console.log("UserID", data.userId);
+    console.log("User ID", data.user_id);
 
     try {
       await createJob({
-        userId: data.userId,
+        user_id: data.user_id,
         name: parsed.data.name,
         address: parsed.data.address,
-        date: parsed.data.date,
+        start_date: parsed.data.start_date,
       });
     } catch (error) {
       console.error("Create Job Error", error);

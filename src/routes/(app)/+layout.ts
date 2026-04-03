@@ -9,5 +9,5 @@ export const load: LayoutLoad = async () => {
   if (!data?.session) {
     throw redirect(302, `/auth`);
   }
-  return { userId: data.user.id };
+  return { user_id: data.user.id };
 };

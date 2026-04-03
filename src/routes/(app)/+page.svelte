@@ -13,7 +13,7 @@
   let jobs = $state<SelectJob[]>([]);
 
   onMount(async () => {
-    const jobList = await listJobsByUser(data.userId);
+    const jobList = await listJobsByUser(data.user_id);
     jobs = jobList;
   });
 </script>
@@ -41,7 +41,7 @@
       <JobCard
         name={job.name}
         address={job.address}
-        startDate={job.startDate}
+        startDate={job.start_date}
         priority={true}
       />
     {/each}

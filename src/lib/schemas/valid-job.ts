@@ -5,7 +5,7 @@ export const newJobSchema = z.object({
     .string()
     .min(1, "Must include a job name")
     .max(50, "Name must be less than 50 characters"),
-  date: z.coerce.date(),
+  start_date: z.coerce.date(),
   address: z
     .string()
     .min(1, "Must include a valid address")
@@ -18,7 +18,7 @@ export function mapNewJobErrors(error: ZodError<NewJobInput>) {
   const flat = z.flattenError(error);
   return {
     name: flat.fieldErrors.name?.[0],
-    date: flat.fieldErrors.date?.[0],
+    start_date: flat.fieldErrors.start_date?.[0],
     address: flat.fieldErrors.address?.[0],
   };
 }

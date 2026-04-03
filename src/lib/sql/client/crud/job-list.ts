@@ -6,8 +6,8 @@ export async function listJobsByUser(userId: string) {
   const jobList: SelectJob[] = await db
     .select()
     .from(jobs)
-    .where(eq(jobs.userId, userId))
-    .orderBy(jobs.createdAt);
+    .where(eq(jobs.user_id, userId))
+    .orderBy(jobs.created_at);
 
   return jobList || [];
 }

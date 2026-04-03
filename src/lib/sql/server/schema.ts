@@ -5,22 +5,22 @@ export const jobs = pgTable(
   "jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    userId: text("user_id").notNull().default(sql`auth.user_id ()`),
+    user_id: text("user_id").notNull().default(sql`auth.user_id ()`),
     name: text("name").notNull(),
     address: text("address").notNull(),
-    startDate: timestamp("start_date", { withTimezone: true, mode: "string" })
+    start_date: timestamp("start_date", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
-    endDate: timestamp("end_date", { withTimezone: true, mode: "string" }),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    end_date: timestamp("end_date", { withTimezone: true, mode: "string" }),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date().toISOString()),
   },
-  (table) => [index("user_idx").on(table.userId)],
+  (table) => [index("user_idx").on(table.user_id)],
 );
 
 export type InsertJob = typeof jobs.$inferInsert;

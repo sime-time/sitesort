@@ -2,10 +2,10 @@ import { db } from "$lib/sql/client/db";
 import { type InsertJob, jobs } from "$lib/sql/client/schema";
 
 interface CreateJobInput {
-  userId: string;
+  user_id: string;
   name: string;
   address: string;
-  date: Date;
+  start_date: Date;
 }
 
 export async function createJob(input: CreateJobInput) {
@@ -15,13 +15,13 @@ export async function createJob(input: CreateJobInput) {
   console.log("Inserting job...");
   await db.insert(jobs).values({
     id: id,
-    userId: input.userId,
+    user_id: input.user_id,
     name: input.name,
     address: input.address,
-    startDate: input.date.toISOString(),
-    endDate: null,
-    createdAt: now,
-    updatedAt: now,
+    start_date: input.start_date.toISOString(),
+    end_date: null,
+    created_at: now,
+    updated_at: now,
   } satisfies InsertJob);
 
   console.log("Job inserted:", id);
