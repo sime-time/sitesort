@@ -1,4 +1,5 @@
 allowBuilds:
+  '@journeyapps/wa-sqlite': true
   '@sentry-internal/node-cpu-profiler': true
   core-js: true
   esbuild: true
