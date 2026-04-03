@@ -24,9 +24,6 @@ export function mapNewJobErrors(error: ZodError<NewJobInput>) {
 }
 
 // CRUD upload validation
-export const putJobDataSchema = insertJobSchema.omit({ id: true });
-const patchJobDataSchema = putJobDataSchema.partial().refine(...at least one key...);
-
 export const crudEntrySchema = z.object({
   id: z.uuid(),
   op: z.enum(["PUT", "PATCH", "DELETE"]),

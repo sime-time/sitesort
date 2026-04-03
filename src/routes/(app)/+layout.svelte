@@ -3,7 +3,7 @@
   import { setupPowerSync } from "$lib/sql/client/db";
 
   let { children } = $props();
-  onMount(() => setupPowerSync());
+  onMount(async () => await setupPowerSync());
 </script>
 
 {@render children()}

@@ -13,7 +13,7 @@ export async function createJob(input: CreateJobInput) {
   const id = crypto.randomUUID();
 
   console.log("Inserting job...");
-  await db.insert(jobs).values({
+  const result = await db.insert(jobs).values({
     id: id,
     user_id: input.user_id,
     name: input.name,
@@ -24,6 +24,6 @@ export async function createJob(input: CreateJobInput) {
     updated_at: now,
   } satisfies InsertJob);
 
-  console.log("Job inserted:", id);
+  console.log("Job inserted:", result);
   return { id };
 }
