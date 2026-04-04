@@ -25,7 +25,7 @@ Key config choices:
 - `src/routes/(app)/+layout.ts` sets `export const ssr = false;` for app dashboard routes
 - SSR is still available for non-`(app)` routes and server endpoints
 - `svelte.config.js` uses `@sveltejs/adapter-node`
-- `vite.config.ts` includes `vite-plugin-wasm` (+ top-level await plugin) and excludes `@journeyapps/wa-sqlite` / `@powersync/web` from optimizeDeps
+- `vite.config.ts` includes `vite-plugin-wasm`, excludes `@journeyapps/wa-sqlite` / `@powersync/web` from optimizeDeps, and sets `worker.format = "es"`
 
 ## Architectural Direction
 
@@ -60,6 +60,8 @@ Notes:
 - Keep frontend and backend as separate deployable services (can still share a monorepo).
 - Framework choice for backend (Express vs Hono) is less important than stable endpoint contracts and security.
 - In local/dev, uploads currently go through `src/routes/api/upload/+server.ts`.
+- `src/routes/api/upload/+server.ts` verifies bearer tokens cryptographically (`jose`) using JWKS + issuer + audience env vars (`NEON_AUTH_JWKS_URL`, `NEON_AUTH_ISSUER`, `NEON_AUTH_AUDIENCE`).
+- Upload route enforces row ownership via token subject (`sub`) mapped to `user_id`; unauthorized writes return 403.
 
 ## Forms and Validation
 
@@ -111,6 +113,7 @@ Frontend:
 - Keep WASM-capable Vite config for PowerSync/wa-sqlite support
 
 Backend:
+- Server DB driver is `drizzle-orm/node-postgres` + `pg` to support transactions.
 - Should be owned in your own repo/fork (not long-term pinned to demo source)
 - Keep auth signing keys and secrets out of frontend and static builds
 
@@ -120,12 +123,18 @@ Backend:
 - Active upload endpoint exists at `src/routes/api/upload/+server.ts` for PowerSync CRUD upload handling.
 - Client writes are local-first via PowerSync local DB, then uploaded through connector `uploadData()`.
 - New-job form is client-handled in `src/routes/(app)/new-job/+page.svelte`.
+- PowerSync upload payload shape currently validated as `{ crud: [{ op, type, id, data, ... }] }` (`type`/`data`, not `table`/`opData`).
+- `UnauthorizedUploadError` is defined in `src/lib/utils/error-handling.ts` and used by the upload route.
 
 ## Decisions to Preserve
 
 - Prioritize offline-first behavior over classic server form actions.
 - Keep shared schema definitions under `$lib/schemas`.
 - Keep architecture simple and incremental: local-first now, sync layer after local model stabilizes.
+
+## Known Technical Debt
+
+- `setupPowerSync()` in `src/lib/sql/client/db.ts` is not yet idempotent; add a single-connect guard to prevent accidental repeated `connect()` calls.
 
 ## Phase 1 Tickets
 
@@ -145,7 +154,7 @@ Ticket 3 - Implement IndexedDB local adapter
 - Acceptance: jobs persist across refresh while offline.
 
 Ticket 4 - Convert new job submit flow to local-first
-- Update `src/routes/new-job/+page.svelte` to handle submit on client.
+- Update `src/routes/(app)/new-job/+page.svelte` to handle submit on client.
 - Validate with shared Zod schema before local write.
 - Remove dependence on server form actions for core create path.
 - Acceptance: creating a job succeeds with no network.
