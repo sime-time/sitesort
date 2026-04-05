@@ -6,19 +6,41 @@
 
   let {
     name,
-    startDate,
     address,
     completed,
+    startDate,
+    endDate,
     pinned,
     onPin,
   }: {
     name: string;
-    startDate: string;
     address: string;
     completed: boolean;
+    startDate: string;
+    endDate?: string | null;
     pinned?: boolean;
     onPin?: () => void;
   } = $props();
+
+  function openMap(e: Event) {
+    e.stopPropagation();
+
+    const query = encodeURIComponent(address?.trim() ?? "");
+    if (!query) {
+      toast.error("No address found");
+      return;
+    }
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    // Cross-platform URL (opens Google Maps app on many phones if installed)
+    const url = isIOS
+      ? `https://maps.apple.com/?q=${query}`
+      : `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+    // User-gesture click => allowed to open
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
 </script>
 
 <Card.Root
@@ -44,19 +66,17 @@
     {/if}
     <Card.Title>{name}</Card.Title>
     <Card.Description class="flex gap-1 items-center">
-      <Icon icon="material-symbols:date-range-rounded" />
-      <span>Started {startDate}</span>
+      {#if completed && endDate}
+        <Icon icon="material-symbols:calendar-check" />
+        <span>Completed {endDate}</span>
+      {:else}
+        <Icon icon="material-symbols:date-range" />
+        <span>Started {startDate}</span>
+      {/if}
     </Card.Description>
   </Card.Header>
   <Card.Content>
-    <Button
-      variant="ghost"
-      size="xs"
-      onclick={(e) => {
-				e.stopPropagation(); 
-				toast.success("Address Copied");
-			}}
-    >
+    <Button variant="ghost" size="xs" onclick={(e) => openMap(e)}>
       <Icon icon="material-symbols:moved-location" />
       <span>{address}</span>
     </Button>

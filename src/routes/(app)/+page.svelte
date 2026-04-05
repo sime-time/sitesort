@@ -114,8 +114,9 @@
           <JobCard
             name={job.name}
             address={job.address}
-            startDate={job.start_date}
             completed={true}
+            startDate={job.start_date}
+            endDate={job.end_date}
           />
         {/each}
       </div>
