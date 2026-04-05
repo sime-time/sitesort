@@ -8,30 +8,40 @@
     name,
     startDate,
     address,
-    priority,
-  }: { name: string; startDate: string; address: string; priority?: boolean } =
-    $props();
+    completed,
+    pinned,
+    onPin,
+  }: {
+    name: string;
+    startDate: string;
+    address: string;
+    completed: boolean;
+    pinned?: boolean;
+    onPin?: () => void;
+  } = $props();
 </script>
 
 <Card.Root
-  class="border-l-primary border-l-4"
+  class={pinned ? `border-l-primary border-l-3` : ""}
   onclick={() => console.log("Card clicked")}
 >
   <Card.Header class="relative">
-    <Button
-      variant="outline"
-      size="icon-sm"
-      class="absolute right-4 top-0 uppercase text-xs z-10"
-      onclick={(e) => {
-				e.stopPropagation();
-				priority = !priority;
-				console.log("Badge clicked");
-			}}
-      ><Icon
-        icon={priority ? "ph:push-pin-bold" : "ph:push-pin-slash-bold"}
-        class="text-muted-foreground"
-      /></Button
-    >
+    {#if !completed}
+      <Button
+        variant="outline"
+        size="icon-sm"
+        class="absolute right-4 top-0 uppercase text-xs z-10"
+        onclick={(e) => {
+					e.stopPropagation();
+					onPin?.();
+				}}
+      >
+        <Icon
+          icon={pinned ? "ph:push-pin-bold" : "ph:push-pin-slash-bold"}
+          class="text-muted-foreground"
+        />
+      </Button>
+    {/if}
     <Card.Title>{name}</Card.Title>
     <Card.Description class="flex gap-1 items-center">
       <Icon icon="material-symbols:date-range-rounded" />
@@ -51,7 +61,9 @@
       <span>{address}</span>
     </Button>
     <div class="flex justify-end items-center gap-1 text-primary">
-      <p class="uppercase tracking-widest font-medium text-xs">Continue</p>
+      <p class="uppercase tracking-widest font-medium text-xs">
+        {completed ? "Edit" : "Continue"}
+      </p>
       <Icon icon="material-symbols:chevron-right" />
     </div>
   </Card.Content>
