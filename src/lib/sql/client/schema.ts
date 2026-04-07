@@ -1,5 +1,5 @@
 import { DrizzleAppSchema } from "@powersync/drizzle-driver";
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const jobs = sqliteTable("jobs", {
   id: text("id").primaryKey().notNull(),
@@ -10,6 +10,26 @@ export const jobs = sqliteTable("jobs", {
   end_date: text("end_date"),
   created_at: text("created_at").notNull(),
   updated_at: text("updated_at").notNull(),
+});
+
+export const materials = sqliteTable("materials", {
+  id: text("id").primaryKey().notNull(),
+  job_id: text("job_id")
+    .references(() => jobs.id)
+    .notNull(),
+  name: text("name").notNull(),
+  quantity: integer("quantity").default(0).notNull(),
+});
+
+export const tasks = sqliteTable("tasks", {
+  id: text("id").primaryKey().notNull(),
+  job_id: text("job_id")
+    .references(() => jobs.id)
+    .notNull(),
+  description: text("description").notNull(),
+  is_completed: integer("is_completed", { mode: "boolean" })
+    .default(false)
+    .notNull(),
 });
 
 export type InsertJob = typeof jobs.$inferInsert;

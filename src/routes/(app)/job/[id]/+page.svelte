@@ -8,7 +8,7 @@
   import * as Tabs from "$lib/components/ui/tabs/index";
 
   const currentJobName = $derived(
-    page.url.searchParams.get("job-name") ?? "Job",
+    page.url.searchParams.get("job-name") ?? "Job Details",
   );
 </script>
 
@@ -31,11 +31,12 @@
         <Accordion.Root type="multiple">
           <MaterialCategory value="cables" title="Cable & Wire" />
           <MaterialCategory value="conduits" title="Conduits & Fittings" />
+          <MaterialCategory value="misc" title="Misc." />
         </Accordion.Root>
         <Button
           variant="secondary"
           size="xl"
-          class="w-full border-2 border-secondary-foreground border-dashed"
+          class="w-full border-2 border-secondary-foreground border-dashed py-7"
         >
           <Icon icon="material-symbols:add-circle" />
           Add Extra Material

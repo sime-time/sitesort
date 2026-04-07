@@ -12,7 +12,7 @@
     <Card.Title>{name}</Card.Title>
   </Card.Header>
   <Card.Content>
-    <div class="bg-secondary flex flex-row items-center p-1 gap-3">
+    <div class="bg-accent flex flex-row items-center p-1 gap-3">
       <Button size="icon-lg" variant="outline" onclick={() => count--}>
         <Icon icon="ic:sharp-minus" class="size-6 text-primary" />
       </Button>
