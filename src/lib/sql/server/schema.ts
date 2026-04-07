@@ -34,20 +34,34 @@ export const jobs = pgTable(
 
 export const materials = pgTable("materials", {
   id: uuid("id").defaultRandom().primaryKey(),
-  job_id: text("job_id")
+  job_id: uuid("job_id")
     .references(() => jobs.id)
     .notNull(),
   name: text("name").notNull(),
   quantity: integer("quantity").default(0).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date().toISOString()),
 });
 
 export const tasks = pgTable("tasks", {
   id: uuid("id").defaultRandom().primaryKey(),
-  job_id: text("job_id")
+  job_id: uuid("job_id")
     .references(() => jobs.id)
     .notNull(),
   description: text("description").notNull(),
   is_completed: boolean().default(false).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date().toISOString()),
 });
 
 export type InsertJob = typeof jobs.$inferInsert;

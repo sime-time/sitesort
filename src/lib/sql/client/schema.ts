@@ -19,6 +19,8 @@ export const materials = sqliteTable("materials", {
     .notNull(),
   name: text("name").notNull(),
   quantity: integer("quantity").default(0).notNull(),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull(),
 });
 
 export const tasks = sqliteTable("tasks", {
@@ -30,6 +32,8 @@ export const tasks = sqliteTable("tasks", {
   is_completed: integer("is_completed", { mode: "boolean" })
     .default(false)
     .notNull(),
+  created_at: text("created_at").notNull(),
+  updated_at: text("updated_at").notNull(),
 });
 
 export type InsertJob = typeof jobs.$inferInsert;
