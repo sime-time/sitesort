@@ -5,7 +5,7 @@
   import JobCard from "$lib/components/JobCard.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
-  import { listJobsByUser } from "$lib/sql/client/crud/job-list";
+  import { watchUserJobs } from "$lib/sql/client/crud/job-list";
   import type { SelectJob } from "$lib/sql/client/schema";
   import {
     readPinnedJobId,
@@ -43,9 +43,20 @@
     }
   }
 
-  onMount(async () => {
-    jobs = await listJobsByUser(data.user_id);
+  onMount(() => {
     pinnedJobId = readPinnedJobId(data.user_id);
+
+    // live query that updates job list whenever database changes
+    const dispose = watchUserJobs(
+      data.user_id,
+      (nextJobs) => {
+        jobs = nextJobs;
+      },
+      (error) => {
+        console.error("jobs watch failed", error);
+      },
+    );
+    return () => dispose();
   });
 
   // revalidate pinned job when jobs list changes
