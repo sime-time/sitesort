@@ -3,14 +3,10 @@
   import { goto } from "$app/navigation";
   import Button from "./ui/button/button.svelte";
 
-  let { showBack = false }: { showBack?: boolean } = $props();
+  let { showBack = false, title }: { showBack?: boolean; title?: string } =
+    $props();
 
   function goBack() {
-    // If there's a page to go back to, use browser history
-    if (window.history.length > 1) {
-      window.history.back();
-      return;
-    }
     // Fallback if user landed directly on this page
     goto("/");
   }
@@ -28,6 +24,7 @@
           icon="material-symbols:arrow-left-alt"
           class="text-muted-foreground"
         />
+        <h1 class="text-lg font-medium">{title}</h1>
       </button>
 
       <Icon icon="fa7-solid:helmet-safety" class="text-primary" />

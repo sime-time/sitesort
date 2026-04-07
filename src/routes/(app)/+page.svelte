@@ -90,6 +90,7 @@
       >
         {#each activeJobs as job (job.id)}
           <JobCard
+            id={job.id}
             name={job.name}
             address={job.address}
             startDate={job.start_date}
@@ -112,6 +113,7 @@
       <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20">
         {#each completedJobs as job (job.id)}
           <JobCard
+            id={job.id}
             name={job.name}
             address={job.address}
             completed={true}

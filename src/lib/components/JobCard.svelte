@@ -1,10 +1,13 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { toast } from "svelte-sonner";
+  import { goto } from "$app/navigation";
+  import { page } from "$app/state";
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Card from "$lib/components/ui/card/index";
 
   let {
+    id,
     name,
     address,
     completed,
@@ -13,6 +16,7 @@
     pinned,
     onPin,
   }: {
+    id: string;
     name: string;
     address: string;
     completed: boolean;
@@ -21,6 +25,12 @@
     pinned?: boolean;
     onPin?: () => void;
   } = $props();
+
+  function openJob() {
+    const url = new URL(`../job/${id}`, page.url);
+    url.searchParams.set("job-name", name);
+    goto(url, { replaceState: true });
+  }
 
   function openMap(e: Event) {
     e.stopPropagation();
@@ -45,7 +55,7 @@
 
 <Card.Root
   class={pinned ? `border-l-primary border-l-3` : ""}
-  onclick={() => console.log("Card clicked")}
+  onclick={openJob}
 >
   <Card.Header class="relative">
     {#if !completed}
