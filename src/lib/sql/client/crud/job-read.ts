@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db, powerSyncDb } from "$lib/sql/client/db";
 import { jobs, type SelectJob } from "$lib/sql/client/schema";
 
@@ -22,12 +22,12 @@ export function watchUserJobs(
   return dispose;
 }
 
-export async function listUserJobs(userId: string) {
-  const jobList: SelectJob[] = await db
+export async function getUserJob(userId: string, jobId: string) {
+  const job: SelectJob[] = await db
     .select()
     .from(jobs)
-    .where(eq(jobs.user_id, userId))
-    .orderBy(jobs.created_at);
+    .where(and(eq(jobs.user_id, userId), eq(jobs.id, jobId)))
+    .limit(1);
 
-  return jobList || [];
+  return job[0];
 }

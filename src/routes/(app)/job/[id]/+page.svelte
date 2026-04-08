@@ -6,14 +6,48 @@
   import * as Accordion from "$lib/components/ui/accordion/index";
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
+  import { getUserJob } from "$lib/sql/client/crud/job-read";
+  import { listJobMaterials } from "$lib/sql/client/crud/material-read";
+  import type { SelectJob, SelectMaterial } from "$lib/sql/client/schema";
+  import type { PageProps } from "./$types";
 
-  const currentJobName = $derived(
-    page.url.searchParams.get("job-name") ?? "Job Details",
-  );
+  let { data }: PageProps = $props();
+
+  const jobId = $derived(page.params.id);
+
+  let job = $state<SelectJob | null>(null);
+  let materials = $state<SelectMaterial[]>([]);
+  let loading = $state(true);
+  let loadError = $state<string | null>(null);
+
+  async function loadJob(id: string) {
+    loading = true;
+    loadError = null;
+
+    try {
+      const [nextJob, nextMaterials] = await Promise.all([
+        getUserJob(data.user_id, id),
+        listJobMaterials(id),
+      ]);
+
+      job = nextJob ?? null;
+      materials = nextMaterials;
+    } catch (err) {
+      console.error("Failed loading job page data", err);
+      loadError = "Failed to load job";
+    } finally {
+      loading = false;
+    }
+  }
+
+  $effect(() => {
+    if (!jobId) return;
+    void loadJob(jobId);
+  });
 </script>
 
 <div class="h-dvh overflow-hidden flex flex-col">
-  <TopBar title={currentJobName} showBack={true} />
+  <TopBar title={job?.name} showBack={true} />
   <Tabs.Root value="in-progress" class="w-full flex-1 p-3 min-h-0">
     <Tabs.List class="w-full">
       <Tabs.Trigger value="in-progress">

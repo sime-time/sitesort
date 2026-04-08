@@ -10,6 +10,16 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
+const timestamps = () => ({
+  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date().toISOString()),
+});
+
 export const jobs = pgTable(
   "jobs",
   {
@@ -21,31 +31,37 @@ export const jobs = pgTable(
       .notNull()
       .defaultNow(),
     end_date: timestamp("end_date", { withTimezone: true, mode: "string" }),
-    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .notNull()
-      .defaultNow(),
-    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date().toISOString()),
+    ...timestamps(),
   },
   (table) => [index("user_idx").on(table.user_id)],
 );
 
-export const materials = pgTable("materials", {
+export const job_materials = pgTable("job_materials", {
   id: uuid("id").defaultRandom().primaryKey(),
   job_id: uuid("job_id")
     .references(() => jobs.id)
     .notNull(),
-  name: text("name").notNull(),
+  material_id: uuid("material_id")
+    .references(() => materials.id)
+    .notNull(),
   quantity: integer("quantity").default(0).notNull(),
-  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
-    .notNull()
-    .defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date().toISOString()),
+  ...timestamps(),
+});
+
+export const materials = pgTable("materials", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  category_id: uuid("category_id")
+    .references(() => categories.id)
+    .notNull(),
+  name: text("name").notNull(),
+  ...timestamps(),
+});
+
+export const categories = pgTable("categories", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  order: integer("order").notNull(),
+  ...timestamps(),
 });
 
 export const tasks = pgTable("tasks", {
@@ -55,13 +71,7 @@ export const tasks = pgTable("tasks", {
     .notNull(),
   description: text("description").notNull(),
   is_completed: boolean().default(false).notNull(),
-  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
-    .notNull()
-    .defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date().toISOString()),
+  ...timestamps(),
 });
 
 export type InsertJob = typeof jobs.$inferInsert;
