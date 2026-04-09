@@ -11,7 +11,7 @@
     type JobMaterial,
     listJobMaterials,
   } from "$lib/sql/client/crud/material-read";
-  import type { SelectJob, SelectMaterial } from "$lib/sql/client/schema";
+  import type { SelectJob } from "$lib/sql/client/schema";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -77,7 +77,9 @@
     </Tabs.List>
 
     <Tabs.Content value="in-progress" class="flex flex-col min-h-0">
-      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20">
+      <div
+        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
+      >
         <Accordion.Root type="multiple">
           {#each Array.from(materialsByCategory.entries()) as [ category, items ]}
             <MaterialCategory value={category} title={category} {items} />

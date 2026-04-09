@@ -67,7 +67,13 @@ export type SelectJobMaterial = typeof job_materials.$inferSelect;
 export type InsertTask = typeof tasks.$inferInsert;
 export type SelectTask = typeof tasks.$inferSelect;
 
-export const drizzleSchema = { jobs, materials, tasks };
+export const drizzleSchema = {
+  jobs,
+  materials,
+  tasks,
+  job_materials,
+  categories,
+};
 
 // Infer the PowerSync schema from your Drizzle schema
 export const AppSchema = new DrizzleAppSchema(drizzleSchema);

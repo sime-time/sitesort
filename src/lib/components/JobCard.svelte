@@ -27,9 +27,7 @@
   } = $props();
 
   function openJob() {
-    const url = new URL(`../job/${id}`, page.url);
-    url.searchParams.set("job-name", name);
-    goto(url, { replaceState: true });
+    goto(`/job/${id}`);
   }
 
   function openMap(e: Event) {
