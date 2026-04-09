@@ -7,7 +7,10 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
   import { getUserJob } from "$lib/sql/client/crud/job-read";
-  import { listJobMaterials } from "$lib/sql/client/crud/material-read";
+  import {
+    type JobMaterial,
+    listJobMaterials,
+  } from "$lib/sql/client/crud/material-read";
   import type { SelectJob, SelectMaterial } from "$lib/sql/client/schema";
   import type { PageProps } from "./$types";
 
@@ -16,13 +19,27 @@
   const jobId = $derived(page.params.id);
 
   let job = $state<SelectJob | null>(null);
-  let materials = $state<SelectMaterial[]>([]);
+  let materials = $state<JobMaterial[]>([]);
   let loading = $state(true);
-  let loadError = $state<string | null>(null);
 
-  async function loadJob(id: string) {
+  const materialsByCategory = $derived.by(() => {
+    const groups = new Map<string, JobMaterial[]>();
+
+    for (const material of materials) {
+      const list = groups.get(material.category);
+
+      if (list) {
+        list.push(material);
+      } else {
+        groups.set(material.category, [material]);
+      }
+    }
+
+    return groups;
+  });
+
+  async function loadJobDetails(id: string) {
     loading = true;
-    loadError = null;
 
     try {
       const [nextJob, nextMaterials] = await Promise.all([
@@ -34,7 +51,6 @@
       materials = nextMaterials;
     } catch (err) {
       console.error("Failed loading job page data", err);
-      loadError = "Failed to load job";
     } finally {
       loading = false;
     }
@@ -42,7 +58,7 @@
 
   $effect(() => {
     if (!jobId) return;
-    void loadJob(jobId);
+    void loadJobDetails(jobId);
   });
 </script>
 
@@ -63,9 +79,9 @@
     <Tabs.Content value="in-progress" class="flex flex-col min-h-0">
       <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20">
         <Accordion.Root type="multiple">
-          <MaterialCategory value="cables" title="Cable & Wire" />
-          <MaterialCategory value="conduits" title="Conduits & Fittings" />
-          <MaterialCategory value="misc" title="Misc." />
+          {#each Array.from(materialsByCategory.entries()) as [ category, items ]}
+            <MaterialCategory value={category} title={category} {items} />
+          {/each}
         </Accordion.Root>
         <Button
           variant="secondary"

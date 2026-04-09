@@ -3,7 +3,7 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Card from "$lib/components/ui/card/index.js";
 
-  let { name } = $props();
+  let { name, quantity } = $props();
   let count = $state(0);
 </script>
 
