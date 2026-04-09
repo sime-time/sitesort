@@ -70,7 +70,7 @@ export const tasks = pgTable("tasks", {
     .references(() => jobs.id)
     .notNull(),
   description: text("description").notNull(),
-  is_completed: boolean().default(false).notNull(),
+  completed: boolean().default(false).notNull(),
   ...timestamps(),
 });
 

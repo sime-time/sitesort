@@ -3,6 +3,7 @@
   import { page } from "$app/state";
   import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
+  import TaskItem from "$lib/components/task/TaskItem.svelte";
   import * as Accordion from "$lib/components/ui/accordion/index";
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
@@ -11,7 +12,8 @@
     type JobMaterial,
     listJobMaterials,
   } from "$lib/sql/client/crud/material-read";
-  import type { SelectJob } from "$lib/sql/client/schema";
+  import { listJobTasks } from "$lib/sql/client/crud/task-read";
+  import type { SelectJob, SelectTask } from "$lib/sql/client/schema";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -20,6 +22,7 @@
 
   let job = $state<SelectJob | null>(null);
   let materials = $state<JobMaterial[]>([]);
+  let tasks = $state<SelectTask[]>([]);
   let loading = $state(true);
 
   const materialsByCategory = $derived.by(() => {
@@ -42,13 +45,15 @@
     loading = true;
 
     try {
-      const [nextJob, nextMaterials] = await Promise.all([
+      const [nextJob, nextMaterials, nextTasks] = await Promise.all([
         getUserJob(data.user_id, id),
         listJobMaterials(id),
+        listJobTasks(id),
       ]);
 
       job = nextJob ?? null;
       materials = nextMaterials;
+      tasks = nextTasks;
     } catch (err) {
       console.error("Failed loading job page data", err);
     } finally {
@@ -77,7 +82,7 @@
     </Tabs.List>
 
     <Tabs.Content value="in-progress" class="flex flex-col min-h-0">
-      <div
+      <section
         class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
       >
         <Accordion.Root type="multiple">
@@ -88,21 +93,44 @@
         <Button
           variant="secondary"
           size="xl"
-          class="w-full border-2 border-secondary-foreground border-dashed py-7"
+          class="w-full border-2 border-secondary-foreground border-dashed py-7 mt-5"
         >
           <Icon icon="material-symbols:add-circle" />
           Add Extra Material
         </Button>
-      </div>
+      </section>
     </Tabs.Content>
 
     <Tabs.Content value="completed" class="flex flex-col min-h-0">
-      <section class="w-full flex justify-between items-end my-4 shrink-0">
-        <h2 class="font-heading font-medium text-2xl uppercase">Checklist</h2>
+      <section
+        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
+      >
+        {#each tasks as task}
+          <TaskItem
+            completed={task.is_completed}
+            description={task.description}
+          />
+        {/each}
+        <TaskItem completed={true} description="Test all receptacles" />
+        <TaskItem
+          completed={false}
+          description="Test all GFCI's and protected receptacles"
+        />
+        <TaskItem completed={false} description="Test all switches" />
+        <TaskItem completed={false} description="Test smoke detectors" />
+        <TaskItem
+          completed={false}
+          description="Verify all circuits are turned on"
+        />
+        <Button
+          variant="secondary"
+          size="xl"
+          class="w-full border-2 border-secondary-foreground border-dashed py-7 mt-5"
+        >
+          <Icon icon="material-symbols:add-circle" />
+          Add New Task
+        </Button>
       </section>
-      <div
-        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20"
-      ></div>
     </Tabs.Content>
   </Tabs.Root>
 </div>

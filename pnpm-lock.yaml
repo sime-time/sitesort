@@ -67,8 +67,8 @@ importers:
         specifier: ^3.12.0
         version: 3.12.0
       '@lucide/svelte':
-        specifier: ^1.7.0
-        version: 1.7.0(svelte@5.53.12)
+        specifier: ^1.8.0
+        version: 1.8.0(svelte@5.53.12)
       '@sveltejs/adapter-auto':
         specifier: ^7.0.0
         version: 7.0.1(@sveltejs/kit@2.55.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.53.12)(vite@7.3.1(@types/node@22.19.15)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.3)))(svelte@5.53.12)(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.15)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.3)))
@@ -869,8 +869,8 @@ packages:
   '@levischuck/tiny-cbor@0.2.11':
     resolution: {integrity: sha512-llBRm4dT4Z89aRsm6u2oEZ8tfwL/2l6BwpZ7JcyieouniDECM5AqNgr/y08zalEIvW3RSK4upYyybDcmjXqAow==}
 
-  '@lucide/svelte@1.7.0':
-    resolution: {integrity: sha512-YytBKOUBGox7yWcykZnYxOkn5WpR5G1qYXLYXV/j1B79SOTTEKzB+s5yF5Rq9l9OkweDStNH2b4yTqfvhEhV8g==}
+  '@lucide/svelte@1.8.0':
+    resolution: {integrity: sha512-+zYQUKqEOVP5lxbGmxL1OVgGMQtRK91eIJ0bR+3Cr1ts4oQEsQfxyzzd5X47psJlblAuGFrl2xm4YuATjR9oaA==}
     peerDependencies:
       svelte: ^5
 
@@ -4353,7 +4353,7 @@ snapshots:
 
   '@levischuck/tiny-cbor@0.2.11': {}
 
-  '@lucide/svelte@1.7.0(svelte@5.53.12)':
+  '@lucide/svelte@1.8.0(svelte@5.53.12)':
     dependencies:
       svelte: 5.53.12
 
