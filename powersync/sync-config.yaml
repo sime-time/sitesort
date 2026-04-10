@@ -1,0 +1,37 @@
+config:
+  edition: 3
+
+streams:
+  user_jobs:
+    auto_subscribe: true
+    queries:
+      - SELECT jobs.*
+        FROM jobs
+        WHERE jobs.user_id = auth.user_id()
+  user_job_materials:
+    auto_subscribe: true
+    queries:
+      - SELECT job_materials.*
+        FROM job_materials
+        JOIN jobs ON jobs.id = job_materials.job_id
+        WHERE jobs.user_id = auth.user_id()
+  user_materials:
+    auto_subscribe: true
+    queries:
+      - SELECT DISTINCT materials.*
+        FROM materials
+        JOIN job_materials ON job_materials.material_id = materials.id
+        JOIN jobs ON jobs.id = job_materials.job_id
+        WHERE jobs.user_id = auth.user_id()
+  user_tasks:
+    auto_subscribe: true
+    queries:
+      - SELECT tasks.*
+        FROM tasks
+        JOIN jobs ON jobs.id = tasks.job_id
+        WHERE jobs.user_id = auth.user_id()
+  categories:
+    auto_subscribe: true
+    queries:
+      - SELECT categories.*
+        FROM categories

@@ -49,7 +49,7 @@ export const tasks = sqliteTable("tasks", {
     .references(() => jobs.id)
     .notNull(),
   description: text("description").notNull(),
-  is_completed: integer("is_completed", { mode: "boolean" })
+  completed: integer("is_completed", { mode: "boolean" })
     .default(false)
     .notNull(),
   created_at: text("created_at").notNull(),

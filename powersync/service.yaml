@@ -1,0 +1,33 @@
+# PowerSync Cloud config – source-of-truth template with all schema options as valid YAML.
+
+# [required] Service type identifier.
+_type: cloud
+
+# [required] Instance name for display in the PowerSync Cloud dashboard.
+name: Production 
+
+# [required] Deployment region, e.g. us. Cannot be changed after initial deployment.
+region: us
+
+# -------------------------------------------------------------------------
+# Replication (required): database connections for sync
+# Note: only a single connection is currently supported.
+# Connection: `uri` and `password` are required for a complete connection. Alternatively omit `uri`
+# and provide individual fields (hostname, port, database, username, password, etc.); they are used
+# to construct the connection URI. For MongoDB, `uri` is required.
+# -------------------------------------------------------------------------
+replication:
+  connections:
+    - type: postgresql
+      # [optional] Connection string (recommended). Omit and use hostname/port/database/username/password instead.
+      uri: !env DATABASE_URL  
+
+      # [optional] TLS mode. Options: verify-full | verify-ca. Default: verify-full. Use verify-full for production.
+      sslmode: verify-full
+     
+client_auth:
+  supabase: false
+  # [optional] JWKS URL; instance fetches public keys to verify JWT signatures.
+  jwks_uri: !env NEON_AUTH_JWKS_URL
+  # [optional] Additional audiences to accept (instance domain is always accepted). Default: [].
+  additional_audiences: [!env NEON_AUTH_AUDIENCE]

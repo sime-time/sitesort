@@ -106,10 +106,7 @@
         class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
       >
         {#each tasks as task}
-          <TaskItem
-            completed={task.is_completed}
-            description={task.description}
-          />
+          <TaskItem completed={task.completed} description={task.description} />
         {/each}
         <TaskItem completed={true} description="Test all receptacles" />
         <TaskItem
