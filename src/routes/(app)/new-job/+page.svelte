@@ -14,8 +14,11 @@
   import * as Field from "$lib/components/ui/field/index";
   import { Input } from "$lib/components/ui/input/index";
   import * as Popover from "$lib/components/ui/popover/index";
-  import { mapNewJobErrors, newJobSchema } from "$lib/schemas/valid-job";
-  import { createJob } from "$lib/sql/client/crud/job-create";
+  import {
+    createJob,
+    createJobSchema,
+    mapCreateJobErrors,
+  } from "$lib/sql/client/crud/create-job";
   import type { PageProps } from "./$types";
 
   type FormErrors = {
@@ -35,14 +38,15 @@
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const parsed = newJobSchema.safeParse({
+    const parsed = createJobSchema.safeParse({
+      user_id: data.user_id,
       name: jobName,
       start_date: jobDate.toDate(getLocalTimeZone()),
       address: jobAddress,
     });
 
     if (!parsed.success) {
-      errors = mapNewJobErrors(parsed.error);
+      errors = mapCreateJobErrors(parsed.error);
       return;
     }
     errors = {};

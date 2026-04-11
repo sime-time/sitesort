@@ -7,7 +7,7 @@ export async function listJobTasks(jobId: string) {
     .select()
     .from(tasks)
     .where(eq(tasks.job_id, jobId))
-    .orderBy(tasks.created_at);
+    .orderBy(tasks.order);
 
   return taskList || [];
 }

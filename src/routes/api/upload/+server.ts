@@ -1,5 +1,4 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
-import { and, eq } from "drizzle-orm";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
 import { dev } from "$app/environment";
@@ -8,9 +7,14 @@ import {
   NEON_AUTH_ISSUER,
   NEON_AUTH_JWKS_URL,
 } from "$env/static/private";
-import { uploadBodySchema } from "$lib/schemas/valid-job";
+import {
+  type CrudEntryType,
+  type DbTransaction,
+  uploadBodySchema,
+} from "$lib/handlers/entry-schema";
+import { handleJobEntry } from "$lib/handlers/handle-job";
+import { handleTaskEntry } from "$lib/handlers/handle-task";
 import { db } from "$lib/sql/server/db";
-import { type InsertJob, jobInsertSchema, jobs } from "$lib/sql/server/schema";
 import {
   getErrorCode,
   UnauthorizedUploadError,
@@ -78,81 +82,20 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   }
 
-  const { crud } = bodyParsed.data;
+  const { crud }: { crud: CrudEntryType[] } = bodyParsed.data;
   if (crud.length === 0) {
     return json({ ok: true });
   }
 
   // Drizzle upload transaction
   try {
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: DbTransaction) => {
       for (const entry of crud) {
-        switch (entry.op) {
-          case "PUT": {
-            const parsed = jobInsertSchema.parse(entry.data);
-
-            if (parsed.user_id !== auth.user_id) {
-              throw new UnauthorizedUploadError();
-            }
-
-            const row: InsertJob = {
-              id: entry.id,
-              user_id: parsed.user_id,
-              name: parsed.name,
-              address: parsed.address,
-              start_date: parsed.start_date,
-              end_date: parsed.end_date ?? null,
-              created_at: parsed.created_at,
-              updated_at: parsed.updated_at,
-            };
-
-            await tx
-              .insert(jobs)
-              .values(row)
-              .onConflictDoUpdate({
-                target: jobs.id,
-                set: {
-                  user_id: row.user_id,
-                  name: row.name,
-                  address: row.address,
-                  start_date: row.start_date,
-                  end_date: row.end_date,
-                  created_at: row.created_at,
-                  updated_at: row.updated_at,
-                },
-              });
-
-            break;
-          }
-          case "PATCH": {
-            const parsed = jobInsertSchema.parse(entry.data);
-            const patch: Partial<InsertJob> = {
-              ...parsed,
-              updated_at: parsed.updated_at ?? new Date().toISOString(),
-            };
-            const updated = await tx
-              .update(jobs)
-              .set(patch)
-              .where(and(eq(jobs.id, entry.id), eq(jobs.user_id, auth.user_id)))
-              .returning({ id: jobs.id });
-
-            if (updated.length === 0) {
-              throw new UnauthorizedUploadError();
-            }
-            break;
-          }
-          case "DELETE": {
-            const deleted = await tx
-              .delete(jobs)
-              .where(and(eq(jobs.id, entry.id), eq(jobs.user_id, auth.user_id)))
-              .returning({ id: jobs.id });
-
-            if (deleted.length === 0) {
-              throw new UnauthorizedUploadError();
-            }
-            break;
-          }
-
+        switch (entry.type) {
+          case "jobs":
+            return handleJobEntry(tx, entry, auth.user_id);
+          case "tasks":
+            return handleTaskEntry(tx, entry, auth.user_id);
           default:
             break;
         }

@@ -7,12 +7,12 @@
   import * as Accordion from "$lib/components/ui/accordion/index";
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
-  import { getUserJob } from "$lib/sql/client/crud/job-read";
+  import { getUserJob } from "$lib/sql/client/crud/read-job";
   import {
     type JobMaterial,
     listJobMaterials,
-  } from "$lib/sql/client/crud/material-read";
-  import { listJobTasks } from "$lib/sql/client/crud/task-read";
+  } from "$lib/sql/client/crud/read-material";
+  import { listJobTasks } from "$lib/sql/client/crud/read-task";
   import type { SelectJob, SelectTask } from "$lib/sql/client/schema";
   import type { PageProps } from "./$types";
 
@@ -106,19 +106,12 @@
         class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
       >
         {#each tasks as task}
-          <TaskItem completed={task.completed} description={task.description} />
+          <TaskItem
+            id={task.id}
+            completed={task.completed}
+            description={task.description}
+          />
         {/each}
-        <TaskItem completed={true} description="Test all receptacles" />
-        <TaskItem
-          completed={false}
-          description="Test all GFCI's and protected receptacles"
-        />
-        <TaskItem completed={false} description="Test all switches" />
-        <TaskItem completed={false} description="Test smoke detectors" />
-        <TaskItem
-          completed={false}
-          description="Verify all circuits are turned on"
-        />
         <Button
           variant="secondary"
           size="xl"

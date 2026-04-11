@@ -1,0 +1,1 @@
+ALTER TABLE "tasks" RENAME COLUMN "is_completed" TO "completed";

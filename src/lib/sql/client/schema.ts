@@ -48,10 +48,9 @@ export const tasks = sqliteTable("tasks", {
   job_id: text("job_id")
     .references(() => jobs.id)
     .notNull(),
+  order: integer("order"),
   description: text("description").notNull(),
-  completed: integer("is_completed", { mode: "boolean" })
-    .default(false)
-    .notNull(),
+  completed: integer("completed", { mode: "boolean" }).default(false).notNull(),
   created_at: text("created_at").notNull(),
   updated_at: text("updated_at").notNull(),
 });

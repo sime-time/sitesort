@@ -65,11 +65,12 @@ export const categories = pgTable("categories", {
 });
 
 export const tasks = pgTable("tasks", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  job_id: uuid("job_id")
+  id: uuid().defaultRandom().primaryKey(),
+  job_id: uuid()
     .references(() => jobs.id)
     .notNull(),
-  description: text("description").notNull(),
+  order: integer(),
+  description: text().notNull(),
   completed: boolean().default(false).notNull(),
   ...timestamps(),
 });

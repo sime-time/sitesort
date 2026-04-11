@@ -29,6 +29,20 @@
       "when": 1775685787904,
       "tag": "0003_special_slipstream",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1775863129465,
+      "tag": "0004_serious_yellowjacket",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1775863666069,
+      "tag": "0005_cold_cargill",
+      "breakpoints": true
     }
   ]
 }

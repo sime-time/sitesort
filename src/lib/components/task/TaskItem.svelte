@@ -1,11 +1,16 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card/index.js";
-  import Checkbox from "../ui/checkbox/checkbox.svelte";
+  import Checkbox from "$lib/components/ui/checkbox/checkbox.svelte";
 
   const {
+    id,
     description,
     completed,
-  }: { description: string; completed: boolean } = $props();
+  }: {
+    id: string;
+    description: string;
+    completed: boolean;
+  } = $props();
 </script>
 
 <Card.Root class="flex flex-row justify-between items-center">
