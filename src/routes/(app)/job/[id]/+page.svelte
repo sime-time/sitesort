@@ -1,12 +1,6 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { page } from "$app/state";
-  import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
-  import TopBar from "$lib/components/TopBar.svelte";
-  import TaskItem from "$lib/components/task/TaskItem.svelte";
-  import * as Accordion from "$lib/components/ui/accordion/index";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import * as Tabs from "$lib/components/ui/tabs/index";
   import { getUserJob } from "$lib/client/crud/read-job";
   import {
     type JobMaterial,
@@ -14,6 +8,12 @@
   } from "$lib/client/crud/read-material";
   import { listJobTasks } from "$lib/client/crud/read-task";
   import type { SelectJob, SelectTask } from "$lib/client/schema";
+  import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
+  import TopBar from "$lib/components/TopBar.svelte";
+  import TaskItem from "$lib/components/task/TaskItem.svelte";
+  import * as Accordion from "$lib/components/ui/accordion/index";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import * as Tabs from "$lib/components/ui/tabs/index";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();

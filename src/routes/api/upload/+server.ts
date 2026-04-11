@@ -8,13 +8,13 @@ import {
   NEON_AUTH_JWKS_URL,
 } from "$env/static/private";
 import { db } from "$lib/server/db";
+import { handleJobEntry } from "$lib/server/handlers/handle-job";
+import { handleTaskEntry } from "$lib/server/handlers/handle-task";
 import {
   type CrudEntryType,
   type DbTransaction,
   uploadBodySchema,
-} from "$lib/server/handlers/entry-schema";
-import { handleJobEntry } from "$lib/server/handlers/handle-job";
-import { handleTaskEntry } from "$lib/server/handlers/handle-task";
+} from "$lib/server/handlers/upload-schema";
 import {
   getErrorCode,
   UnauthorizedUploadError,

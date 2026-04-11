@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { type InsertJob, jobInsertSchema, jobs } from "$lib/server/schema";
 import { UnauthorizedUploadError } from "$lib/utils/error-handling";
-import type { CrudEntryType, DbTransaction } from "./entry-schema";
+import type { CrudEntryType, DbTransaction } from "./upload-schema";
 
 export async function handleJobEntry(
   tx: DbTransaction,
