@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { db, powerSyncDb } from "$lib/sql/client/db";
-import { jobs, type SelectJob } from "$lib/sql/client/schema";
+import { db, powerSyncDb } from "$lib/client/db";
+import { jobs, type SelectJob } from "$lib/client/schema";
 
 export function watchUserJobs(
   userId: string,

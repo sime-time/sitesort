@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { authClient } from "$lib/sql/client/auth";
+import { authClient } from "$lib/client/auth";
 import type { LayoutLoad } from "./$types";
 
 export const ssr = false;

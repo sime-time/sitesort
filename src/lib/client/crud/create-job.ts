@@ -1,6 +1,6 @@
 import { type ZodError, z } from "zod";
-import { db } from "$lib/sql/client/db";
-import { type InsertJob, jobs } from "$lib/sql/client/schema";
+import { db } from "$lib/client/db";
+import { type InsertJob, jobs } from "$lib/client/schema";
 
 export const createJobSchema = z.object({
   user_id: z.string(),

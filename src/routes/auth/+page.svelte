@@ -7,7 +7,7 @@
   import { toast } from "svelte-sonner";
   import Button from "$lib/components/ui/button/button.svelte";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
-  import { authClient } from "$lib/sql/client/auth";
+  import { authClient } from "$lib/client/auth";
 
   let session = $state<BetterAuthSession | null>(null);
   let user = $state<BetterAuthUser | null>(null);

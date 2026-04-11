@@ -7,13 +7,13 @@
   import * as Accordion from "$lib/components/ui/accordion/index";
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
-  import { getUserJob } from "$lib/sql/client/crud/read-job";
+  import { getUserJob } from "$lib/client/crud/read-job";
   import {
     type JobMaterial,
     listJobMaterials,
-  } from "$lib/sql/client/crud/read-material";
-  import { listJobTasks } from "$lib/sql/client/crud/read-task";
-  import type { SelectJob, SelectTask } from "$lib/sql/client/schema";
+  } from "$lib/client/crud/read-material";
+  import { listJobTasks } from "$lib/client/crud/read-task";
+  import type { SelectJob, SelectTask } from "$lib/client/schema";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();

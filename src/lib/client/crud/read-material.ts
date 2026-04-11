@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "$lib/sql/client/db";
-import { categories, job_materials, materials } from "$lib/sql/client/schema";
+import { db } from "$lib/client/db";
+import { categories, job_materials, materials } from "$lib/client/schema";
 
 export type JobMaterial = {
   id: string;

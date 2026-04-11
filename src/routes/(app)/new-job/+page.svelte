@@ -18,7 +18,7 @@
     createJob,
     createJobSchema,
     mapCreateJobErrors,
-  } from "$lib/sql/client/crud/create-job";
+  } from "$lib/client/crud/create-job";
   import type { PageProps } from "./$types";
 
   type FormErrors = {

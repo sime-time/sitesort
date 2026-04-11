@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "$lib/sql/client/db";
-import { tasks } from "$lib/sql/client/schema";
+import { db } from "$lib/client/db";
+import { tasks } from "$lib/client/schema";
 
 export async function toggleTask(id: string, completed: boolean) {
   const update = await db

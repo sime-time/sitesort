@@ -7,14 +7,14 @@ import {
   NEON_AUTH_ISSUER,
   NEON_AUTH_JWKS_URL,
 } from "$env/static/private";
+import { db } from "$lib/server/db";
 import {
   type CrudEntryType,
   type DbTransaction,
   uploadBodySchema,
-} from "$lib/handlers/entry-schema";
-import { handleJobEntry } from "$lib/handlers/handle-job";
-import { handleTaskEntry } from "$lib/handlers/handle-task";
-import { db } from "$lib/sql/server/db";
+} from "$lib/server/handlers/entry-schema";
+import { handleJobEntry } from "$lib/server/handlers/handle-job";
+import { handleTaskEntry } from "$lib/server/handlers/handle-task";
 import {
   getErrorCode,
   UnauthorizedUploadError,
@@ -99,8 +99,8 @@ export const POST: RequestHandler = async ({ request }) => {
           default:
             break;
         }
-      } // end loop
-    }); // end transaction
+      }
+    });
 
     return json({ ok: true });
   } catch (err) {

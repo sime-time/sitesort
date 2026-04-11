@@ -5,8 +5,8 @@
   import JobCard from "$lib/components/JobCard.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
-  import { watchUserJobs } from "$lib/sql/client/crud/read-job";
-  import type { SelectJob } from "$lib/sql/client/schema";
+  import { watchUserJobs } from "$lib/client/crud/read-job";
+  import type { SelectJob } from "$lib/client/schema";
   import {
     readPinnedJobId,
     writePinnedJobId,
