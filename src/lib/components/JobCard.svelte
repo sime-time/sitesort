@@ -2,7 +2,6 @@
   import Icon from "@iconify/svelte";
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
-  import { page } from "$app/state";
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Card from "$lib/components/ui/card/index";
 
@@ -49,6 +48,29 @@
     // User-gesture click => allowed to open
     window.open(url, "_blank", "noopener,noreferrer");
   }
+
+  function formatDisplayDate(dateString?: string | null) {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return dateString;
+
+    const parts = new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).formatToParts(date);
+
+    const weekday = parts.find((part) => part.type === "weekday")?.value;
+    const month = parts.find((part) => part.type === "month")?.value;
+    const day = parts.find((part) => part.type === "day")?.value;
+    const year = parts.find((part) => part.type === "year")?.value;
+
+    if (!weekday || !month || !day || !year) return dateString;
+
+    return `${weekday}: ${month} ${day}, ${year}`;
+  }
 </script>
 
 <Card.Root
@@ -76,10 +98,10 @@
     <Card.Description class="flex gap-1 items-center">
       {#if completed && endDate}
         <Icon icon="material-symbols:calendar-check" />
-        <span>Completed {endDate}</span>
+        <span>Completed {formatDisplayDate(endDate)}</span>
       {:else}
         <Icon icon="material-symbols:date-range" />
-        <span>Started {startDate}</span>
+        <span>Started {formatDisplayDate(startDate)}</span>
       {/if}
     </Card.Description>
   </Card.Header>

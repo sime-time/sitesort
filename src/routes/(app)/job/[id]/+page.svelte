@@ -8,6 +8,7 @@
   } from "$lib/client/crud/read-material";
   import { listJobTasks } from "$lib/client/crud/read-task";
   import type { SelectJob, SelectTask } from "$lib/client/schema";
+  import BottomButton from "$lib/components/BottomButton.svelte";
   import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import TaskItem from "$lib/components/task/TaskItem.svelte";
@@ -90,15 +91,12 @@
             <MaterialCategory value={category} title={category} {items} />
           {/each}
         </Accordion.Root>
-        <Button
-          variant="secondary"
-          size="xl"
-          class="w-full border-2 border-secondary-foreground border-dashed py-7 mt-5"
-        >
-          <Icon icon="material-symbols:add-circle" />
-          Add Extra Material
-        </Button>
       </section>
+      <BottomButton
+        label="Add Extra Material"
+        icon="material-symbols:add-circle"
+        dotted={true}
+      />
     </Tabs.Content>
 
     <Tabs.Content value="completed" class="flex flex-col min-h-0">
@@ -112,15 +110,12 @@
             description={task.description}
           />
         {/each}
-        <Button
-          variant="secondary"
-          size="xl"
-          class="w-full border-2 border-secondary-foreground border-dashed py-7 mt-5"
-        >
-          <Icon icon="material-symbols:add-circle" />
-          Add New Task
-        </Button>
       </section>
+      <BottomButton
+        label="Add New Task"
+        icon="material-symbols:add-circle"
+        dotted={true}
+      />
     </Tabs.Content>
   </Tabs.Root>
 </div>

@@ -1,12 +1,12 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { onMount, tick } from "svelte";
+  import { watchUserJobs } from "$lib/client/crud/read-job";
+  import type { SelectJob } from "$lib/client/schema";
   import BottomButton from "$lib/components/BottomButton.svelte";
   import JobCard from "$lib/components/JobCard.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index";
-  import { watchUserJobs } from "$lib/client/crud/read-job";
-  import type { SelectJob } from "$lib/client/schema";
   import {
     readPinnedJobId,
     writePinnedJobId,
@@ -97,7 +97,7 @@
       </section>
       <div
         bind:this={activeJobsListEl}
-        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20"
+        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
       >
         {#each activeJobs as job (job.id)}
           <JobCard
@@ -121,7 +121,9 @@
         <p class="font-semibold text-primary">{completedJobs.length} TOTAL</p>
       </section>
 
-      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20">
+      <div
+        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
+      >
         {#each completedJobs as job (job.id)}
           <JobCard
             id={job.id}

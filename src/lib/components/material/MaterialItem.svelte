@@ -29,7 +29,9 @@
 </script>
 
 <Card.Root class="flex flex-row justify-between items-center">
-  <Card.Header class="grow"> <Card.Title>{name}</Card.Title> </Card.Header>
+  <Card.Header class="grow">
+    <Card.Title class="text-base">{name}</Card.Title>
+  </Card.Header>
   <Card.Content>
     <div class="bg-accent flex flex-row items-center p-1 gap-3">
       <Button

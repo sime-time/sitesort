@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request }) => {
           case "jobs":
             return handleJobEntry(tx, entry, auth.user_id);
           case "tasks":
-            return handleTaskEntry(tx, entry, auth.user_id);
+            return handleTaskEntry(tx, entry);
           default:
             break;
         }
