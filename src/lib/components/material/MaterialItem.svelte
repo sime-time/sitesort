@@ -50,7 +50,7 @@
           onkeydown={blockInvalidKeys}
           step="1"
           min="0"
-          class="font-heading text-xl font-semibold w-14 text-center no-spinner"
+          class="font-heading text-xl font-semibold w-13 text-center no-spinner"
         >
       </div>
       <Button
