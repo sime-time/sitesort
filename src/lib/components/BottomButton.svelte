@@ -15,7 +15,7 @@
 </script>
 
 <section
-  class="fixed bg-card inset-x-0 bottom-0 z-50 flex justify-center p-3 pb-[calc(1rem+env(safe-area-inset-bottom))]"
+  class="fixed bg-white inset-x-0 bottom-0 z-50 flex justify-center p-3 pb-[calc(1rem+env(safe-area-inset-bottom))]"
 >
   <div class="w-full max-w-120">
     <button

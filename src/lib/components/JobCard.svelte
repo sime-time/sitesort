@@ -83,7 +83,7 @@
     }
   }}
 >
-  <div class="card-body relative">
+  <div class="card-body relative p-4">
     {#if !completed}
       <button
         type="button"
@@ -114,7 +114,7 @@
 
     <button
       type="button"
-      class="btn btn-ghost btn-sm w-fit"
+      class="btn btn-soft btn-info btn-xs w-fit"
       onclick={(e) => openMap(e)}
     >
       <Icon icon="material-symbols:moved-location" class="size-4" />
