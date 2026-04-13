@@ -2,7 +2,7 @@
   import favicon from "$lib/assets/favicon.svg";
   import "@fontsource-variable/space-grotesk/wght.css";
   import "@fontsource-variable/work-sans/wght.css";
-  import { Toaster } from "$lib/components/ui/sonner";
+  import { Toaster } from "$lib/components/sonner";
 
   import "../app.css";
 

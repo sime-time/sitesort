@@ -1,24 +1,26 @@
 <script lang="ts">
-  import * as Accordion from "$lib/components/ui/accordion/index";
-  import type { JobMaterial } from "$lib/sql/client/crud/material-read";
+  import type { JobMaterial } from "$lib/client/crud/read-material";
   import MaterialItem from "./MaterialItem.svelte";
 
   let {
-    value,
     title,
     items,
   }: {
-    value: string;
     title: string;
     items: JobMaterial[];
   } = $props();
 </script>
 
-<Accordion.Item {value}>
-  <Accordion.Trigger>{title}</Accordion.Trigger>
-  <Accordion.Content>
+<div class="collapse collapse-arrow bg-base-100 border-b border-base-300">
+  <input type="checkbox" name="material-accordion" checked={false}>
+  <div
+    class="collapse-title font-semibold font-heading uppercase tracking-wider text-lg"
+  >
+    {title}
+  </div>
+  <div class="collapse-content flex flex-col gap-1">
     {#each items as item}
       <MaterialItem name={item.name} quantity={item.quantity} />
     {/each}
-  </Accordion.Content>
-</Accordion.Item>
+  </div>
+</div>

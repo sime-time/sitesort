@@ -1,7 +1,4 @@
 <script lang="ts">
-  import * as Card from "$lib/components/ui/card/index.js";
-  import Checkbox from "$lib/components/ui/checkbox/checkbox.svelte";
-
   const {
     id,
     description,
@@ -13,11 +10,13 @@
   } = $props();
 </script>
 
-<Card.Root class="flex flex-row justify-between items-center">
-  <Card.Header>
-    <Checkbox id="task" size="xl" checked={completed} />
-  </Card.Header>
-  <Card.Content class="grow">
-    <Card.Title class="text-base">{description}</Card.Title>
-  </Card.Content>
-</Card.Root>
+<div class="bg-white border-b border-accent p-4">
+  <label class="w-full flex items-center gap-3">
+    <input
+      type="checkbox"
+      checked={completed}
+      class="checkbox checkbox-xl checkbox-primary border border-primary size-10"
+    >
+    <span class="font-medium text-base">{description}</span>
+  </label>
+</div>

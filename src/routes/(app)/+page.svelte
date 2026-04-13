@@ -1,12 +1,12 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { onMount, tick } from "svelte";
+  import { goto } from "$app/navigation";
   import { watchUserJobs } from "$lib/client/crud/read-job";
   import type { SelectJob } from "$lib/client/schema";
   import BottomButton from "$lib/components/BottomButton.svelte";
   import JobCard from "$lib/components/JobCard.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
-  import * as Tabs from "$lib/components/ui/tabs/index";
   import {
     readPinnedJobId,
     writePinnedJobId,
@@ -17,6 +17,7 @@
   let jobs = $state<SelectJob[]>([]);
   let pinnedJobId = $state<string | null>(null);
   let activeJobsListEl = $state<HTMLDivElement | null>(null);
+  let activeTab = $state<"in-progress" | "completed">("in-progress");
 
   const completedJobs = $derived(jobs.filter((job) => job.end_date !== null));
   const activeJobs = $derived.by(() => {
@@ -78,69 +79,96 @@
 <div class="h-dvh overflow-hidden flex flex-col">
   <TopBar />
 
-  <Tabs.Root value="in-progress" class="w-full flex-1 p-3 min-h-0">
-    <Tabs.List class="w-full">
-      <Tabs.Trigger value="in-progress">
-        <Icon icon="material-symbols:pending" />
+  <div class="flex-1 min-h-0 p-3 flex flex-col">
+    <!-- Tabs Header -->
+    <div
+      role="tablist"
+      class="tabs tabs-box tabs-sm w-full shrink-0 font-medium text-base"
+    >
+      <button
+        role="tab"
+        type="button"
+        class={`tab flex-1 gap-1.5 ${
+				activeTab === "in-progress"
+					? "tab-active text-primary"
+					: "text-base-content/60"
+				}`}
+        onclick={() => (activeTab = "in-progress")}
+      >
+        <Icon icon="material-symbols:pending" class="text-base" />
         <span>In Progress</span>
-      </Tabs.Trigger>
-      <Tabs.Trigger value="completed">
-        <Icon icon="material-symbols:check-circle" />
+      </button>
+
+      <button
+        role="tab"
+        type="button"
+        class={`tab flex-1 gap-1.5 ${
+				activeTab === "completed"
+					? "tab-active text-primary"
+					: "text-base-content/60"
+				}`}
+        onclick={() => (activeTab = "completed")}
+      >
+        <Icon icon="material-symbols:check-circle" class="text-base" />
         <span>Completed</span>
-      </Tabs.Trigger>
-    </Tabs.List>
+      </button>
+    </div>
 
-    <Tabs.Content value="in-progress" class="flex flex-col min-h-0">
-      <section class="w-full flex justify-between items-end my-4 shrink-0">
-        <h2 class="font-heading font-medium text-2xl uppercase">Active Jobs</h2>
-        <p class="font-semibold text-primary">{activeJobs.length} TOTAL</p>
-      </section>
-      <div
-        bind:this={activeJobsListEl}
-        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
-      >
-        {#each activeJobs as job (job.id)}
-          <JobCard
-            id={job.id}
-            name={job.name}
-            address={job.address}
-            startDate={job.start_date}
-            completed={false}
-            pinned={job.id === pinnedJobId}
-            onPin={() => pinJob(job.id)}
-          />
-        {/each}
-      </div>
-    </Tabs.Content>
+    <!-- Tab Content -->
+    <div class="tab-content flex flex-col min-h-0 bg-base-100">
+      {#if activeTab === "in-progress"}
+        <section class="w-full flex justify-between items-end my-4 shrink-0">
+          <h2 class="font-heading font-medium text-2xl uppercase">
+            Active Jobs
+          </h2>
+          <p class="font-semibold text-primary">{activeJobs.length} TOTAL</p>
+        </section>
 
-    <Tabs.Content value="completed" class="flex flex-col min-h-0">
-      <section class="w-full flex justify-between items-end my-4 shrink-0">
-        <h2 class="font-heading font-medium text-2xl uppercase">
-          Completed Jobs
-        </h2>
-        <p class="font-semibold text-primary">{completedJobs.length} TOTAL</p>
-      </section>
+        <div
+          bind:this={activeJobsListEl}
+          class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
+        >
+          {#each activeJobs as job (job.id)}
+            <JobCard
+              id={job.id}
+              name={job.name}
+              address={job.address}
+              startDate={job.start_date}
+              completed={false}
+              pinned={job.id === pinnedJobId}
+              onPin={() => pinJob(job.id)}
+            />
+          {/each}
+        </div>
+      {:else}
+        <section class="w-full flex justify-between items-end my-4 shrink-0">
+          <h2 class="font-heading font-medium text-2xl uppercase">
+            Completed Jobs
+          </h2>
+          <p class="font-semibold text-primary">{completedJobs.length} TOTAL</p>
+        </section>
 
-      <div
-        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
-      >
-        {#each completedJobs as job (job.id)}
-          <JobCard
-            id={job.id}
-            name={job.name}
-            address={job.address}
-            completed={true}
-            startDate={job.start_date}
-            endDate={job.end_date}
-          />
-        {/each}
-      </div>
-    </Tabs.Content>
+        <div
+          class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
+        >
+          {#each completedJobs as job (job.id)}
+            <JobCard
+              id={job.id}
+              name={job.name}
+              address={job.address}
+              completed={true}
+              startDate={job.start_date}
+              endDate={job.end_date}
+            />
+          {/each}
+        </div>
+      {/if}
+    </div>
+  </div>
 
-    <BottomButton
-      label="Create New Job"
-      icon="material-symbols:add-rounded"
-      href="/new-job"
-    />
-  </Tabs.Root>
+  <BottomButton
+    label="Create New Job"
+    icon="material-symbols:add-rounded"
+    onclick={() => goto("/new-job")}
+  />
 </div>

@@ -12,9 +12,6 @@
   import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import TaskItem from "$lib/components/task/TaskItem.svelte";
-  import * as Accordion from "$lib/components/ui/accordion/index";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import * as Tabs from "$lib/components/ui/tabs/index";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -25,6 +22,7 @@
   let materials = $state<JobMaterial[]>([]);
   let tasks = $state<SelectTask[]>([]);
   let loading = $state(true);
+  let activeTab = $state<"materials" | "checklist">("materials");
 
   const materialsByCategory = $derived.by(() => {
     const groups = new Map<string, JobMaterial[]>();
@@ -70,52 +68,66 @@
 
 <div class="h-dvh overflow-hidden flex flex-col">
   <TopBar title={job?.name} showBack={true} />
-  <Tabs.Root value="in-progress" class="w-full flex-1 p-3 min-h-0">
-    <Tabs.List class="w-full">
-      <Tabs.Trigger value="in-progress">
-        <Icon icon="material-symbols:service-toolbox" />
+
+  <div class="min-h-0 p-3 flex flex-col flex-1 ">
+    <!-- Tabs Header -->
+    <div
+      role="tablist"
+      class="tabs tabs-box tabs-sm w-full shrink-0 font-medium text-base"
+    >
+      <button
+        role="tab"
+        type="button"
+        class={`tab flex-1 gap-1.5 ${
+				activeTab === "materials"
+					? "tab-active text-primary"
+					: "text-base-content/60"
+				}`}
+        onclick={() => (activeTab = "materials")}
+      >
+        <Icon icon="material-symbols:service-toolbox" class="text-base" />
         <span>Materials</span>
-      </Tabs.Trigger>
-      <Tabs.Trigger value="completed">
-        <Icon icon="material-symbols:checklist" />
+      </button>
+
+      <button
+        role="tab"
+        type="button"
+        class={`tab flex-1 gap-1.5 ${
+				activeTab === "checklist"
+					? "tab-active text-primary"
+					: "text-base-content/60"
+				}`}
+        onclick={() => (activeTab = "checklist")}
+      >
+        <Icon icon="material-symbols:checklist" class="text-base" />
         <span>Checklist</span>
-      </Tabs.Trigger>
-    </Tabs.List>
+      </button>
+    </div>
 
-    <Tabs.Content value="in-progress" class="flex flex-col min-h-0">
+    <!-- Tab Content -->
+    <div class="tab-content flex flex-col min-h-0 bg-base-100">
       <section
         class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
       >
-        <Accordion.Root type="multiple">
+        {#if activeTab === "materials"}
           {#each Array.from(materialsByCategory.entries()) as [ category, items ]}
-            <MaterialCategory value={category} title={category} {items} />
+            <MaterialCategory title={category} {items} />
           {/each}
-        </Accordion.Root>
+        {:else}
+          {#each tasks as task}
+            <TaskItem
+              id={task.id}
+              completed={task.completed}
+              description={task.description}
+            />
+          {/each}
+        {/if}
       </section>
-      <BottomButton
-        label="Add Extra Material"
-        icon="material-symbols:add-circle"
-        dotted={true}
-      />
-    </Tabs.Content>
 
-    <Tabs.Content value="completed" class="flex flex-col min-h-0">
-      <section
-        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
-      >
-        {#each tasks as task}
-          <TaskItem
-            id={task.id}
-            completed={task.completed}
-            description={task.description}
-          />
-        {/each}
-      </section>
       <BottomButton
-        label="Add New Task"
+        label={activeTab === "materials" ? "Add Extra Material" : "Add New Task"}
         icon="material-symbols:add-circle"
-        dotted={true}
       />
-    </Tabs.Content>
-  </Tabs.Root>
+    </div>
+  </div>
 </div>

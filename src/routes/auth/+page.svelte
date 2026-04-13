@@ -5,8 +5,7 @@
     BetterAuthUser,
   } from "@neondatabase/neon-js/auth/types";
   import { toast } from "svelte-sonner";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import Spinner from "$lib/components/ui/spinner/spinner.svelte";
+  import { goto } from "$app/navigation";
   import { authClient } from "$lib/client/auth";
 
   let session = $state<BetterAuthSession | null>(null);
@@ -46,8 +45,8 @@
 
 <div class="w-full h-100 flex items-center justify-center gap-1">
   {#if loading}
-    <Spinner />
-    <span>Loading...</span>
+    <span class="loading loading-spinner loading-sm"></span>
+    <span class="ml-2">Loading...</span>
   {:else if session && user}
     <div>
       <h1
@@ -57,17 +56,21 @@
         <span class="text-primary">{user.email}</span>
       </h1>
       <div class="flex justify-between">
-        <Button type="button" href="/" size="lg" variant="secondary"
-          >Go to App</Button
-        >
-        <Button
+        <button
           type="button"
-          variant="destructiveSoft"
-          size="lg"
+          onclick={() => goto("/")}
+          class="btn btn-lg btn-secondary font-heading font-medium uppercase tracking-wider"
+        >
+          Go to App
+        </button>
+
+        <button
+          type="button"
           onclick={handleSignOut}
+          class="btn btn-lg btn-error btn-soft font-heading font-medium uppercase tracking-wider"
         >
           Sign Out
-        </Button>
+        </button>
       </div>
     </div>
   {:else}
@@ -75,15 +78,13 @@
       <h1 class="text-2xl font-bold text-center mb-4 font-heading">
         Welcome to SiteSort
       </h1>
-      <Button
+      <button
         type="submit"
-        variant="secondary"
-        class="font-sans tracking-normal normal-case"
-        size="xl"
+        class="btn btn-lg btn-secondary font-sans font-medium normal-case tracking-normal"
       >
         <Icon icon="ri:google-fill" />
         Continue with Google
-      </Button>
+      </button>
     </form>
   {/if}
 </div>

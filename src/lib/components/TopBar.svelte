@@ -1,7 +1,6 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
-  import Button from "./ui/button/button.svelte";
 
   let { showBack = false, title }: { showBack?: boolean; title?: string } =
     $props();
@@ -16,7 +15,7 @@
   }
 </script>
 
-<header class="border-b p-6 h-18">
+<header class="p-6 h-18 border-b border-b-accent">
   {#if showBack}
     <div class="flex items-center justify-between text-2xl">
       <button type="button" class="flex items-center gap-3" onclick={goBack}>
@@ -37,15 +36,14 @@
           SiteSort
         </h1>
       </div>
-      <Button
-        variant="destructiveSoft"
-        size="xs"
-        class="font-sans tracking-normal"
+      <button
+        type="button"
+        class="font-sans tracking-normal btn btn-soft btn-error btn-xs uppercase"
         onclick={signOut}
       >
-        <Icon icon="material-symbols:logout-sharp" />
+        <Icon icon="material-symbols:logout-sharp" class="size-4" />
         Sign Out
-      </Button>
+      </button>
     </div>
   {/if}
 </header>

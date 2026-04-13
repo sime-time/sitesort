@@ -2,8 +2,6 @@
   import Icon from "@iconify/svelte";
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import * as Card from "$lib/components/ui/card/index";
 
   let {
     id,
@@ -73,16 +71,23 @@
   }
 </script>
 
-<Card.Root
-  class={pinned ? `border-l-primary border-l-3` : ""}
+<div
+  role="button"
+  tabindex="0"
+  class={`card bg-white border-b border-b-accent ${pinned ? `border-l-primary border-l-3` : ""}`}
   onclick={openJob}
+  onkeydown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openJob();
+    }
+  }}
 >
-  <Card.Header class="relative">
+  <div class="card-body relative">
     {#if !completed}
-      <Button
-        variant="outline"
-        size="icon-sm"
-        class="absolute right-4 top-0 uppercase text-xs z-10"
+      <button
+        type="button"
+        class="btn btn-soft btn-secondary btn-square btn-sm absolute right-4 top-4 z-10"
         onclick={(e) => {
 					e.stopPropagation();
 					onPin?.();
@@ -90,12 +95,14 @@
       >
         <Icon
           icon={pinned ? "ph:push-pin-bold" : "ph:push-pin-slash-bold"}
-          class="text-muted-foreground"
+          class="size-4 text-accent-content"
         />
-      </Button>
+      </button>
     {/if}
-    <Card.Title>{name}</Card.Title>
-    <Card.Description class="flex gap-1 items-center">
+
+    <h3 class="card-title font-medium text-lg">{name}</h3>
+
+    <div class="flex gap-1 items-center">
       {#if completed && endDate}
         <Icon icon="material-symbols:calendar-check" />
         <span>Completed {formatDisplayDate(endDate)}</span>
@@ -103,18 +110,22 @@
         <Icon icon="material-symbols:date-range" />
         <span>Started {formatDisplayDate(startDate)}</span>
       {/if}
-    </Card.Description>
-  </Card.Header>
-  <Card.Content>
-    <Button variant="ghost" size="xs" onclick={(e) => openMap(e)}>
-      <Icon icon="material-symbols:moved-location" />
-      <span>{address}</span>
-    </Button>
-    <div class="flex justify-end items-center gap-1 text-primary">
-      <p class="uppercase tracking-widest font-medium text-xs">
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-ghost btn-sm w-fit"
+      onclick={(e) => openMap(e)}
+    >
+      <Icon icon="material-symbols:moved-location" class="size-4" />
+      <span class="font-heading uppercase tracking-widest">{address}</span>
+    </button>
+
+    <div class="card-actions flex justify-end items-center gap-1 text-primary">
+      <span class="uppercase tracking-widest font-medium text-xs">
         {completed ? "Edit" : "Continue"}
-      </p>
+      </span>
       <Icon icon="material-symbols:chevron-right" />
     </div>
-  </Card.Content>
-</Card.Root>
+  </div>
+</div>
