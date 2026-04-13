@@ -127,6 +127,7 @@
       <BottomButton
         label={activeTab === "materials" ? "Add Extra Material" : "Add New Task"}
         icon="material-symbols:add-circle"
+        extra={true}
       />
     </div>
   </div>
