@@ -107,7 +107,7 @@
     <!-- Tab Content -->
     <div class="tab-content flex flex-col min-h-0 bg-base-100">
       <section
-        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
+        class="flex-1 min-h-0 overflow-y-auto overscroll-contain pt-3 pb-20 no-scrollbar"
       >
         {#if activeTab === "materials"}
           {#each Array.from(materialsByCategory.entries()) as [ category, items ]}
