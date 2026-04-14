@@ -9,7 +9,6 @@
   const pathname = $derived(page.url.pathname);
   const jobId = $derived(page.params.id);
   const isJobDetail = $derived(pathname.startsWith("/job/") && !!jobId);
-  const showBack = $derived(isJobDetail);
 
   const title = $derived(isJobDetail ? jobTitle || "Loading..." : "");
 
@@ -34,10 +33,14 @@
   function signOut() {
     goto("/auth");
   }
+
+  function editJob() {
+    goto(`/job/edit/${jobId}`);
+  }
 </script>
 
 <header class="p-6 h-18 border-b border-b-accent">
-  {#if showBack}
+  {#if isJobDetail}
     <div class="flex items-center justify-between text-2xl">
       <button type="button" class="flex items-center gap-3" onclick={goBack}>
         <Icon
@@ -47,7 +50,13 @@
         <h1 class="text-lg font-medium">{title}</h1>
       </button>
 
-      <Icon icon="fa7-solid:helmet-safety" class="text-primary" />
+      <button
+        type="button"
+        class="btn btn-sm btn-circle btn-ghost"
+        onclick={editJob}
+      >
+        <Icon icon="material-symbols:settings" class="size-6" />
+      </button>
     </div>
   {:else}
     <div class="flex justify-between text-primary text-2xl">

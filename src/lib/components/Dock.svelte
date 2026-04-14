@@ -7,7 +7,7 @@
   const active = $derived.by(() => {
     if (pathname.startsWith("/time")) {
       return "time";
-    } else if (pathname.startsWith("/create-job")) {
+    } else if (pathname.startsWith("/job/create")) {
       return "create";
     } else {
       return "jobs";
@@ -37,7 +37,7 @@
   <button
     type="button"
     class={active === "create" ? "dock-active" : ""}
-    onclick={() => goto("/create-job")}
+    onclick={() => goto("/job/create")}
   >
     <Icon icon="material-symbols:add-box-outline" />
     <span class="dock-label">Create</span>
