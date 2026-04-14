@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Icon from "@iconify/svelte";
   import {
     blockInvalidKeys,
     clampMin,
@@ -18,6 +17,36 @@
   }
 </script>
 
+{#snippet MinusIcon()}
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    class="size-6 text-primary"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M5 12h14" />
+  </svg>
+{/snippet}
+
+{#snippet PlusIcon()}
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    class="size-6 text-primary"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+{/snippet}
+
 <div class="card flex flex-row justify-between items-center">
   <div class="card-title grow font-normal text-base">{name}</div>
   <div class="bg-accent flex flex-row items-center p-1 gap-3 rounded-sm">
@@ -26,7 +55,7 @@
       class="btn btn-square btn-lg bg-base-100 border"
       onclick={() => count = clampMin(count - 1)}
     >
-      <Icon icon="ic:sharp-minus" class="size-6 text-primary" />
+      {@render MinusIcon()}
     </button>
 
     <div class="size-9 flex items-center justify-center">
@@ -47,7 +76,7 @@
       class="btn btn-square btn-lg bg-base-100 border"
       onclick={() => count = clampMin(count + 1)}
     >
-      <Icon icon="ic:sharp-plus" class="size-6 text-primary" />
+      {@render PlusIcon()}
     </button>
   </div>
 </div>

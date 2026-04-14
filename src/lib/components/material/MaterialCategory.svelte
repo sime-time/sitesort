@@ -19,7 +19,7 @@
     {title}
   </div>
   <div class="collapse-content flex flex-col gap-1">
-    {#each items as item}
+    {#each items as item (item.id)}
       <MaterialItem name={item.name} quantity={item.quantity} />
     {/each}
   </div>

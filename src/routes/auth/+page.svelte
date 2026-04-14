@@ -13,14 +13,33 @@
   let loading = $state(true);
 
   $effect(() => {
-    authClient.getSession().then(({ data }) => {
-      console.log(data);
-      if (data?.session) {
-        user = data.user;
-        session = data.session;
-      }
-      loading = false;
-    });
+    let alive = true;
+
+    authClient
+      .getSession()
+      .then(({ data }) => {
+        if (!alive) return;
+
+        if (data?.session) {
+          user = data.user;
+          session = data.session;
+        }
+        loading = false;
+      })
+      .catch((error) => {
+        console.error("Session check failed:", error);
+        if (!alive) return;
+        user = null;
+        session = null;
+      })
+      .finally(() => {
+        if (!alive) return;
+        loading = false;
+      });
+
+    return () => {
+      alive = false;
+    };
   });
 
   async function handleGoogleSignIn(e: SubmitEvent) {
