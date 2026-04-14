@@ -8,7 +8,6 @@
   } from "$lib/client/crud/read-material";
   import { listJobTasks } from "$lib/client/crud/read-task";
   import type { SelectJob, SelectTask } from "$lib/client/schema";
-  import BottomButton from "$lib/components/BottomButton.svelte";
   import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import TaskItem from "$lib/components/task/TaskItem.svelte";
@@ -122,13 +121,17 @@
             />
           {/each}
         {/if}
-      </section>
 
-      <BottomButton
-        label={activeTab === "materials" ? "Add Extra Material" : "Add New Task"}
-        icon="material-symbols:add-circle"
-        extra={true}
-      />
+        <button
+          type="button"
+          class="mt-6 w-full uppercase font-heading tracking-widest btn btn-xl btn-neutral btn-soft border-2 border-neutral border-dashed"
+        >
+          <Icon icon="material-symbols:add-circle-outline" />
+          <span class="text-base">
+            {activeTab === "materials" ? "New Material" : "New Task"}
+          </span>
+        </button>
+      </section>
     </div>
   </div>
 </div>

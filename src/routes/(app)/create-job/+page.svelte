@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from "@iconify/svelte";
   import {
     type CalendarDate,
     getLocalTimeZone,
@@ -11,7 +12,6 @@
     createJobSchema,
     mapCreateJobErrors,
   } from "$lib/client/crud/create-job";
-  import BottomButton from "$lib/components/BottomButton.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import type { PageProps } from "./$types";
 
@@ -127,5 +127,11 @@
     <p class="label text-error">{errors.address}</p>
   </fieldset>
 
-  <BottomButton label="Create Job" icon="material-symbols:save" type="submit" />
+  <button
+    type="submit"
+    class="btn-primary w-full btn btn-xl uppercase font-heading tracking-widest"
+  >
+    <Icon icon="material-symbols:add-box-outline" />
+    <span class="text-base">Create Job</span>
+  </button>
 </form>

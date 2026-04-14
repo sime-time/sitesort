@@ -10,8 +10,6 @@
     completed,
     startDate,
     endDate,
-    pinned,
-    onPin,
   }: {
     id: string;
     name: string;
@@ -19,8 +17,6 @@
     completed: boolean;
     startDate: string;
     endDate?: string | null;
-    pinned?: boolean;
-    onPin?: () => void;
   } = $props();
 
   function openJob() {
@@ -74,7 +70,7 @@
 <div
   role="button"
   tabindex="0"
-  class={`card bg-white border-b border-b-accent ${pinned ? `border-l-primary border-l-3` : ""}`}
+  class="card bg-white border-b border-b-accent"
   onclick={openJob}
   onkeydown={(e) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -84,22 +80,6 @@
   }}
 >
   <div class="card-body relative p-4">
-    {#if !completed}
-      <button
-        type="button"
-        class="btn btn-soft btn-secondary btn-square btn-sm absolute right-4 top-4 z-10"
-        onclick={(e) => {
-					e.stopPropagation();
-					onPin?.();
-				}}
-      >
-        <Icon
-          icon={pinned ? "ph:push-pin-bold" : "ph:push-pin-slash-bold"}
-          class="size-4 text-accent-content"
-        />
-      </button>
-    {/if}
-
     <h3 class="card-title font-medium text-lg">{name}</h3>
 
     <div class="flex gap-1 items-center">

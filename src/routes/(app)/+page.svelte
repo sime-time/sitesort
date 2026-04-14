@@ -1,52 +1,21 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import { onMount, tick } from "svelte";
-  import { goto } from "$app/navigation";
+  import { onMount } from "svelte";
   import { watchUserJobs } from "$lib/client/crud/read-job";
   import type { SelectJob } from "$lib/client/schema";
-  import BottomButton from "$lib/components/BottomButton.svelte";
   import JobCard from "$lib/components/JobCard.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
-  import {
-    readPinnedJobId,
-    writePinnedJobId,
-  } from "$lib/utils/pinned-job.svelte";
 
   let { data } = $props();
 
   let jobs = $state<SelectJob[]>([]);
-  let pinnedJobId = $state<string | null>(null);
   let activeJobsListEl = $state<HTMLDivElement | null>(null);
   let activeTab = $state<"in-progress" | "completed">("in-progress");
 
   const completedJobs = $derived(jobs.filter((job) => job.end_date !== null));
-  const activeJobs = $derived.by(() => {
-    const active = jobs.filter((job) => job.end_date === null);
-
-    if (!pinnedJobId) return active;
-
-    // keep original order, but move pinned one to top
-    return [...active].sort((a, b) => {
-      if (a.id === pinnedJobId) return -1;
-      if (b.id === pinnedJobId) return 1;
-      return 0;
-    });
-  });
-
-  async function pinJob(id: string) {
-    const wasPinned = pinnedJobId === id;
-    const next = wasPinned ? null : id;
-    pinnedJobId = next;
-    writePinnedJobId(data.user_id, next);
-    if (!wasPinned) {
-      await tick();
-      activeJobsListEl?.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }
+  const activeJobs = $derived(jobs.filter((job) => job.end_date === null));
 
   onMount(() => {
-    pinnedJobId = readPinnedJobId(data.user_id);
-
     // Live query that updates job list whenever database changes
     const dispose = watchUserJobs(
       data.user_id,
@@ -58,21 +27,6 @@
       },
     );
     return () => dispose();
-  });
-
-  // Revalidate pinned job when jobs list changes
-  $effect(() => {
-    if (!pinnedJobId) return;
-
-    // Clear stale pinned if job no longer exists or is no longer active
-    const pinnedJobIsCompleted = jobs.some(
-      (job) => job.id === pinnedJobId && job.end_date !== null,
-    );
-
-    if (pinnedJobIsCompleted) {
-      pinnedJobId = null;
-      writePinnedJobId(data.user_id, null);
-    }
   });
 </script>
 
@@ -126,7 +80,7 @@
 
         <div
           bind:this={activeJobsListEl}
-          class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
+          class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-12 no-scrollbar"
         >
           {#each activeJobs as job (job.id)}
             <JobCard
@@ -135,8 +89,6 @@
               address={job.address}
               startDate={job.start_date}
               completed={false}
-              pinned={job.id === pinnedJobId}
-              onPin={() => pinJob(job.id)}
             />
           {/each}
         </div>
@@ -149,7 +101,7 @@
         </section>
 
         <div
-          class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-20 no-scrollbar"
+          class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-12 no-scrollbar"
         >
           {#each completedJobs as job (job.id)}
             <JobCard
@@ -165,10 +117,4 @@
       {/if}
     </div>
   </div>
-
-  <BottomButton
-    label="Create New Job"
-    icon="material-symbols:add-rounded"
-    onclick={() => goto("/new-job")}
-  />
 </div>

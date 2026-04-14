@@ -27,7 +27,7 @@
 </script>
 
 <div class="card flex flex-row justify-between items-center">
-  <div class="card-title grow font-medium text-base">{name}</div>
+  <div class="card-title grow font-normal text-base">{name}</div>
   <div class="bg-accent flex flex-row items-center p-1 gap-3 rounded-sm">
     <button
       type="button"
