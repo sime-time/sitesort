@@ -69,8 +69,6 @@
   }
 </script>
 
-<TopBar showBack={true} />
-
 <form class="flex flex-col w-full p-3 gap-3" onsubmit={handleSubmit}>
   <legend class="font-heading font-medium text-2xl uppercase my-4">
     New Job

@@ -1,13 +1,34 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
+  import { page } from "$app/state";
+  import { getUserJob } from "$lib/client/crud/read-job";
 
-  let { showBack = false, title }: { showBack?: boolean; title?: string } =
-    $props();
+  let jobTitle = $state<string>("");
+
+  const pathname = $derived(page.url.pathname);
+  const jobId = $derived(page.params.id);
+  const isJobDetail = $derived(pathname.startsWith("/job/") && !!jobId);
+  const showBack = $derived(isJobDetail);
+
+  const title = $derived(isJobDetail ? jobTitle || "Loading..." : "");
+
+  $effect(() => {
+    if (!isJobDetail || !jobId) return;
+
+    const userId = page.data?.user_id as string | undefined;
+
+    if (!userId) return;
+
+    void (async () => {
+      const job = await getUserJob(userId, jobId);
+      jobTitle = job?.name ?? "";
+    })();
+  });
 
   function goBack() {
-    // Fallback if user landed directly on this page
-    goto("/");
+    if (history.length > 1) history.back();
+    else goto("/");
   }
 
   function signOut() {
