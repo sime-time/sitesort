@@ -12,7 +12,6 @@
     createJobSchema,
     mapCreateJobErrors,
   } from "$lib/client/crud/create-job";
-  import TopBar from "$lib/components/TopBar.svelte";
   import type { PageProps } from "./$types";
 
   type FormErrors = {
@@ -70,7 +69,7 @@
 </script>
 
 <form class="flex flex-col w-full p-3 gap-3" onsubmit={handleSubmit}>
-  <legend class="font-heading font-medium text-2xl uppercase my-4">
+  <legend class="font-heading font-medium text-2xl uppercase my-2">
     New Job
   </legend>
 
