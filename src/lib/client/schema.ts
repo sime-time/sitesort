@@ -2,57 +2,57 @@ import { DrizzleAppSchema } from "@powersync/drizzle-driver";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const jobs = sqliteTable("jobs", {
-  id: text("id").primaryKey().notNull(),
-  user_id: text("user_id").notNull(),
-  name: text("name").notNull(),
-  address: text("address").notNull(),
-  start_date: text("start_date").notNull(),
-  end_date: text("end_date"),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull(),
+  id: text().primaryKey().notNull(),
+  user_id: text().notNull(),
+  name: text().notNull(),
+  address: text().notNull(),
+  start_date: text().notNull(),
+  end_date: text(),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
 });
 
 export const job_materials = sqliteTable("job_materials", {
-  id: text("id").primaryKey().notNull(),
-  job_id: text("job_id")
+  id: text().primaryKey().notNull(),
+  job_id: text()
     .references(() => jobs.id)
     .notNull(),
-  material_id: text("material_id")
+  material_id: text()
     .references(() => materials.id)
     .notNull(),
-  quantity: integer("quantity").default(0).notNull(),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull(),
+  quantity: integer().default(0).notNull(),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
 });
 
 export const materials = sqliteTable("materials", {
-  id: text("id").primaryKey().notNull(),
-  category_id: text("category_id")
+  id: text().primaryKey().notNull(),
+  category_id: text()
     .references(() => categories.id)
     .notNull(),
-  name: text("name").notNull(),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull(),
+  name: text().notNull(),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
 });
 
 export const categories = sqliteTable("categories", {
-  id: text("id").primaryKey().notNull(),
-  name: text("name").notNull(),
-  order: integer("order").notNull(),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull(),
+  id: text().primaryKey().notNull(),
+  name: text().notNull(),
+  order: integer().notNull(),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
 });
 
 export const tasks = sqliteTable("tasks", {
-  id: text("id").primaryKey().notNull(),
-  job_id: text("job_id")
+  id: text().primaryKey().notNull(),
+  job_id: text()
     .references(() => jobs.id)
     .notNull(),
-  order: integer("order"),
-  description: text("description").notNull(),
-  completed: integer("completed", { mode: "boolean" }).default(false).notNull(),
-  created_at: text("created_at").notNull(),
-  updated_at: text("updated_at").notNull(),
+  order: integer(),
+  description: text().notNull(),
+  completed: integer({ mode: "boolean" }).default(false).notNull(),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
 });
 
 export type InsertJob = typeof jobs.$inferInsert;

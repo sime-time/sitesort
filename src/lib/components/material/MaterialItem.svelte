@@ -1,28 +1,20 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import {
+    blockInvalidKeys,
+    clampMin,
+    sanitizeWholeNumber,
+  } from "$lib/utils/sanitize-numeric-input";
 
   let { name, quantity = 0 }: { name: string; quantity: number } = $props();
 
   // svelte-ignore state_referenced_locally
   let count = $state<number>(clampMin(quantity));
 
-  function clampMin(n: number) {
-    return Math.max(0, n);
-  }
-
-  function sanitizeWholeNumber(value: string) {
-    const digitsOnly = value.replace(/\D/g, "");
-    return digitsOnly === "" ? 0 : Number(digitsOnly);
-  }
   function handleInput(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
     count = clampMin(sanitizeWholeNumber(input.value));
     input.value = String(count);
-  }
-  function blockInvalidKeys(event: KeyboardEvent) {
-    if (["e", "E", "+", "-", "."].includes(event.key)) {
-      event.preventDefault();
-    }
   }
 </script>
 

@@ -1,19 +1,23 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { page } from "$app/state";
+  import { listCategories } from "$lib/client/crud/read-category";
   import {
     type JobMaterial,
     listJobMaterials,
   } from "$lib/client/crud/read-material";
   import { listJobTasks } from "$lib/client/crud/read-task";
-  import type { SelectTask } from "$lib/client/schema";
+  import type { SelectCategory, SelectTask } from "$lib/client/schema";
   import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
+  import MaterialForm from "$lib/components/material/MaterialForm.svelte";
+  import TaskForm from "$lib/components/task/TaskForm.svelte";
   import TaskItem from "$lib/components/task/TaskItem.svelte";
 
   const jobId = $derived(page.params.id);
 
   let materials = $state<JobMaterial[]>([]);
   let tasks = $state<SelectTask[]>([]);
+  let categories = $state<SelectCategory[]>([]);
   let loading = $state(true);
   let activeTab = $state<"materials" | "checklist">("materials");
 
@@ -43,13 +47,15 @@
     loading = true;
 
     try {
-      const [nextMaterials, nextTasks] = await Promise.all([
+      const [nextMaterials, nextTasks, nextCategories] = await Promise.all([
         listJobMaterials(id),
         listJobTasks(id),
+        listCategories(),
       ]);
 
       materials = nextMaterials;
       tasks = nextTasks;
+      categories = nextCategories;
     } catch (err) {
       console.error("Failed loading job page data", err);
     } finally {
@@ -143,24 +149,11 @@
           </form>
 
           <!-- Modal Form -->
-          <h3 class="text-lg font-bold">
-            {activeTab === "materials" ? "New Material" : "New Task"}
-          </h3>
-          <p class="py-4">Press ESC key or click the button below to close</p>
-
-          <!-- Add To Job Button -->
-          <div class="modal-action">
-            <button
-              type="button"
-              class="mt-6 w-full uppercase font-heading tracking-widest btn btn-lg btn-primary"
-            >
-              <Icon
-                icon="material-symbols:add-circle-outline"
-                class="font-bold"
-              />
-              <span class="text-base"> Add to Job </span>
-            </button>
-          </div>
+          {#if activeTab === "materials"}
+            <MaterialForm {jobId} {categories} />
+          {:else}
+            <TaskForm {jobId} />
+          {/if}
         </div>
       </dialog>
     </section>
