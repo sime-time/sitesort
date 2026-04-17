@@ -18,23 +18,28 @@
     name?: string;
     date?: string;
     address?: string;
+    completed?: boolean;
   };
 
   let { data }: PageProps = $props();
 
-  let jobName = $state<string>("");
-  let jobDate = $state<CalendarDate>(today(getLocalTimeZone()));
-  let jobAddress = $state<string>("");
+  let name = $state<string>("");
+  let startDate = $state<CalendarDate>(today(getLocalTimeZone()));
+  let endDate = $state<CalendarDate>(today(getLocalTimeZone()));
+  let address = $state<string>("");
+  let completed = $state<boolean>(false);
   let errors = $state<FormErrors>({});
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const parsed = createJobSchema.safeParse({
+    const parsed = editJobSchema.safeParse({
       user_id: data.user_id,
-      name: jobName,
-      start_date: jobDate.toDate(getLocalTimeZone()),
-      address: jobAddress,
+      name: name,
+      address: address,
+      start_date: startDate.toDate(getLocalTimeZone()),
+      end_date: endDate.toDate(getLocalTimeZone()),
+      completed: completed,
     });
 
     if (!parsed.success) {
@@ -42,9 +47,6 @@
       return;
     }
     errors = {};
-
-    console.log("Success", parsed.data);
-    console.log("User ID", data.user_id);
 
     try {
       await createJob({
@@ -61,9 +63,11 @@
 
     // Reset job form on success
     toast.success("Job created");
-    jobName = "";
-    jobAddress = "";
-    jobDate = today(getLocalTimeZone());
+    name = "";
+    address = "";
+    startDate = today(getLocalTimeZone());
+    endDate = today(getLocalTimeZone());
+    completed = false;
     goto("/");
   }
 </script>
@@ -84,27 +88,10 @@
       type="text"
       id="job-name"
       class="input border w-full"
-      bind:value={jobName}
+      bind:value={name}
       aria-invalid={!!errors.name}
     >
     <p class="label text-error">{errors.name}</p>
-  </fieldset>
-
-  <fieldset class="fieldset" data-invalid={errors.date ? "true" : undefined}>
-    <label
-      class="label uppercase tracking-wide text-neutral font-medium text-sm"
-      for="job-date"
-    >
-      Deployment Date
-    </label>
-    <input
-      type="date"
-      id="job-date"
-      class="input border w-full"
-      bind:value={jobDate}
-      aria-invalid={!!errors.address}
-    >
-    <p class="label text-error">{errors.date}</p>
   </fieldset>
 
   <fieldset class="fieldset" data-invalid={errors.address ? "true" : undefined}>
@@ -118,12 +105,62 @@
       type="text"
       id="job-address"
       class="input border w-full"
-      bind:value={jobAddress}
+      bind:value={address}
       aria-invalid={!!errors.address}
     >
     <p class="label text-error">{errors.address}</p>
   </fieldset>
 
+  <fieldset class="fieldset" data-invalid={errors.date ? "true" : undefined}>
+    <label
+      class="label uppercase tracking-wide text-neutral font-medium text-sm"
+      for="start-date"
+    >
+      Start Date
+    </label>
+    <input
+      type="date"
+      id="start-date"
+      class="input border w-full"
+      bind:value={startDate}
+      aria-invalid={!!errors.address}
+    >
+    <p class="label text-error">{errors.date}</p>
+  </fieldset>
+
+  <fieldset class="fieldset" data-invalid={errors.date ? "true" : undefined}>
+    <label
+      class="label uppercase tracking-wide text-neutral font-medium text-sm"
+      for="end-date"
+    >
+      End Date
+    </label>
+    <input
+      type="date"
+      id="end-date"
+      class="input border w-full"
+      bind:value={endDate}
+      aria-invalid={!!errors.address}
+    >
+    <p class="label text-error">{errors.date}</p>
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <label
+      class="label uppercase tracking-wide text-neutral font-medium text-sm"
+      for="task-completed"
+    >
+      Job Completed
+    </label>
+
+    <input
+      id="task-completed"
+      type="checkbox"
+      bind:checked={completed}
+      class="toggle toggle-xl border-error text-error bg-error/10 checked:toggle-success checked:border-success checked:text-success checked:bg-success/10"
+    >
+    <p class="label text-error">{errors.completed}</p>
+  </fieldset>
   <button
     type="submit"
     class="btn-primary w-full btn btn-xl uppercase font-heading tracking-widest"

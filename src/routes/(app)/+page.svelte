@@ -4,7 +4,6 @@
   import { watchUserJobs } from "$lib/client/crud/read-job";
   import type { SelectJob } from "$lib/client/schema";
   import JobCard from "$lib/components/JobCard.svelte";
-  import TopBar from "$lib/components/TopBar.svelte";
 
   let { data } = $props();
 
@@ -12,8 +11,8 @@
   let activeJobsListEl = $state<HTMLDivElement | null>(null);
   let activeTab = $state<"in-progress" | "completed">("in-progress");
 
-  const completedJobs = $derived(jobs.filter((job) => job.end_date !== null));
-  const activeJobs = $derived(jobs.filter((job) => job.end_date === null));
+  const completedJobs = $derived(jobs.filter((job) => job.completed));
+  const activeJobs = $derived(jobs.filter((job) => !job.completed));
 
   onMount(() => {
     // Live query that updates job list whenever database changes
@@ -83,7 +82,7 @@
             name={job.name}
             address={job.address}
             startDate={job.start_date}
-            completed={false}
+            completed={job.completed}
           />
         {/each}
       </div>
@@ -103,9 +102,9 @@
             id={job.id}
             name={job.name}
             address={job.address}
-            completed={true}
             startDate={job.start_date}
             endDate={job.end_date}
+            completed={job.completed}
           />
         {/each}
       </div>

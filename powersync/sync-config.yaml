@@ -35,3 +35,10 @@ streams:
     queries:
       - SELECT categories.*
         FROM categories
+  user_time_entries:
+    auto_subscribe: true
+    queries:
+      - SELECT time_entries.*
+        FROM time_entries 
+        WHERE time_entries.user_id = auth.user_id()
+

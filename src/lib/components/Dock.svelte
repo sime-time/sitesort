@@ -15,7 +15,7 @@
   });
 </script>
 
-<div class="dock bg-white">
+<div class="dock dock-lg bg-white">
   <button
     type="button"
     class={active === "jobs" ? "dock-active" : ""}

@@ -8,6 +8,7 @@ export const jobs = sqliteTable("jobs", {
   address: text().notNull(),
   start_date: text().notNull(),
   end_date: text(),
+  completed: integer({ mode: "boolean" }).default(false).notNull(),
   created_at: text().notNull(),
   updated_at: text().notNull(),
 });
@@ -51,6 +52,15 @@ export const tasks = sqliteTable("tasks", {
   order: integer(),
   description: text().notNull(),
   completed: integer({ mode: "boolean" }).default(false).notNull(),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
+});
+
+export const time_entries = sqliteTable("time_entries", {
+  id: text().primaryKey().notNull(),
+  user_id: text().notNull(),
+  clock_in: text().notNull(),
+  clock_out: text(),
   created_at: text().notNull(),
   updated_at: text().notNull(),
 });

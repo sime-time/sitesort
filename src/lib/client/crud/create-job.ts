@@ -29,6 +29,7 @@ export async function createJob(input: CreateJobInput) {
     address: input.address,
     start_date: input.start_date.toISOString(),
     end_date: null,
+    completed: false,
     created_at: now,
     updated_at: now,
   } satisfies InsertJob);

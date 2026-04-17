@@ -31,6 +31,7 @@ export const jobs = pgTable(
       .notNull()
       .defaultNow(),
     end_date: timestamp({ withTimezone: true, mode: "string" }),
+    completed: boolean().default(false).notNull(),
     ...timestamps(),
   },
   (table) => [index("user_idx").on(table.user_id)],
@@ -72,6 +73,14 @@ export const tasks = pgTable("tasks", {
   description: text().notNull(),
   completed: boolean().default(false).notNull(),
   order: integer(),
+  ...timestamps(),
+});
+
+export const time_entries = pgTable("time_entries", {
+  id: uuid().defaultRandom().primaryKey(),
+  user_id: text().notNull().default(sql`auth.user_id ()`),
+  clock_in: timestamp({ withTimezone: true, mode: "string" }).notNull(),
+  clock_out: timestamp({ withTimezone: true, mode: "string" }),
   ...timestamps(),
 });
 
