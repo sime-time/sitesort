@@ -1,20 +1,16 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import { onMount } from "svelte";
-
-  type TimeEntry = {
-    id: string;
-    clockInAt: string;
-    clockOutAt: string | null;
-    createdAt: string;
-    updatedAt: string;
-  };
-
-  const STORAGE_KEY = "sitesort.timeEntries.v1";
-
-  let entries = $state<TimeEntry[]>([]);
-  let nowMs = $state<number>(Date.now());
-  let isHydrated = $state<boolean>(false);
+  import {
+    formatDayHeading,
+    formatDuration,
+    formatTimeLabel,
+    getEntryDuration,
+    getLocalDayKey,
+    parseLocalDatetime,
+    type TimeEntry,
+    timeState,
+    toDatetimeLocalValue,
+  } from "$lib/client/time-state.svelte";
 
   let editDialogEl = $state<HTMLDialogElement | null>(null);
   let editingId = $state<string | null>(null);
@@ -23,11 +19,23 @@
   let editError = $state<string>("");
 
   const activeEntry = $derived(
-    entries.find((entry) => entry.clockOutAt === null),
+    timeState.entries.find((entry) => entry.clockOutAt === null),
+  );
+
+  const activeElapsed = $derived(
+    activeEntry
+      ? formatDuration(
+          timeState.nowMs - new Date(activeEntry.clockInAt).getTime(),
+        )
+      : "",
+  );
+
+  const activeStartTime = $derived(
+    activeEntry ? formatTimeLabel(activeEntry.clockInAt) : "",
   );
 
   const groupedEntries = $derived.by(() => {
-    const sorted = [...entries].sort(
+    const sorted = [...timeState.entries].sort(
       (a, b) =>
         new Date(b.clockInAt).getTime() - new Date(a.clockInAt).getTime() ||
         b.id.localeCompare(a.id),
@@ -49,61 +57,12 @@
     }));
   });
 
-  const activeElapsed = $derived(
-    activeEntry
-      ? formatDuration(nowMs - new Date(activeEntry.clockInAt).getTime())
-      : "",
-  );
-
-  const activeStartTime = $derived(
-    activeEntry ? formatTimeLabel(activeEntry.clockInAt) : "",
-  );
-
-  onMount(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as unknown;
-        if (Array.isArray(parsed)) {
-          entries = parsed
-            .filter((item): item is TimeEntry => {
-              if (!item || typeof item !== "object") return false;
-              const candidate = item as Partial<TimeEntry>;
-              return (
-                typeof candidate.id === "string" &&
-                typeof candidate.clockInAt === "string" &&
-                (typeof candidate.clockOutAt === "string" ||
-                  candidate.clockOutAt === null) &&
-                typeof candidate.createdAt === "string" &&
-                typeof candidate.updatedAt === "string"
-              );
-            })
-            .sort(
-              (a, b) =>
-                new Date(a.clockInAt).getTime() -
-                new Date(b.clockInAt).getTime(),
-            );
-        }
-      } catch {
-        entries = [];
-      }
-    }
-
-    isHydrated = true;
-  });
-
-  $effect(() => {
-    if (!isHydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  });
-
   $effect(() => {
     if (!activeEntry) return;
 
-    nowMs = Date.now();
+    timeState.nowMs = Date.now();
     const timer = window.setInterval(() => {
-      nowMs = Date.now();
+      timeState.nowMs = Date.now();
     }, 1000);
 
     return () => window.clearInterval(timer);
@@ -128,12 +87,12 @@
       updatedAt: nowIso,
     };
 
-    entries = [newEntry, ...entries];
+    timeState.entries = [newEntry, ...timeState.entries];
   }
 
   function clockOut(entryId: string) {
     const nowIso = new Date().toISOString();
-    entries = entries.map((entry) => {
+    timeState.entries = timeState.entries.map((entry) => {
       if (entry.id !== entryId) return entry;
       return {
         ...entry,
@@ -186,7 +145,7 @@
 
     const updatedAt = new Date().toISOString();
 
-    entries = entries.map((entry) => {
+    timeState.entries = timeState.entries.map((entry) => {
       if (entry.id !== editingId) return entry;
       return {
         ...entry,
@@ -201,89 +160,28 @@
 
   function deleteEditingEntry() {
     if (!editingId) return;
-    entries = entries.filter((entry) => entry.id !== editingId);
+    timeState.entries = timeState.entries.filter(
+      (entry) => entry.id !== editingId,
+    );
     closeEdit();
-  }
-
-  function parseLocalDatetime(value: string): string | null {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return null;
-    return date.toISOString();
-  }
-
-  function toDatetimeLocalValue(isoString: string): string {
-    const date = new Date(isoString);
-    if (Number.isNaN(date.getTime())) return "";
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-
-  function getLocalDayKey(isoString: string): string {
-    const date = new Date(isoString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-
-  function formatDayHeading(dayKey: string): string {
-    const [year, month, day] = dayKey.split("-").map(Number);
-    const date = new Date(year, (month || 1) - 1, day || 1);
-    return new Intl.DateTimeFormat("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    }).format(date);
-  }
-
-  function formatTimeLabel(isoString: string): string {
-    const date = new Date(isoString);
-    if (Number.isNaN(date.getTime())) return "--";
-
-    return new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(date);
-  }
-
-  function formatDuration(milliseconds: number): string {
-    const safeMs = Math.max(0, milliseconds);
-    const totalSeconds = Math.floor(safeMs / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  }
-
-  function getEntryDuration(entry: TimeEntry): string {
-    const clockInMs = new Date(entry.clockInAt).getTime();
-    const clockOutMs = entry.clockOutAt
-      ? new Date(entry.clockOutAt).getTime()
-      : nowMs;
-
-    return formatDuration(clockOutMs - clockInMs);
   }
 </script>
 
 <section class="flex-1 min-h-0 flex flex-col p-3 gap-3">
-  <div class="card bg-base-100 border border-accent shadow-sm shrink-0">
+  <div class="card bg-white border border-accent shrink-0">
     <div class="card-body p-4 gap-4">
       <div class="flex items-center justify-between gap-2">
         <h1 class="font-heading font-medium text-2xl uppercase">Time</h1>
         {#if activeEntry}
-          <span class="badge badge-success badge-lg uppercase tracking-wide">
+          <span
+            class="badge badge-success badge-soft badge-lg uppercase tracking-wide"
+          >
             On the Clock
           </span>
         {:else}
-          <span class="badge badge-neutral badge-lg uppercase tracking-wide">
+          <span
+            class="badge badge-neutral badge-soft badge-lg uppercase tracking-wide"
+          >
             Off the Clock
           </span>
         {/if}
@@ -306,7 +204,7 @@
       </button>
 
       {#if activeEntry}
-        <div class="alert alert-info py-2">
+        <div class="alert alert-info alert-soft py-2">
           <Icon icon="material-symbols:timer-outline" class="size-5" />
           <div class="flex flex-col">
             <span class="font-semibold">{activeElapsed}</span>
@@ -346,11 +244,11 @@
             {dayGroup.label}
           </h2>
 
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col">
             {#each dayGroup.entries as entry (entry.id)}
               <button
                 type="button"
-                class="card bg-base-100 border border-accent shadow-sm text-left"
+                class="card bg-white border-b border-accent text-left"
                 onclick={() => openEdit(entry)}
               >
                 <div class="card-body p-4 gap-2">
