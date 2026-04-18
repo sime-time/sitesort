@@ -22,7 +22,8 @@
 </script>
 
 <div
-  class="fixed inset-x-0 z-40 bottom-[calc(var(--dock-height)+env(safe-area-inset-bottom))]"
+  id="time-banner"
+  class="fixed inset-x-0 z-40 bottom-[calc(var(--dock-height))]"
 >
   <div class="alert alert-info">
     <Icon icon="material-symbols:timer-outline" class="size-5" />
@@ -32,3 +33,9 @@
     </div>
   </div>
 </div>
+
+<style>
+  #time-banner {
+    view-transition-name: time-banner;
+  }
+</style>

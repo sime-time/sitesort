@@ -32,10 +32,7 @@
   });
 </script>
 
-<main
-  class="h-dvh overflow-hidden flex flex-col pb-[calc(var(--dock-height)+env(safe-area-inset-bottom))]"
-  style="--dock-height: 3.8rem"
->
+<main class="h-dvh overflow-hidden flex flex-col pb-[calc(var(--dock-height))]">
   <ViewTransition />
   <TopBar />
   {@render children()}

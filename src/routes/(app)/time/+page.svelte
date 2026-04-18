@@ -193,7 +193,7 @@
       </button>
 
       {#if activeEntry}
-        <div class="alert alert-info alert-soft py-2">
+        <div class="alert alert-info alert-soft py-2 min-h-15">
           <Icon icon="material-symbols:timer-outline" class="size-5" />
           <div class="flex flex-col">
             <span class="font-semibold">{activeElapsed}</span>
@@ -201,10 +201,12 @@
           </div>
         </div>
       {:else}
-        <p class="text-sm text-base-content/70">
-          Clock in when work starts. <br>
-          Clock out for breaks and end of day.
-        </p>
+        <div class="min-h-15 flex items-center">
+          <p class="text-sm text-base-content/70">
+            Clock in when work starts. <br>
+            Clock out for breaks and end of day.
+          </p>
+        </div>
       {/if}
     </div>
   </div>
