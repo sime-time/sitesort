@@ -279,8 +279,12 @@
   </div>
 </section>
 
-<dialog bind:this={editDialogEl} class="modal" onclose={closeEdit}>
-  <div class="modal-box w-11/12 max-w-md">
+<dialog
+  bind:this={editDialogEl}
+  class="modal modal-bottom sm:modal-middle"
+  onclose={closeEdit}
+>
+  <div class="modal-box">
     <h3 class="font-bold text-lg">Edit Time Entry</h3>
 
     <div class="mt-4 flex flex-col gap-3">

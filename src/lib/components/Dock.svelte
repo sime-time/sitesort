@@ -2,6 +2,7 @@
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
+  import { haptic } from "$lib/utils/haptic";
 
   const pathname = $derived(page.url.pathname);
   const active = $derived.by(() => {
@@ -13,13 +14,18 @@
       return "jobs";
     }
   });
+
+  function gotoHaptic(href: string) {
+    goto(href);
+    haptic.confirm();
+  }
 </script>
 
-<footer class="dock dock-lg bg-white">
+<footer class="dock dock-lg bg-white z-50">
   <button
     type="button"
     class={active === "jobs" ? "dock-active" : ""}
-    onclick={() => goto("/")}
+    onclick={() => gotoHaptic("/")}
   >
     {#if active === "jobs"}
       <span class="dock-marker" aria-hidden="true"></span>
@@ -31,7 +37,7 @@
   <button
     type="button"
     class={active === "time" ? "dock-active" : ""}
-    onclick={() => goto("/time")}
+    onclick={() => gotoHaptic("/time")}
   >
     {#if active === "time"}
       <span class="dock-marker" aria-hidden="true"></span>
@@ -43,7 +49,7 @@
   <button
     type="button"
     class={active === "create" ? "dock-active" : ""}
-    onclick={() => goto("/job/create")}
+    onclick={() => gotoHaptic("/job/create")}
   >
     {#if active === "create"}
       <span class="dock-marker" aria-hidden="true"></span>
