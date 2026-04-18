@@ -57,17 +57,6 @@
     }));
   });
 
-  $effect(() => {
-    if (!activeEntry) return;
-
-    timeState.nowMs = Date.now();
-    const timer = window.setInterval(() => {
-      timeState.nowMs = Date.now();
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  });
-
   function handleToggleClock() {
     if (activeEntry) {
       clockOut(activeEntry.id);
@@ -213,7 +202,8 @@
         </div>
       {:else}
         <p class="text-sm text-base-content/70">
-          Clock in when work starts. Clock out for breaks and end of day.
+          Clock in when work starts. <br>
+          Clock out for breaks and end of day.
         </p>
       {/if}
     </div>

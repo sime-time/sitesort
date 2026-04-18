@@ -1,7 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { setupPowerSync } from "$lib/client/db";
-  import { timeState } from "$lib/client/time-state.svelte";
+  import {
+    initTimeState,
+    startClock,
+    stopClock,
+    timeState,
+  } from "$lib/client/time-state.svelte";
   import Dock from "$lib/components/Dock.svelte";
   import TimeBanner from "$lib/components/TimeBanner.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
@@ -11,7 +16,19 @@
   );
 
   let { children } = $props();
-  onMount(async () => await setupPowerSync());
+
+  onMount(async () => {
+    await setupPowerSync();
+    initTimeState();
+  });
+
+  $effect(() => {
+    if (activeEntry) {
+      return startClock();
+    } else {
+      return stopClock();
+    }
+  });
 </script>
 
 <main
