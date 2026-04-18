@@ -11,6 +11,7 @@
     timeState,
     toDatetimeLocalValue,
   } from "$lib/client/time-state.svelte";
+  import { haptic } from "$lib/utils/haptic";
 
   let editDialogEl = $state<HTMLDialogElement | null>(null);
   let editingId = $state<string | null>(null);
@@ -58,6 +59,7 @@
   });
 
   function handleToggleClock() {
+    haptic.confirm();
     if (activeEntry) {
       clockOut(activeEntry.id);
       return;

@@ -72,7 +72,10 @@
   }
 </script>
 
-<form class="flex flex-col w-full p-3 gap-3" onsubmit={handleSubmit}>
+<form
+  class="flex flex-col flex-1 min-h-0 w-full p-3 gap-3 overflow-y-auto pb-[calc(var(--dock-height)+env(safe-area-inset-bottom)+1rem)] no-scrollbar"
+  onsubmit={handleSubmit}
+>
   <legend class="font-heading font-medium text-2xl uppercase my-2">
     Edit Job
   </legend>
@@ -161,11 +164,19 @@
     >
     <p class="label text-error">{errors.completed}</p>
   </fieldset>
+
   <button
     type="submit"
-    class="btn-primary w-full btn btn-xl uppercase font-heading tracking-widest"
+    class="btn-info w-full btn btn-xl uppercase font-heading tracking-widest"
   >
     <Icon icon="material-symbols:save" />
     <span class="text-base">Save Changes</span>
+  </button>
+  <button
+    type="submit"
+    class="btn-error w-full btn btn-xl uppercase font-heading tracking-widest"
+  >
+    <Icon icon="material-symbols:delete-outline" />
+    <span class="text-base">Delete Job</span>
   </button>
 </form>
