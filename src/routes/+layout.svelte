@@ -1,15 +1,48 @@
 <script lang="ts">
-  import favicon from "$lib/assets/favicon.svg";
+  import faviconDark from "$lib/assets/favicon-dark.svg";
+  import faviconLight from "$lib/assets/favicon-light.svg";
   import "@fontsource-variable/space-grotesk/wght.css";
   import "@fontsource-variable/work-sans/wght.css";
+  import { onMount } from "svelte";
   import { Toaster } from "$lib/components/sonner";
 
   import "../app.css";
 
   let { children } = $props();
+
+  async function detectSWUpdate() {
+    const registration = await navigator.serviceWorker.ready;
+
+    registration.addEventListener("updatefound", () => {
+      const newSW = registration.installing;
+      newSW?.addEventListener("statechange", () => {
+        if (newSW.state === "installed") {
+          if (confirm("New update available! Reload to update?")) {
+            newSW.postMessage({ type: "SKIP_WAITING" });
+            window.location.reload();
+          }
+        }
+      });
+    });
+  }
+
+  onMount(() => detectSWUpdate());
 </script>
 
-<svelte:head> <link rel="icon" href={favicon}> </svelte:head>
+<svelte:head>
+  <link
+    rel="icon"
+    href={faviconLight}
+    type="image/svg+xml"
+    media="(prefers-color-scheme: light)"
+  >
+  <link
+    rel="icon"
+    href={faviconDark}
+    type="image/svg+xml"
+    media="(prefers-color-scheme: dark)"
+  >
+</svelte:head>
 
 <Toaster />
 <main class="w-full min-h-dvh flex justify-center">
