@@ -77,3 +77,9 @@
     </div>
   {/if}
 </header>
+
+<style>
+  header {
+    view-transition-name: top-bar;
+  }
+</style>

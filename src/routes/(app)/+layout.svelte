@@ -10,6 +10,7 @@
   import Dock from "$lib/components/Dock.svelte";
   import TimeBanner from "$lib/components/TimeBanner.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
+  import ViewTransition from "$lib/components/ViewTransition.svelte";
 
   const activeEntry = $derived(
     timeState.entries.find((entry) => entry.clockOutAt === null),
@@ -35,6 +36,7 @@
   class="h-dvh overflow-hidden flex flex-col pb-[calc(var(--dock-height)+env(safe-area-inset-bottom))]"
   style="--dock-height: 3.8rem"
 >
+  <ViewTransition />
   <TopBar />
   {@render children()}
   {#if activeEntry}
