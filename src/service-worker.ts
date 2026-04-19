@@ -86,24 +86,19 @@ self.addEventListener("fetch", (event) => {
   async function handleNavigate(): Promise<Response> {
     const cache = await caches.open(CACHE);
     try {
-      // Network-first for live content, no runtime HTML caching
+      // Network-first for fresh nav, but DO NOT cache document at runtime
       return await fetch(request);
     } catch {
-      // 1) exact cached navigation URL
-      const exact = await cache.match(request);
-      if (exact) return exact;
-
-      // 2) app shell fallback (preferred for offline-first app)
-      const shell = await cache.match("/");
-      if (shell) return shell;
-
-      // 3) emergency static fallback
+      // Stable offline fallback first
       const offline = await cache.match("/offline.html");
       if (offline) return offline;
-
+      // Optional shell fallback
+      const shell = await cache.match("/");
+      if (shell) return shell;
       return new Response("Offline", { status: 503 });
     }
   }
+
   // 1) HTML navigations
   if (request.mode === "navigate") {
     event.respondWith(handleNavigate());
