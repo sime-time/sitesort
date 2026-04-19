@@ -93,9 +93,11 @@ export const POST: RequestHandler = async ({ request }) => {
       for (const entry of crud) {
         switch (entry.type) {
           case "jobs":
-            return handleJobEntry(tx, entry, auth.user_id);
+            await handleJobEntry(tx, entry, auth.user_id);
+            break;
           case "tasks":
-            return handleTaskEntry(tx, entry);
+            await handleTaskEntry(tx, entry);
+            break;
           default:
             break;
         }
