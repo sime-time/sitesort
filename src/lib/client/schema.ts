@@ -65,6 +65,18 @@ export const time_entries = sqliteTable("time_entries", {
   updated_at: text().notNull(),
 });
 
+export const drizzleSchema = {
+  jobs,
+  materials,
+  tasks,
+  job_materials,
+  categories,
+  time_entries,
+};
+
+// Infer the PowerSync schema from your Drizzle schema
+export const AppSchema = new DrizzleAppSchema(drizzleSchema);
+
 export type InsertJob = typeof jobs.$inferInsert;
 export type SelectJob = typeof jobs.$inferSelect;
 export type InsertCategory = typeof categories.$inferInsert;
@@ -75,14 +87,3 @@ export type InsertJobMaterial = typeof job_materials.$inferInsert;
 export type SelectJobMaterial = typeof job_materials.$inferSelect;
 export type InsertTask = typeof tasks.$inferInsert;
 export type SelectTask = typeof tasks.$inferSelect;
-
-export const drizzleSchema = {
-  jobs,
-  materials,
-  tasks,
-  job_materials,
-  categories,
-};
-
-// Infer the PowerSync schema from your Drizzle schema
-export const AppSchema = new DrizzleAppSchema(drizzleSchema);
