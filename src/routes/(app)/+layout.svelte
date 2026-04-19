@@ -16,10 +16,12 @@
     timeState.entries.find((entry) => entry.clockOutAt === null),
   );
 
-  let { children } = $props();
+  let { children, data } = $props();
 
   onMount(async () => {
-    await setupPowerSync();
+    if (data.authState === "authenticated" && data.user_id) {
+      await setupPowerSync();
+    }
     initTimeState();
   });
 
