@@ -23,6 +23,7 @@ export async function handleJobEntry(
         address: parsed.address,
         start_date: parsed.start_date,
         end_date: parsed.end_date ?? null,
+        completed: parsed.completed,
         created_at: parsed.created_at,
         updated_at: parsed.updated_at,
       };
@@ -38,6 +39,7 @@ export async function handleJobEntry(
             address: row.address,
             start_date: row.start_date,
             end_date: row.end_date,
+            completed: row.completed,
             created_at: row.created_at,
             updated_at: row.updated_at,
           },

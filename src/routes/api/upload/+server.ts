@@ -107,11 +107,15 @@ export const POST: RequestHandler = async ({ request }) => {
     return json({ ok: true });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return json({
-        ok: false,
-        message: "Invalid operation payload",
-        errorCode: "22023",
-      });
+      return json(
+        {
+          ok: false,
+          message: "Invalid operation payload",
+          errorCode: "22023",
+          issues: err.issues || undefined,
+        },
+        { status: 400 },
+      );
     }
 
     if (err instanceof UnauthorizedUploadError) {
