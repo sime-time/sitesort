@@ -25,7 +25,7 @@
   }
 </script>
 
-<footer class="dock dock-lg bg-white z-50">
+<footer class="dock dock-xl bg-white z-50">
   <button
     type="button"
     class={active === "jobs" ? "dock-active" : ""}
@@ -87,5 +87,9 @@
   :global(::view-transition-new(dock-active-marker)) {
     animation-duration: 240ms;
     animation-timing-function: cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+
+  :global(:root) {
+    --dock-height: 5rem;
   }
 </style>

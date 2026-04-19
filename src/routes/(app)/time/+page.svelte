@@ -168,7 +168,7 @@
   }
 </script>
 
-<section class="flex-1 min-h-0 flex flex-col p-3 gap-3">
+<section class="flex-1 min-h-0 flex flex-col p-3 pb-1 gap-3">
   <div class="card bg-white border border-accent shrink-0">
     <div class="card-body p-4 gap-4">
       <div class="flex items-center justify-between gap-2">
@@ -262,7 +262,7 @@
                         {entry.clockOutAt ? "Completed shift" : "Open shift"}
                       </p>
                     </div>
-                    <div class="badge badge-outline">
+                    <div class="badge badge-info badge-soft">
                       {getEntryDuration(entry)}
                     </div>
                   </div>

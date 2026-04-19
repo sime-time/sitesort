@@ -64,7 +64,3 @@ html,
 body {
   touch-action: manipulation;
 }
-
-:root {
-  --dock-height: 4.3rem;
-}
