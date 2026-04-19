@@ -93,7 +93,9 @@
   {#if dbReady}
     {@render children()}
   {:else}
-    <section class="flex-1 min-h-0 p-3">Opening local data...</section>
+    <section class="flex flex-1 min-h-0 p-3 justify-center items-center">
+      <span class="loading loading-spinner loading-xl"></span>
+    </section>
   {/if}
 
   {#if activeEntry}
