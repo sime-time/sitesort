@@ -84,7 +84,9 @@
   });
 </script>
 
-<main class="h-dvh overflow-hidden flex flex-col pb-[calc(var(--dock-height))]">
+<main
+  class="h-dvh overflow-hidden flex flex-col pb-[calc(var(--dock-height)+env(safe-area-inset-bottom))]"
+>
   <ViewTransition />
   <TopBar />
 

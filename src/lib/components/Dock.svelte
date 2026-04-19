@@ -6,6 +6,8 @@
   import { page } from "$app/state";
   import { haptic } from "$lib/utils/haptic";
 
+  const ICON_CLASS = "size-6";
+
   const pathname = $derived(page.url.pathname);
   const active = $derived.by(() => {
     if (pathname.startsWith("/time")) {
@@ -32,8 +34,8 @@
     {#if active === "jobs"}
       <span class="dock-marker" aria-hidden="true"></span>
     {/if}
-    <Icon icon="mdi:hammer-screwdriver" />
-    <span class="dock-label">Jobs</span>
+    <Icon icon="mdi:hammer-screwdriver" class={ICON_CLASS} />
+    <span class="dock-label font-semibold">Jobs</span>
   </button>
 
   <button
@@ -44,8 +46,8 @@
     {#if active === "time"}
       <span class="dock-marker" aria-hidden="true"></span>
     {/if}
-    <Icon icon={nestClockFarsightAnalogOutlineIcon} />
-    <span class="dock-label">Time</span>
+    <Icon icon={nestClockFarsightAnalogOutlineIcon} class={ICON_CLASS} />
+    <span class="dock-label font-semibold">Time</span>
   </button>
 
   <button
@@ -56,8 +58,8 @@
     {#if active === "create"}
       <span class="dock-marker" aria-hidden="true"></span>
     {/if}
-    <Icon icon={addBoxOutlineIcon} />
-    <span class="dock-label">Create</span>
+    <Icon icon={addBoxOutlineIcon} class={ICON_CLASS} />
+    <span class="dock-label font-semibold">Create</span>
   </button>
 </footer>
 

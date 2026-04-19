@@ -24,7 +24,7 @@
 
 <div
   id="time-banner"
-  class="fixed inset-x-0 z-40 bottom-[calc(var(--dock-height))]"
+  class="fixed inset-x-0 z-40 bottom-[calc(var(--dock-height)+env(safe-area-inset-bottom))]"
 >
   <div class="alert alert-info">
     <Icon icon={timerOutlineIcon} class="size-5" />
