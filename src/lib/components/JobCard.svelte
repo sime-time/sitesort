@@ -1,5 +1,9 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import chevronRightIcon from "@iconify-icons/material-symbols/chevron-right";
+  import dateRangeIcon from "@iconify-icons/material-symbols/date-range";
+  import eventAvailableIcon from "@iconify-icons/material-symbols/event-available";
+  import movedLocationIcon from "@iconify-icons/material-symbols/moved-location";
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
 
@@ -84,10 +88,10 @@
 
     <div class="flex gap-1 items-center">
       {#if completed && endDate}
-        <Icon icon="material-symbols:calendar-check" />
+        <Icon icon={eventAvailableIcon} />
         <span>Completed {formatDisplayDate(endDate)}</span>
       {:else}
-        <Icon icon="material-symbols:date-range" />
+        <Icon icon={dateRangeIcon} />
         <span>Started {formatDisplayDate(startDate)}</span>
       {/if}
     </div>
@@ -97,7 +101,7 @@
       class="btn btn-soft btn-info btn-xs w-fit"
       onclick={(e) => openMap(e)}
     >
-      <Icon icon="material-symbols:moved-location" class="size-4" />
+      <Icon icon={movedLocationIcon} class="size-4" />
       <span class="font-heading uppercase tracking-widest">{address}</span>
     </button>
 
@@ -105,7 +109,7 @@
       <span class="uppercase tracking-widest font-medium text-xs">
         {completed ? "Edit" : "Continue"}
       </span>
-      <Icon icon="material-symbols:chevron-right" />
+      <Icon icon={chevronRightIcon} />
     </div>
   </div>
 </div>

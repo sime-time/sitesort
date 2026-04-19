@@ -1,5 +1,11 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import chevronRightIcon from "@iconify-icons/material-symbols/chevron-right";
+  import deleteOutlineIcon from "@iconify-icons/material-symbols/delete-outline";
+  import nestClockFarsightAnalogOutlineIcon from "@iconify-icons/material-symbols/nest-clock-farsight-analog-outline";
+  import pauseCircleOutlineIcon from "@iconify-icons/material-symbols/pause-circle-outline";
+  import playCircleOutlineIcon from "@iconify-icons/material-symbols/play-circle-outline";
+  import timerOutlineIcon from "@iconify-icons/material-symbols/timer-outline";
   import {
     formatDayHeading,
     formatDuration,
@@ -187,8 +193,8 @@
       >
         <Icon
           icon={activeEntry
-              ? "material-symbols:pause-circle-outline"
-              : "material-symbols:play-circle-outline"}
+              ? pauseCircleOutlineIcon
+              : playCircleOutlineIcon}
           class="size-6"
         />
         <span>{activeEntry ? "Clock Out" : "Clock In"}</span>
@@ -196,7 +202,7 @@
 
       {#if activeEntry}
         <div class="alert alert-info alert-soft py-2 min-h-15">
-          <Icon icon="material-symbols:timer-outline" class="size-5" />
+          <Icon icon={timerOutlineIcon} class="size-5" />
           <div class="flex flex-col">
             <span class="font-semibold">{activeElapsed}</span>
             <span class="text-sm">Since {activeStartTime}</span>
@@ -220,7 +226,7 @@
       <div class="card bg-base-100 border border-dashed border-accent">
         <div class="card-body items-center text-center py-8">
           <Icon
-            icon="material-symbols:nest-clock-farsight-analog-outline"
+            icon={nestClockFarsightAnalogOutlineIcon}
             class="size-10 text-base-content/50"
           />
           <p class="font-medium">No time entries yet</p>
@@ -266,10 +272,7 @@
                     <span class="text-xs uppercase tracking-widest font-medium">
                       Edit
                     </span>
-                    <Icon
-                      icon="material-symbols:chevron-right"
-                      class="size-5"
-                    />
+                    <Icon icon={chevronRightIcon} class="size-5" />
                   </div>
                 </div>
               </button>
@@ -324,7 +327,7 @@
         class="btn btn-error btn-soft"
         onclick={deleteEditingEntry}
       >
-        <Icon icon="material-symbols:delete-outline" class="size-5" />
+        <Icon icon={deleteOutlineIcon} class="size-5" />
         Delete
       </button>
 

@@ -85,22 +85,15 @@ self.addEventListener("fetch", (event) => {
 
   async function handleNavigate(): Promise<Response> {
     const cache = await caches.open(CACHE);
-
     try {
-      const res = await fetch(request);
-      if (isSameOrigin && isHttp && res.status === 200) {
-        event.waitUntil(cache.put(request, res.clone()));
-      }
-
-      return res;
+      // Network-first for fresh nav, but DO NOT cache document at runtime
+      return await fetch(request);
     } catch {
-      // Try exact nav URL first
-      const exact = await cache.match(request);
-      if (exact) return exact;
-
-      // Then app shell fallback route
-      const shell =
-        (await cache.match("/")) ?? (await cache.match("/offline.html"));
+      // Stable offline fallback first
+      const offline = await cache.match("/offline.html");
+      if (offline) return offline;
+      // Optional shell fallback
+      const shell = await cache.match("/");
       if (shell) return shell;
       return new Response("Offline", { status: 503 });
     }

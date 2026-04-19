@@ -1,5 +1,8 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import arrowLeftAlt from "@iconify-icons/material-symbols/arrow-left-alt";
+  import logoutSharp from "@iconify-icons/material-symbols/logout-sharp";
+  import settings from "@iconify-icons/material-symbols/settings";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { getUserJob } from "$lib/client/crud/read-job";
@@ -43,10 +46,7 @@
   {#if isJobDetail}
     <div class="flex items-center justify-between text-2xl">
       <button type="button" class="flex items-center gap-3" onclick={goBack}>
-        <Icon
-          icon="material-symbols:arrow-left-alt"
-          class="text-muted-foreground"
-        />
+        <Icon icon={arrowLeftAlt} class="text-muted-foreground" />
         <h1 class="text-lg font-medium">{title}</h1>
       </button>
 
@@ -55,7 +55,7 @@
         class="btn btn-sm btn-circle btn-ghost"
         onclick={editJob}
       >
-        <Icon icon="material-symbols:settings" class="size-6" />
+        <Icon icon={settings} class="size-6" />
       </button>
     </div>
   {:else}
@@ -71,7 +71,7 @@
         class="font-sans tracking-normal btn btn-soft btn-error btn-xs uppercase"
         onclick={signOut}
       >
-        <Icon icon="material-symbols:logout-sharp" class="size-4" />
+        <Icon icon={logoutSharp} class="size-4" />
         Sign Out
       </button>
     </div>
