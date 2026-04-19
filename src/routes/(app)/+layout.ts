@@ -4,34 +4,66 @@ import type { LayoutLoad } from "./$types";
 
 export const ssr = false;
 
+const LAST_USER_ID_KEY = "sitesort.last_user_id";
+
+function readLastKnownUserId(): string | undefined {
+  if (typeof localStorage === "undefined") return undefined;
+  const value = localStorage.getItem(LAST_USER_ID_KEY);
+  return value && value.length > 0 ? value : undefined;
+}
+
+function writeLastKnownUserId(userId: string): void {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(LAST_USER_ID_KEY, userId);
+}
+
 export const load: LayoutLoad = async () => {
+  const offline =
+    typeof navigator !== "undefined" && navigator.onLine === false;
+  const lastKnownUserId = readLastKnownUserId();
+
   let sessionResult: Awaited<ReturnType<typeof authClient.getSession>>;
+
   try {
     sessionResult = await authClient.getSession();
   } catch {
-    if (typeof navigator !== "undefined" && navigator.onLine === false) {
-      return { authState: "unknown_offline" as const };
+    if (offline) {
+      return {
+        authState: "unknown_offline" as const,
+        user_id: lastKnownUserId,
+      };
     }
+
     throw redirect(302, "/auth");
   }
 
   const { data, error } = sessionResult;
 
+  // Authenticated: trust session, persist user id for offline grace
   if (data?.session && !error) {
+    writeLastKnownUserId(data.user.id);
     return {
-      user_id: data.user.id,
       authState: "authenticated" as const,
+      user_id: data.user.id,
     };
   }
-  if (!data?.session && !error) {
-    throw redirect(302, `/auth`);
-  }
-  if (error) {
-    if (typeof navigator !== "undefined" && navigator.onLine === false) {
-      return { authState: "unknown_offline" as const };
-    }
-    throw redirect(302, `/auth`);
+
+  // Session missing but offline: allow local-only mode
+  if (!data?.session && !error && offline) {
+    return {
+      authState: "unknown_offline" as const,
+      user_id: lastKnownUserId,
+    };
   }
 
-  throw redirect(302, `/auth`);
+  // Explicit error while offline: allow local-only mode
+  if (error && offline) {
+    return {
+      authState: "unknown_offline" as const,
+      user_id: lastKnownUserId,
+    };
+  }
+
+  // Online unauthenticated/error -> real auth flow
+  throw redirect(302, "/auth");
 };
