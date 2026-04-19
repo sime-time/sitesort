@@ -1,5 +1,7 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import addBoxOutlineIcon from "@iconify-icons/material-symbols/add-box-outline";
+  import nestClockFarsightAnalogOutlineIcon from "@iconify-icons/material-symbols/nest-clock-farsight-analog-outline";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { haptic } from "$lib/utils/haptic";
@@ -42,7 +44,7 @@
     {#if active === "time"}
       <span class="dock-marker" aria-hidden="true"></span>
     {/if}
-    <Icon icon="material-symbols:nest-clock-farsight-analog-outline" />
+    <Icon icon={nestClockFarsightAnalogOutlineIcon} />
     <span class="dock-label">Time</span>
   </button>
 
@@ -54,7 +56,7 @@
     {#if active === "create"}
       <span class="dock-marker" aria-hidden="true"></span>
     {/if}
-    <Icon icon="material-symbols:add-box-outline" />
+    <Icon icon={addBoxOutlineIcon} />
     <span class="dock-label">Create</span>
   </button>
 </footer>

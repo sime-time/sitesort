@@ -1,5 +1,7 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import checkCircleIcon from "@iconify-icons/material-symbols/check-circle";
+  import pendingIcon from "@iconify-icons/material-symbols/pending";
   import { onMount } from "svelte";
   import { watchUserJobs } from "$lib/client/crud/read-job";
   import type { SelectJob } from "$lib/client/schema";
@@ -45,7 +47,7 @@
 				}`}
       onclick={() => (activeTab = "in-progress")}
     >
-      <Icon icon="material-symbols:pending" class="text-base" />
+      <Icon icon={pendingIcon} class="text-base" />
       <span>In Progress</span>
     </button>
 
@@ -59,7 +61,7 @@
 				}`}
       onclick={() => (activeTab = "completed")}
     >
-      <Icon icon="material-symbols:check-circle" class="text-base" />
+      <Icon icon={checkCircleIcon} class="text-base" />
       <span>Completed</span>
     </button>
   </div>

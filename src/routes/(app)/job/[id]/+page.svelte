@@ -1,5 +1,9 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import addCircleOutlineIcon from "@iconify-icons/material-symbols/add-circle-outline";
+  import checklistIcon from "@iconify-icons/material-symbols/checklist";
+  import closeIcon from "@iconify-icons/material-symbols/close";
+  import serviceToolboxIcon from "@iconify-icons/material-symbols/service-toolbox";
   import { page } from "$app/state";
   import { listCategories } from "$lib/client/crud/read-category";
   import {
@@ -85,7 +89,7 @@
 				}`}
       onclick={() => (activeTab = "materials")}
     >
-      <Icon icon="material-symbols:service-toolbox" class="text-base" />
+      <Icon icon={serviceToolboxIcon} class="text-base" />
       <span>Materials</span>
     </button>
 
@@ -99,7 +103,7 @@
 				}`}
       onclick={() => (activeTab = "checklist")}
     >
-      <Icon icon="material-symbols:checklist" class="text-base" />
+      <Icon icon={checklistIcon} class="text-base" />
       <span>Checklist</span>
     </button>
   </div>
@@ -129,7 +133,7 @@
         class="mt-6 w-full uppercase font-heading tracking-widest btn btn-xl btn-neutral btn-soft border-2 border-neutral border-dashed"
         onclick={openAddModal}
       >
-        <Icon icon="material-symbols:add-circle-outline" />
+        <Icon icon={addCircleOutlineIcon} />
         <span class="text-base">
           {activeTab === "materials" ? "New Material" : "New Task"}
         </span>
@@ -144,7 +148,7 @@
               type="submit"
               class="btn btn-sm btn-circle btn-neutral btn-soft absolute right-2 top-2"
             >
-              <Icon icon="material-symbols:close" class="size-6" />
+              <Icon icon={closeIcon} class="size-6" />
             </button>
           </form>
 

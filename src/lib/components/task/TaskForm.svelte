@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import addCircleOutlineIcon from "@iconify-icons/material-symbols/add-circle-outline";
 
   const { jobId } = $props();
 
@@ -53,7 +54,7 @@
       type="submit"
       class="mt-6 w-full uppercase font-heading tracking-widest btn btn-lg btn-primary"
     >
-      <Icon icon="material-symbols:add-circle-outline" class="size-6" />
+      <Icon icon={addCircleOutlineIcon} class="size-6" />
       <span class="text-base"> Add to Job </span>
     </button>
   </div>
