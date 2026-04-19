@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import addBoxOutlineIcon from "@iconify-icons/material-symbols/add-box-outline";
   import {
     type CalendarDate,
     getLocalTimeZone,
@@ -69,10 +68,7 @@
   }
 </script>
 
-<form
-  class="flex flex-col flex-1 min-h-0 w-full p-3 gap-3 overflow-y-auto pb-[calc(var(--dock-height)+env(safe-area-inset-bottom)+1rem)] no-scrollbar"
-  onsubmit={handleSubmit}
->
+<form class="flex flex-col w-full p-3 gap-3" onsubmit={handleSubmit}>
   <legend class="font-heading font-medium text-2xl uppercase my-2">
     New Job
   </legend>
@@ -132,7 +128,7 @@
     type="submit"
     class="btn-primary w-full btn btn-xl uppercase font-heading tracking-widest"
   >
-    <Icon icon={addBoxOutlineIcon} />
+    <Icon icon="material-symbols:add-box-outline" />
     <span class="text-base">Create Job</span>
   </button>
 </form>

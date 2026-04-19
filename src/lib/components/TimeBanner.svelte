@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import timerOutlineIcon from "@iconify-icons/material-symbols/timer-outline";
   import {
     formatDuration,
     formatTimeLabel,
@@ -27,7 +26,7 @@
   class="fixed inset-x-0 z-40 bottom-[calc(var(--dock-height))]"
 >
   <div class="alert alert-info">
-    <Icon icon={timerOutlineIcon} class="size-5" />
+    <Icon icon="material-symbols:timer-outline" class="size-5" />
     <div class="flex flex-col">
       <span class="font-semibold">{activeElapsed}</span>
       <span class="text-sm">Since {activeStartTime}</span>

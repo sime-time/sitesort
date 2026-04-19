@@ -1,9 +1,5 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import checkCircleIconData from "@iconify-icons/material-symbols/check-circle";
-  import errorIconData from "@iconify-icons/material-symbols/error";
-  import infoIconData from "@iconify-icons/material-symbols/info";
-  import warningIconData from "@iconify-icons/material-symbols/warning";
   import {
     Toaster as Sonner,
     type ToasterProps as SonnerProps,
@@ -36,15 +32,15 @@
     <span class="loading loading-spinner loading-sm"></span>
   {/snippet}
   {#snippet successIcon()}
-    <Icon icon={checkCircleIconData} class="size-4 text-success" />
+    <Icon icon="material-symbols:check-circle" class="size-4 text-success" />
   {/snippet}
   {#snippet errorIcon()}
-    <Icon icon={errorIconData} class="size-4 text-error" />
+    <Icon icon="material-symbols:error" class="size-4 text-error" />
   {/snippet}
   {#snippet infoIcon()}
-    <Icon icon={infoIconData} class="size-4 text-info" />
+    <Icon icon="material-symbols:info" class="size-4 text-info" />
   {/snippet}
   {#snippet warningIcon()}
-    <Icon icon={warningIconData} class="size-4 text-warning" />
+    <Icon icon="material-symbols:warning" class="size-4 text-warning" />
   {/snippet}
 </Sonner>

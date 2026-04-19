@@ -1,7 +1,5 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import deleteOutlineIcon from "@iconify-icons/material-symbols/delete-outline";
-  import saveIcon from "@iconify-icons/material-symbols/save";
   import {
     type CalendarDate,
     getLocalTimeZone,
@@ -35,7 +33,7 @@
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const parsed = createJobSchema.safeParse({
+    const parsed = editJobSchema.safeParse({
       user_id: data.user_id,
       name: name,
       address: address,
@@ -171,14 +169,14 @@
     type="submit"
     class="btn-info w-full btn btn-xl uppercase font-heading tracking-widest"
   >
-    <Icon icon={saveIcon} />
+    <Icon icon="material-symbols:save" />
     <span class="text-base">Save Changes</span>
   </button>
   <button
     type="submit"
     class="btn-error w-full btn btn-xl uppercase font-heading tracking-widest"
   >
-    <Icon icon={deleteOutlineIcon} />
+    <Icon icon="material-symbols:delete-outline" />
     <span class="text-base">Delete Job</span>
   </button>
 </form>
