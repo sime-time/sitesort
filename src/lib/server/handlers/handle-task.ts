@@ -1,12 +1,19 @@
 import { eq } from "drizzle-orm";
 import { type InsertTask, taskInsertSchema, tasks } from "$lib/server/schema";
 import { UnauthorizedUploadError } from "$lib/utils/error-handling";
+import { normalizeBool } from "$lib/utils/normalize-bool";
 import type { CrudEntryType, DbTransaction } from "./upload-schema";
 
 export async function handleTaskEntry(tx: DbTransaction, entry: CrudEntryType) {
   switch (entry.op) {
     case "PUT": {
-      const parsed = taskInsertSchema.parse(entry.data);
+      const raw = entry.data ?? {};
+      const normalized = {
+        ...raw,
+        completed: normalizeBool(raw.completed),
+      };
+
+      const parsed = taskInsertSchema.parse(normalized);
 
       const row: InsertTask = {
         id: entry.id,
@@ -34,11 +41,18 @@ export async function handleTaskEntry(tx: DbTransaction, entry: CrudEntryType) {
       break;
     }
     case "PATCH": {
-      const parsed = taskInsertSchema.parse(entry.data);
+      const raw = entry.data ?? {};
+      const normalized = {
+        ...raw,
+        completed: normalizeBool(raw.completed),
+      };
+
+      const parsed = taskInsertSchema.parse(normalized);
       const patch: Partial<InsertTask> = {
         ...parsed,
         updated_at: parsed.updated_at ?? new Date().toISOString(),
       };
+
       const updated = await tx
         .update(tasks)
         .set(patch)

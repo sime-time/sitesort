@@ -1,15 +1,8 @@
 import { and, eq } from "drizzle-orm";
 import { type InsertJob, jobInsertSchema, jobs } from "$lib/server/schema";
 import { UnauthorizedUploadError } from "$lib/utils/error-handling";
+import { normalizeBool } from "$lib/utils/normalize-bool";
 import type { CrudEntryType, DbTransaction } from "./upload-schema";
-
-// sqlite makes booleans 0 or 1
-// so they must be normalized before uploading to postgres
-function normalizeBool(value: unknown): boolean | undefined {
-  if (value === 0) return false;
-  if (value === 1) return true;
-  return undefined;
-}
 
 export async function handleJobEntry(
   tx: DbTransaction,
@@ -18,8 +11,6 @@ export async function handleJobEntry(
 ) {
   switch (entry.op) {
     case "PUT": {
-      console.log("ENTRY DATA", entry.data);
-
       const raw = entry.data ?? {};
       const normalized = {
         ...raw,
@@ -64,11 +55,18 @@ export async function handleJobEntry(
       break;
     }
     case "PATCH": {
-      const parsed = jobInsertSchema.parse(entry.data);
+      const raw = entry.data ?? {};
+      const normalized = {
+        ...raw,
+        completed: normalizeBool(raw.completed),
+      };
+
+      const parsed = jobInsertSchema.parse(normalized);
       const patch: Partial<InsertJob> = {
         ...parsed,
         updated_at: parsed.updated_at ?? new Date().toISOString(),
       };
+
       const updated = await tx
         .update(jobs)
         .set(patch)
