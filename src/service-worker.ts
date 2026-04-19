@@ -14,15 +14,17 @@ import { build, files, version } from "$service-worker";
 
 const self = globalThis.self as unknown as ServiceWorkerGlobalScope;
 
-// Create a unique cache name for this deploy so it knows there are updates
 const CACHE = `cache-${version}`;
-const ASSETS = [...build, ...files];
+const APP_SHELL = "/";
+const OFFLINE_FALLBACK = "/offline.html";
+const ASSETS = [...build, ...files, APP_SHELL, OFFLINE_FALLBACK];
 
 // Install service worker
 self.addEventListener("install", (event) => {
   async function addFilesToCache() {
     const cache = await caches.open(CACHE);
     await cache.addAll(ASSETS);
+    await self.skipWaiting();
   }
 
   event.waitUntil(addFilesToCache());
@@ -36,6 +38,7 @@ self.addEventListener("activate", (event) => {
         await caches.delete(key);
       }
     }
+    await self.clients.claim();
   }
 
   event.waitUntil(deleteOldCaches());
@@ -45,46 +48,70 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   // only handle GET requests for now
   if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
 
   async function respond() {
-    const url = new URL(event.request.url);
     const cache = await caches.open(CACHE);
 
-    // Serve built files from the cache
-    if (ASSETS.includes(url.pathname)) {
-      const cachedResponse = await cache.match(url.pathname);
-      if (cachedResponse) {
-        return cachedResponse;
+    // Never try to cache third-party requests here
+    if (!isSameOrigin) {
+      return fetch(event.request);
+    }
+
+    // Precached assets: cache-first
+    if (
+      ASSETS.includes(url.pathname) ||
+      url.pathname.startsWith("/_app/immutable/")
+    ) {
+      const precached = await cache.match(url.pathname);
+      if (precached) return precached;
+    }
+
+    // Navigations: network-first, then app shell, then offline fallback
+    if (event.request.mode === "navigate") {
+      try {
+        const response = await fetch(event.request);
+        if (response instanceof Response && response.ok) {
+          await cache.put(event.request, response.clone());
+        }
+
+        return response;
+      } catch {
+        const cachedNav = await cache.match(event.request);
+        if (cachedNav) return cachedNav;
+
+        const shell = await cache.match(APP_SHELL);
+        if (shell) return shell;
+
+        const offline = await cache.match(OFFLINE_FALLBACK);
+        if (offline) return offline;
+
+        return new Response("Offline", { status: 503 });
       }
     }
 
+    // Other same-origin GET: network-first + runtime cache fallback
     try {
-      // Try the network first
       const response = await fetch(event.request);
-      const isNotExtension = url.protocol === "http:";
-      const isSuccess = response.status === 200;
-
-      if (isNotExtension && isSuccess) {
-        cache.put(event.request, response.clone());
+      if (response instanceof Response && response.ok) {
+        await cache.put(event.request, response.clone());
       }
 
       return response;
     } catch {
-      // Fallback to cache
-      const cachedResponse = await cache.match(url.pathname);
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-    }
+      const cached = await cache.match(event.request);
+      if (cached) return cached;
 
-    return new Response("Not found", { status: 404 });
+      return new Response("Not found", { status: 404 });
+    }
   }
 
   event.respondWith(respond());
 });
 
 self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
+  if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
