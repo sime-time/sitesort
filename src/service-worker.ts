@@ -43,84 +43,44 @@ self.addEventListener("activate", (event) => {
 
 // Listen to fetch events
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
-
   // only handle GET requests for now
-  if (request.method !== "GET") return;
+  if (event.request.method !== "GET") return;
 
-  const url = new URL(request.url);
-  const isSameOrigin = url.origin === self.location.origin;
-  const isHttp = url.protocol === "http:" || url.protocol === "https:";
-
-  async function cacheFirst(): Promise<Response> {
+  async function respond() {
+    const url = new URL(event.request.url);
     const cache = await caches.open(CACHE);
-    const cached = await cache.match(request);
-    if (cached) return cached;
 
-    const response = await fetch(request);
-    if (isSameOrigin && isHttp && response.status === 200) {
-      event.waitUntil(cache.put(request, response.clone()));
+    // Serve built files from the cache
+    if (ASSETS.includes(url.pathname)) {
+      const cachedResponse = await cache.match(url.pathname);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
     }
-
-    return response;
-  }
-
-  async function networkFirstWithCacheFallback(): Promise<Response> {
-    const cache = await caches.open(CACHE);
 
     try {
-      const res = await fetch(request);
-      if (isSameOrigin && isHttp && res.status === 200) {
-        event.waitUntil(cache.put(request, res.clone()));
+      // Try the network first
+      const response = await fetch(event.request);
+      const isNotExtension = url.protocol === "http:";
+      const isSuccess = response.status === 200;
+
+      if (isNotExtension && isSuccess) {
+        cache.put(event.request, response.clone());
       }
 
-      return res;
+      return response;
     } catch {
-      const cached = await cache.match(request);
-      if (cached) return cached;
-
-      throw new Error("Network failed and no cache match");
-    }
-  }
-
-  async function handleNavigate(): Promise<Response> {
-    const cache = await caches.open(CACHE);
-
-    try {
-      const res = await fetch(request);
-      if (isSameOrigin && isHttp && res.status === 200) {
-        event.waitUntil(cache.put(request, res.clone()));
+      // Fallback to cache
+      const cachedResponse = await cache.match(url.pathname);
+      if (cachedResponse) {
+        return cachedResponse;
       }
-
-      return res;
-    } catch {
-      // Try exact nav URL first
-      const exact = await cache.match(request);
-      if (exact) return exact;
-
-      // Then app shell fallback route
-      const shell =
-        (await cache.match("/")) ?? (await cache.match("/offline.html"));
-      if (shell) return shell;
-      return new Response("Offline", { status: 503 });
     }
+
+    return new Response("Not found", { status: 404 });
   }
 
-  // 1) HTML navigations
-  if (request.mode === "navigate") {
-    event.respondWith(handleNavigate());
-    return;
-  }
-  // 2) Precached build/static assets
-  if (isSameOrigin && ASSETS.includes(url.pathname)) {
-    event.respondWith(cacheFirst());
-    return;
-  }
-  // 3) Other GETs
-  if (isSameOrigin) {
-    event.respondWith(networkFirstWithCacheFallback());
-    return;
-  }
+  event.respondWith(respond());
 });
 
 self.addEventListener("message", (event) => {
