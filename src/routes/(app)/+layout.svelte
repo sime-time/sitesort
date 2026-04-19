@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { pausePowerSync, setupPowerSync } from "$lib/client/db";
+  import { setupPowerSync } from "$lib/client/db";
   import {
     initTimeState,
     startClock,
@@ -31,29 +31,6 @@
     } else {
       return stopClock();
     }
-  });
-
-  onMount(() => {
-    const start = async () => {
-      if (data.authState === "authenticated" && data.user_id) {
-        await setupPowerSync();
-      }
-    };
-    void start();
-    const onOffline = () => {
-      void pausePowerSync(); // pause network sync, keep local DB usage
-    };
-    const onOnline = () => {
-      if (data.authState === "authenticated" && data.user_id) {
-        void setupPowerSync(); // reconnect once
-      }
-    };
-    window.addEventListener("offline", onOffline);
-    window.addEventListener("online", onOnline);
-    return () => {
-      window.removeEventListener("offline", onOffline);
-      window.removeEventListener("online", onOnline);
-    };
   });
 </script>
 

@@ -52,6 +52,14 @@ self.addEventListener("fetch", (event) => {
   const isSameOrigin = url.origin === self.location.origin;
   const isHttp = url.protocol === "http:" || url.protocol === "https:";
 
+  console.log("[sw] install", CACHE);
+  console.log("[sw] activate", CACHE);
+  console.log("[sw] fetch", { mode: request.mode, path: url.pathname });
+  console.log("[sw] nav:fallback", {
+    tried: ["request", "/", "/offline.html"],
+    used: "...",
+  });
+
   async function cacheFirst(): Promise<Response> {
     const cache = await caches.open(CACHE);
     const cached = await cache.match(request);

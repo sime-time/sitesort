@@ -1,6 +1,7 @@
 <script lang="ts">
   import faviconDark from "$lib/assets/favicon-dark.svg";
   import faviconLight from "$lib/assets/favicon-light.svg";
+  import { dbg } from "$lib/utils/debug";
   import "@fontsource-variable/space-grotesk/wght.css";
   import "@fontsource-variable/work-sans/wght.css";
   import { onMount } from "svelte";
@@ -27,6 +28,34 @@
   }
 
   onMount(() => detectSWUpdate());
+  onMount(() => {
+    dbg("app", "mount", { href: location.href });
+    window.addEventListener("pageshow", (e) =>
+      dbg("app", "pageshow", {
+        persisted: (e as PageTransitionEvent).persisted,
+        href: location.href,
+      }),
+    );
+    window.addEventListener("pagehide", (e) =>
+      dbg("app", "pagehide", {
+        persisted: (e as PageTransitionEvent).persisted,
+        href: location.href,
+      }),
+    );
+    window.addEventListener("offline", () => dbg("net", "offline"));
+    window.addEventListener("online", () => dbg("net", "online"));
+    window.addEventListener("error", (e) =>
+      dbg("window", "error", {
+        message: e.message,
+        file: e.filename,
+        line: e.lineno,
+        col: e.colno,
+      }),
+    );
+    window.addEventListener("unhandledrejection", (e) =>
+      dbg("window", "unhandledrejection", { reason: String(e.reason) }),
+    );
+  });
 </script>
 
 <svelte:head>
