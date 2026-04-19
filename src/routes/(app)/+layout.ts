@@ -1,5 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { authClient } from "$lib/client/auth";
+import { dbg } from "$lib/utils/debug";
 import type { LayoutLoad } from "./$types";
 
 export const ssr = false;
@@ -15,6 +16,15 @@ export const load: LayoutLoad = async () => {
     throw redirect(302, "/auth");
   }
   const { data, error } = sessionResult;
+  dbg("auth", "getSession:start");
+  dbg("auth", "getSession:ok", {
+    hasSession: !!data?.session,
+    hasError: !!error,
+    onLine: navigator.onLine,
+  });
+  dbg("auth", "state", {
+    authState: "authenticated|unauthenticated|unknown_offline",
+  });
 
   if (data?.session && !error) {
     return {
