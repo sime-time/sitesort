@@ -3,6 +3,14 @@ import { type InsertJob, jobInsertSchema, jobs } from "$lib/server/schema";
 import { UnauthorizedUploadError } from "$lib/utils/error-handling";
 import type { CrudEntryType, DbTransaction } from "./upload-schema";
 
+// sqlite makes booleans 0 or 1
+// so they must be normalized before uploading to postgres
+function normalizeBool(value: unknown): boolean | undefined {
+  if (value === 0) return false;
+  if (value === 1) return true;
+  return undefined;
+}
+
 export async function handleJobEntry(
   tx: DbTransaction,
   entry: CrudEntryType,
@@ -10,7 +18,15 @@ export async function handleJobEntry(
 ) {
   switch (entry.op) {
     case "PUT": {
-      const parsed = jobInsertSchema.parse(entry.data);
+      console.log("ENTRY DATA", entry.data);
+
+      const raw = entry.data ?? {};
+      const normalized = {
+        ...raw,
+        completed: normalizeBool(raw.completed),
+      };
+
+      const parsed = jobInsertSchema.parse(normalized);
 
       if (parsed.user_id !== user_id) {
         throw new UnauthorizedUploadError();
