@@ -16,9 +16,6 @@ interface UploadResponse {
 
 // Postgres Response codes that we cannot recover from by retrying.
 const FATAL_RESPONSE_CODES = [
-  // Class 22 — Data Exception
-  // Examples include data type mismatch.
-  /^22...$/,
   // Class 23 — Integrity Constraint Violation.
   // Examples include NOT NULL, FOREIGN KEY and UNIQUE violations.
   /^23...$/,

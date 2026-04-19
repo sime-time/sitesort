@@ -7,7 +7,7 @@ import { z } from "zod";
 export const crudEntrySchema = z.object({
   id: z.uuid(),
   op: z.enum(["PUT", "PATCH", "DELETE"]),
-  type: z.literal(["jobs", "tasks"]),
+  type: z.enum(["jobs", "tasks"]),
   data: z.record(z.string(), z.unknown()).optional(),
 });
 
