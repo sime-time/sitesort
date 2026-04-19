@@ -8,8 +8,6 @@
   import { goto } from "$app/navigation";
   import { authClient } from "$lib/client/auth";
 
-  const LAST_USER_ID_KEY = "sitesort.last_user_id";
-
   let session = $state<BetterAuthSession | null>(null);
   let user = $state<BetterAuthUser | null>(null);
   let loading = $state(true);
@@ -25,7 +23,6 @@
         if (data?.session) {
           user = data.user;
           session = data.session;
-          localStorage.setItem(LAST_USER_ID_KEY, data.user.id);
         }
         loading = false;
       })
@@ -62,7 +59,6 @@
     await authClient.signOut();
     session = null;
     user = null;
-    localStorage.removeItem(LAST_USER_ID_KEY);
   }
 </script>
 

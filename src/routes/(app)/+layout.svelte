@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { invalidateAll } from "$app/navigation";
   import { pausePowerSync, setupPowerSync } from "$lib/client/db";
   import {
     initTimeState,
@@ -19,6 +18,13 @@
 
   let { children, data } = $props();
 
+  onMount(async () => {
+    if (data.authState === "authenticated" && data.user_id) {
+      await setupPowerSync();
+    }
+    initTimeState();
+  });
+
   $effect(() => {
     if (activeEntry) {
       return startClock();
@@ -27,29 +33,21 @@
     }
   });
 
-  async function startSyncIfAllowed() {
-    if (
-      data.authState === "authenticated" &&
-      data.user_id &&
-      navigator.onLine
-    ) {
-      await setupPowerSync();
-    }
-  }
-
   onMount(() => {
-    initTimeState();
-    void startSyncIfAllowed();
-
+    const start = async () => {
+      if (data.authState === "authenticated" && data.user_id) {
+        await setupPowerSync();
+      }
+    };
+    void start();
     const onOffline = () => {
-      void pausePowerSync();
+      void pausePowerSync(); // pause network sync, keep local DB usage
     };
-
-    const onOnline = async () => {
-      await invalidateAll(); // rerun +layout.ts, refresh authState/user_id
-      await startSyncIfAllowed();
+    const onOnline = () => {
+      if (data.authState === "authenticated" && data.user_id) {
+        void setupPowerSync(); // reconnect once
+      }
     };
-
     window.addEventListener("offline", onOffline);
     window.addEventListener("online", onOnline);
     return () => {
