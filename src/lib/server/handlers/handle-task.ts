@@ -20,6 +20,7 @@ export async function handleTaskEntry(tx: DbTransaction, entry: CrudEntryType) {
         job_id: parsed.job_id,
         description: parsed.description,
         order: parsed.order,
+        completed: parsed.completed,
         created_at: parsed.created_at,
         updated_at: parsed.updated_at,
       };
@@ -33,6 +34,7 @@ export async function handleTaskEntry(tx: DbTransaction, entry: CrudEntryType) {
             job_id: row.job_id,
             description: row.description,
             order: row.order,
+            completed: row.completed,
             created_at: row.created_at,
             updated_at: row.updated_at,
           },
@@ -47,7 +49,7 @@ export async function handleTaskEntry(tx: DbTransaction, entry: CrudEntryType) {
         completed: normalizeBool(raw.completed),
       };
 
-      const parsed = taskInsertSchema.parse(normalized);
+      const parsed = taskInsertSchema.partial().parse(normalized);
       const patch: Partial<InsertTask> = {
         ...parsed,
         updated_at: parsed.updated_at ?? new Date().toISOString(),

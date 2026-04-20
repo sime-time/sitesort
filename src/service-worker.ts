@@ -72,15 +72,8 @@ self.addEventListener("fetch", (event) => {
     if (event.request.mode === "navigate") {
       try {
         const response = await fetch(event.request);
-        if (response instanceof Response && response.ok) {
-          await cache.put(event.request, response.clone());
-        }
-
         return response;
       } catch {
-        const cachedNav = await cache.match(event.request);
-        if (cachedNav) return cachedNav;
-
         const shell = await cache.match(APP_SHELL);
         if (shell) return shell;
 
@@ -94,10 +87,12 @@ self.addEventListener("fetch", (event) => {
     // Other same-origin GET: network-first + runtime cache fallback
     try {
       const response = await fetch(event.request);
-      if (response instanceof Response && response.ok) {
+      const contentType = response.headers.get("content-type") ?? "";
+      const isHtml = contentType.includes("text/html");
+      const isApi = url.pathname.startsWith("/api/");
+      if (response.ok && !isHtml && !isApi) {
         await cache.put(event.request, response.clone());
       }
-
       return response;
     } catch {
       const cached = await cache.match(event.request);

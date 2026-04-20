@@ -61,7 +61,7 @@ export async function handleJobEntry(
         completed: normalizeBool(raw.completed),
       };
 
-      const parsed = jobInsertSchema.parse(normalized);
+      const parsed = jobInsertSchema.partial().parse(normalized);
       const patch: Partial<InsertJob> = {
         ...parsed,
         updated_at: parsed.updated_at ?? new Date().toISOString(),

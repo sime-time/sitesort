@@ -256,7 +256,12 @@
                       <p class="font-medium text-base">
                         {formatTimeLabel(entry.clockInAt)}
                         -
-                        {entry.clockOutAt ? formatTimeLabel(entry.clockOutAt) : "Running"}
+                        {#if entry.clockOutAt}
+                          {formatTimeLabel(entry.clockOutAt)}
+                        {:else}
+                          <i>Running</i>
+                          <span class="loading loading-dots loading-xs"></span>
+                        {/if}
                       </p>
                       <p class="text-sm text-base-content/65">
                         {entry.clockOutAt ? "Completed shift" : "Open shift"}
