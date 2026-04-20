@@ -22,6 +22,7 @@
   });
 
   async function handleToggle(event: Event) {
+    haptic.confirm();
     const input = event.currentTarget as HTMLInputElement;
     const nextCompleted = input.checked;
 
@@ -29,7 +30,6 @@
     saving = true;
 
     try {
-      haptic();
       await toggleTask(id, nextCompleted);
     } catch (err) {
       console.error("Toggle task failed", err);

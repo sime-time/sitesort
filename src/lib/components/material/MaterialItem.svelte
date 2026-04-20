@@ -62,13 +62,13 @@
   }
 
   async function incrementQuantity() {
-    await commitQuantity(count + 1);
     haptic();
+    await commitQuantity(count + 1);
   }
 
   async function decrementQuantity() {
-    await commitQuantity(count - 1);
     haptic();
+    await commitQuantity(count - 1);
   }
 </script>
 
