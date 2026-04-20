@@ -75,8 +75,6 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   }
 
-  console.log("rawBody", rawBody.crud[0].data);
-
   const bodyParsed = uploadBodySchema.safeParse(rawBody);
   if (!bodyParsed.success) {
     return json({

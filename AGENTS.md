@@ -4,172 +4,127 @@
 
 SiteSort is a mobile-first web app for electricians that replaces paper sheets used on job sites.
 
-Core user workflows:
+Core workflows:
 - Create a job
-- Track materials with fast tap-based counters
-- Check off rough-in tasks
-- Mark job status (`in_progress` / `completed`)
+- Track materials with fast tap counters
+- Check off job site tasks
+- Mark jobs as complete/incomplete
 
 Primary product goal:
-- Make field logging faster than paper with minimal typing and low-friction UI.
+- Field logging must be faster than paper with minimal typing and low-friction interactions.
 
 ## Current Stack
 
 - Framework: SvelteKit (Svelte 5 runes)
-- Styling/UI: Tailwind + shadcn-svelte style components
-- Validation: Zod + `sveltekit-superforms`
+- Styling: Tailwind CSS + shadcn-svelte style components
 - Runtime/deploy target: Node server (`@sveltejs/adapter-node`)
-- Client data layer: PowerSync Web SDK + Drizzle driver + wa-sqlite
+- Local data + sync: `@powersync/web` + `@powersync/drizzle-driver` + `@journeyapps/wa-sqlite`
+- Server DB access for upload handler: `drizzle-orm/node-postgres` + `pg`
+- Auth client: `@neondatabase/neon-js/auth`
 
-Key config choices:
-- `src/routes/(app)/+layout.ts` sets `export const ssr = false;` for app dashboard routes
-- SSR is still available for non-`(app)` routes and server endpoints
-- `svelte.config.js` uses `@sveltejs/adapter-node`
-- `vite.config.ts` includes `vite-plugin-wasm`, excludes `@journeyapps/wa-sqlite` / `@powersync/web` from optimizeDeps, and sets `worker.format = "es"`
+Key config:
+- `src/routes/(app)/+layout.ts` uses `export const ssr = false`.
+- `svelte.config.js` uses `@sveltejs/adapter-node`.
+- `vite.config.ts` includes `vite-plugin-wasm`, excludes `@journeyapps/wa-sqlite` and `@powersync/web` from optimizeDeps, and sets `worker.format = "es"`.
 
-## Architectural Direction
+## Architecture (Current Mental Model)
 
-The app is planned as offline-first.
+SiteSort is offline-first with a PowerSync-backed local DB.
 
-Target model:
-- Client-first writes to local database on device
-- Sync later to backend/Postgres via PowerSync
-- UI should not depend on always-on network
+Read/write model:
+- UI reads and writes local tables through Drizzle wrapped over PowerSync (`src/lib/client/db.ts`).
+- Local writes are queued by PowerSync and uploaded asynchronously by connector `uploadData()` (`src/lib/client/connector.ts`).
+- Uploads are best-effort and retryable; app UX should still work when offline.
 
-Implications:
-- Do not make server actions the primary mutation path for core user flows
-- Prefer client-side validation + local repository writes
-- Keep sync metadata in records from day one (`syncStatus`, timestamps, retry/error fields)
+Connection lifecycle:
+- `initPowerSyncLocal()` initializes local DB once.
+- `setupPowerSync()` is guarded with `initPromise` and `connectPromise` so repeated calls do not race or double-connect.
+- App layout initializes local DB first, then attempts remote connect when online, and retries on `online` and `visibilitychange` (`src/routes/(app)/+layout.svelte`).
 
-## Backend and Service Boundaries
+Auth/offline behavior:
+- `(app)` layout load path uses cached `LAST_KNOWN_USER_ID_KEY` for offline grace mode.
+- If no cached user exists, app attempts live session and redirects to `/auth` if unavailable.
 
-Recommended service split:
-1. Frontend app (`sitesort`) served by SvelteKit Node runtime
-2. Dedicated backend for PowerSync auth/sync endpoints
-3. Postgres as system-of-record backend store
+## PowerSync Upload Contract
 
-PowerSync-style backend endpoints (external service):
-- `GET /api/auth/token`
-- `POST /api/auth/token`
-- `GET /api/auth/keys`
-- `PUT /api/data`
-- `PATCH /api/data`
-- `DELETE /api/data`
+Client connector behavior (`src/lib/client/connector.ts`):
+- Calls `database.getNextCrudTransaction()` and processes one transaction at a time.
+- Sends `POST /api/upload` with bearer token from Neon auth session.
+- Payload shape sent by client: `{ crud: transaction.crud }`.
+- Calls `transaction.complete()` on success.
+- Also calls `transaction.complete()` for explicit fatal errors so queue does not stall forever.
+- Throws on retryable failures so PowerSync retries later.
 
-Notes:
-- Keep frontend and backend as separate deployable services (can still share a monorepo).
-- Framework choice for backend (Express vs Hono) is less important than stable endpoint contracts and security.
-- In local/dev, uploads currently go through `src/routes/api/upload/+server.ts`.
-- `src/routes/api/upload/+server.ts` verifies bearer tokens cryptographically (`jose`) using JWKS + issuer + audience env vars (`NEON_AUTH_JWKS_URL`, `NEON_AUTH_ISSUER`, `NEON_AUTH_AUDIENCE`).
-- Upload route enforces row ownership via token subject (`sub`) mapped to `user_id`; unauthorized writes return 403.
+Fatal vs retryable handling:
+- Fatal DB codes currently treated as discard-worthy:
+  - Postgres class `23...` (integrity constraint violations)
+  - `42501` (insufficient privilege / unauthorized operation)
+- Retryable path:
+  - Network issues
+  - 5xx responses
+  - unknown transient failures
 
-## Forms and Validation
+## Upload API Semantics
 
-Known schema location:
-- `src/lib/schemas/valid-job.ts`
+Upload endpoint: `src/routes/api/upload/+server.ts`
 
-Current new-job route:
-- `src/routes/(app)/new-job/+page.svelte`
+Request requirements:
+- `Authorization: Bearer <token>`
+- JSON body matching:
+  - `crud: Array<{ id, op, type, data? }>`
+  - `op`: `PUT | PATCH | DELETE`
+  - `type`: `jobs | tasks | materials | job_materials`
 
-Guidance for job creation flow:
-- Validate with shared Zod schema on client
-- Submit to local data repository (Phase 1)
-- Avoid relying on network/server action for core create path
+Auth verification:
+- Token is verified with `jose` using:
+  - `NEON_AUTH_JWKS_URL`
+  - `NEON_AUTH_ISSUER`
+  - `NEON_AUTH_AUDIENCE`
+- `payload.sub` is mapped to `user_id`.
 
-Schema modeling guidance:
-- Use `z.infer<typeof schema>` for data types
-- If transporting dates as JSON strings, use `z.coerce.date()` on parse boundaries
+Transaction behavior:
+- Entire CRUD array is processed in a single Drizzle transaction.
+- Dispatches by `entry.type` to specialized handlers in `src/lib/server/handlers`.
 
-## Offline-First Phase Plan (Phase 1)
+Response semantics important for connector behavior:
+- `200 { ok: true }` => complete transaction.
+- `200 { ok: false, errorCode: "42501" }` => non-retryable unauthorized; connector discards.
+- `400 { ok: false, errorCode: "22023" }` for validation/shape issues.
+- `500` for transient server failures; connector retries.
 
-Phase 1 objective:
-- Fully offline local create/list behavior before PowerSync integration.
+## Data Ownership and Guardrails
 
-Phase 1 implementation principles:
-- Add repository abstraction for jobs (UI depends on interface, not storage impl)
-- Use local persistence adapter (IndexedDB now, PowerSync SQLite later)
-- Generate client UUIDs
-- Store sync state on each record (`pending`, later `synced` / `error`)
-- Add basic offline UX indicators and status labels
+Current ownership enforcement:
+- Jobs:
+  - `PUT` requires payload `user_id` to equal token subject.
+  - `PATCH` and `DELETE` are scoped by both `jobs.id` and `jobs.user_id`.
+- `UnauthorizedUploadError` is normalized in `src/lib/utils/error-handling.ts` and surfaced as `errorCode: "42501"`.
 
-## Product and UX Constraints
+Current limitation to keep in mind:
+- Task/material/job-material handlers currently scope by row id only.
+- They do not yet join back to `jobs.user_id` for explicit per-user ownership checks.
 
-Design intent:
-- Mobile-first and touch-efficient
-- Minimize text entry
-- Optimize for fast in-field interactions
+## Current Route/File Landmarks
 
-Interaction priorities:
-- Large tap targets
-- Fast incremental actions (counters, checklists)
-- Clear job state and progress visibility
-- Avoid complex multi-step forms where possible
-
-## Deployment Notes
-
-Frontend:
-- Adapter is `@sveltejs/adapter-node` (server runtime)
-- App dashboard remains SPA-like by disabling SSR in `src/routes/(app)/+layout.ts`
-- Keep WASM-capable Vite config for PowerSync/wa-sqlite support
-
-Backend:
-- Server DB driver is `drizzle-orm/node-postgres` + `pg` to support transactions.
-- Should be owned in your own repo/fork (not long-term pinned to demo source)
-- Keep auth signing keys and secrets out of frontend and static builds
-
-## Important Repo Context
-
-- This repo currently includes only a small set of routes/components.
-- Active upload endpoint exists at `src/routes/api/upload/+server.ts` for PowerSync CRUD upload handling.
-- Client writes are local-first via PowerSync local DB, then uploaded through connector `uploadData()`.
-- New-job form is client-handled in `src/routes/(app)/new-job/+page.svelte`.
-- PowerSync upload payload shape currently validated as `{ crud: [{ op, type, id, data, ... }] }` (`type`/`data`, not `table`/`opData`).
-- `UnauthorizedUploadError` is defined in `src/lib/utils/error-handling.ts` and used by the upload route.
+- App shell and PowerSync startup: `src/routes/(app)/+layout.svelte`
+- App auth/offline-grace load logic: `src/routes/(app)/+layout.ts`
+- Job create page (client-first submit): `src/routes/(app)/job/create/+page.svelte`
+- Client DB + connect guards: `src/lib/client/db.ts`
+- PowerSync connector + upload retry/fatal logic: `src/lib/client/connector.ts`
+- Upload endpoint: `src/routes/api/upload/+server.ts`
+- Upload schemas and transaction types: `src/lib/server/handlers/upload-schema.ts`
+- Table-specific upload handlers: `src/lib/server/handlers/handle-*.ts`
+- Shared server schema: `src/lib/server/schema.ts`
 
 ## Decisions to Preserve
 
-- Prioritize offline-first behavior over classic server form actions.
-- Keep shared schema definitions under `$lib/schemas`.
-- Keep architecture simple and incremental: local-first now, sync layer after local model stabilizes.
+- Keep core UX local-first; do not make network/server actions the critical path for field workflows.
+- Keep upload handling idempotent and queue-safe (`transaction.complete()` rules are non-negotiable).
+- Keep endpoint contract stable around `{ crud: [{ op, type, id, data? }] }`.
+- Keep auth token verification on upload route strict (JWKS + issuer + audience).
 
 ## Known Technical Debt
 
-- `setupPowerSync()` in `src/lib/sql/client/db.ts` is not yet idempotent; add a single-connect guard to prevent accidental repeated `connect()` calls.
-
-## Phase 1 Tickets
-
-Ticket 1 - Define job domain model and schema boundaries
-- Confirm `newJobSchema` shape for create input and add a stored record type using `z.infer`.
-- Add sync metadata fields for local records (`syncStatus`, `syncError`, `createdAt`, `updatedAt`).
-- Acceptance: shared types exist and are consumed by UI/repository code.
-
-Ticket 2 - Create jobs repository abstraction
-- Add a jobs repository interface in `$lib` with methods for create/list/get.
-- Ensure route components call the repository, not storage APIs directly.
-- Acceptance: UI compiles while depending only on repository methods.
-
-Ticket 3 - Implement IndexedDB local adapter
-- Create IndexedDB-backed implementation for the jobs repository.
-- Persist job records locally with client UUIDs and `syncStatus: "pending"`.
-- Acceptance: jobs persist across refresh while offline.
-
-Ticket 4 - Convert new job submit flow to local-first
-- Update `src/routes/(app)/new-job/+page.svelte` to handle submit on client.
-- Validate with shared Zod schema before local write.
-- Remove dependence on server form actions for core create path.
-- Acceptance: creating a job succeeds with no network.
-
-Ticket 5 - Add offline and sync status UX
-- Show offline/online indicator in app shell or relevant pages.
-- Show per-job sync status labels in job list views.
-- Acceptance: user can tell if data is pending sync.
-
-Ticket 6 - Add local persistence smoke tests
-- Add tests or scripted checks for create/list persistence behavior.
-- Include manual QA steps for browser offline mode and refresh.
-- Acceptance: checklist verifies Phase 1 behavior repeatedly.
-
-Ticket 7 - Prepare PowerSync integration seam
-- Document the mapping between local record shape and future PowerSync tables.
-- Add no-op or stub sync service boundary used by repository.
-- Acceptance: PowerSync adapter can be introduced without changing route-level form code.
+- Remove debug logging from upload endpoint (`console.log("rawBody", ...)`) before production hardening.
+- Add explicit ownership checks for non-`jobs` tables (`tasks`, `materials`, `job_materials`) using user-scoped joins.
+- Add integration tests for upload retry/discard behavior to lock in queue semantics.
