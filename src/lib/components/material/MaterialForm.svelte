@@ -17,7 +17,12 @@
   const {
     jobId,
     categories,
-  }: { jobId?: string; categories: SelectCategory[] } = $props();
+    onSuccess,
+  }: {
+    jobId?: string;
+    categories: SelectCategory[];
+    onSuccess?: () => void;
+  } = $props();
 
   let materialName = $state<string>("");
   let quantity = $state<number>(0);

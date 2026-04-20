@@ -8,9 +8,9 @@
   import { listCategories } from "$lib/client/crud/read-category";
   import {
     type JobMaterial,
-    listJobMaterials,
+    watchJobMaterials,
   } from "$lib/client/crud/read-material";
-  import { listJobTasks } from "$lib/client/crud/read-task";
+  import { watchJobTasks } from "$lib/client/crud/read-task";
   import type { SelectCategory, SelectTask } from "$lib/client/schema";
   import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
   import MaterialForm from "$lib/components/material/MaterialForm.svelte";
@@ -27,8 +27,12 @@
 
   let addModal: HTMLDialogElement | undefined;
 
-  function openAddModal() {
+  function openModalForm() {
     addModal?.showModal();
+  }
+
+  function closeModalForm() {
+    addModal?.close();
   }
 
   const materialsByCategory = $derived.by(() => {
@@ -47,29 +51,43 @@
     return groups;
   });
 
-  async function loadJobDetails(id: string) {
-    loading = true;
-
-    try {
-      const [nextMaterials, nextTasks, nextCategories] = await Promise.all([
-        listJobMaterials(id),
-        listJobTasks(id),
-        listCategories(),
-      ]);
-
-      materials = nextMaterials;
-      tasks = nextTasks;
-      categories = nextCategories;
-    } catch (err) {
-      console.error("Failed loading job page data", err);
-    } finally {
-      loading = false;
-    }
-  }
-
   $effect(() => {
     if (!jobId) return;
-    void loadJobDetails(jobId);
+    loading = true;
+
+    void listCategories()
+      .then((next) => {
+        categories = next;
+      })
+      .catch((err) => {
+        console.error("Category load failed", err);
+      })
+      .finally(() => (loading = false));
+
+    const disposeTasks = watchJobTasks(
+      jobId,
+      (nextTasks) => {
+        tasks = nextTasks;
+      },
+      (error) => {
+        console.error("Task watch failed", error);
+      },
+    );
+
+    const disposeMaterials = watchJobMaterials(
+      jobId,
+      (nextMaterials) => {
+        materials = nextMaterials;
+      },
+
+      (error) => {
+        console.error("Material watch failed", error);
+      },
+    );
+    return () => {
+      disposeTasks();
+      disposeMaterials();
+    };
   });
 </script>
 
@@ -131,7 +149,7 @@
       <button
         type="button"
         class="mt-6 w-full uppercase font-heading tracking-widest btn btn-xl btn-neutral btn-soft border-2 border-neutral border-dashed"
-        onclick={openAddModal}
+        onclick={openModalForm}
       >
         <Icon icon={addCircleOutlineIcon} />
         <span class="text-base">
@@ -154,9 +172,9 @@
 
           <!-- Modal Form -->
           {#if activeTab === "materials"}
-            <MaterialForm {jobId} {categories} />
+            <MaterialForm {jobId} {categories} onSuccess={closeModalForm} />
           {:else}
-            <TaskForm {jobId} />
+            <TaskForm {jobId} onSuccess={closeModalForm} />
           {/if}
         </div>
       </dialog>

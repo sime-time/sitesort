@@ -44,9 +44,6 @@
     }
     errors = {};
 
-    console.log("Success", parsed.data);
-    console.log("User ID", data.user_id);
-
     try {
       await createJob({
         user_id: data.user_id,

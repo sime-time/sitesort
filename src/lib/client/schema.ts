@@ -1,5 +1,6 @@
 import { DrizzleAppSchema } from "@powersync/drizzle-driver";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const jobs = sqliteTable("jobs", {
   id: text().primaryKey().notNull(),
@@ -77,6 +78,7 @@ export const drizzleSchema = {
 // Infer the PowerSync schema from your Drizzle schema
 export const AppSchema = new DrizzleAppSchema(drizzleSchema);
 
+// Types
 export type InsertJob = typeof jobs.$inferInsert;
 export type SelectJob = typeof jobs.$inferSelect;
 export type InsertCategory = typeof categories.$inferInsert;
@@ -87,3 +89,13 @@ export type InsertJobMaterial = typeof job_materials.$inferInsert;
 export type SelectJobMaterial = typeof job_materials.$inferSelect;
 export type InsertTask = typeof tasks.$inferInsert;
 export type SelectTask = typeof tasks.$inferSelect;
+
+// Zod Validation Schemas
+export const jobInsertSchema = createInsertSchema(jobs);
+export const jobSelectSchema = createSelectSchema(jobs);
+export const jobMaterialInsertSchema = createInsertSchema(job_materials);
+export const jobMaterialSelectSchema = createSelectSchema(job_materials);
+export const materialInsertSchema = createInsertSchema(materials);
+export const materialSelectSchema = createSelectSchema(materials);
+export const taskInsertSchema = createInsertSchema(tasks);
+export const taskSelectSchema = createSelectSchema(tasks);

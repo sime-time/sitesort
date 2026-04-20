@@ -20,7 +20,7 @@ replication:
   connections:
     - type: postgresql
       # [optional] Connection string (recommended). Omit and use hostname/port/database/username/password instead.
-      uri: !env DATABASE_URL  
+      uri: !env PS_DATABASE_URL  
 
       # [optional] TLS mode. Options: verify-full | verify-ca. Default: verify-full. Use verify-full for production.
       sslmode: verify-full
@@ -28,6 +28,6 @@ replication:
 client_auth:
   supabase: false
   # [optional] JWKS URL; instance fetches public keys to verify JWT signatures.
-  jwks_uri: !env NEON_AUTH_JWKS_URL
+  jwks_uri: !env PS_NEON_AUTH_JWKS_URL
   # [optional] Additional audiences to accept (instance domain is always accepted). Default: [].
-  additional_audiences: [!env NEON_AUTH_AUDIENCE]
+  additional_audiences: [!env PS_NEON_AUTH_AUDIENCE]

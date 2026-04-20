@@ -1,20 +1,62 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import addCircleOutlineIcon from "@iconify-icons/material-symbols/add-circle-outline";
+  import { toast } from "svelte-sonner";
+  import {
+    createTask,
+    createTaskSchema,
+    mapCreateTaskErrors,
+  } from "$lib/client/crud/create-task";
 
-  const { jobId } = $props();
+  const { jobId, onSuccess }: { jobId?: string; onSuccess?: () => void } =
+    $props();
 
   type FormErrors = {
     description?: string;
-    completed?: boolean;
+    completed?: string;
   };
 
   let description = $state<string>("");
   let completed = $state<boolean>(false);
   let errors = $state<FormErrors>({});
+
+  async function handleSubmit(e: SubmitEvent) {
+    e.preventDefault();
+
+    const parsed = createTaskSchema.safeParse({
+      job_id: jobId,
+      description: description,
+      completed: completed,
+    });
+
+    if (!parsed.success) {
+      errors = mapCreateTaskErrors(parsed.error);
+      return;
+    }
+    errors = {};
+
+    try {
+      await createTask({
+        job_id: parsed.data.job_id,
+        description: parsed.data.description,
+        completed: parsed.data.completed,
+      });
+    } catch (err) {
+      toast.error("Failed to create new task");
+      console.error("Error Create Task", err);
+      return;
+    }
+
+    // Reset form on success
+    toast.success("New task created");
+    description = "";
+    completed = false;
+
+    onSuccess?.(); // close modal from parent
+  }
 </script>
 
-<form class="flex flex-col gap-3">
+<form class="flex flex-col gap-3" onsubmit={handleSubmit}>
   <legend class="font-heading font-medium text-2xl uppercase">New Task</legend>
   <fieldset class="fieldset">
     <label
