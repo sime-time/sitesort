@@ -6,6 +6,7 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { getUserJob } from "$lib/client/crud/read-job";
+  import { haptic } from "$lib/utils/haptic";
 
   let jobTitle = $state<string>("");
 
@@ -29,15 +30,18 @@
   });
 
   function goBack() {
+    haptic.confirm();
     if (history.length > 1) history.back();
     else goto("/");
   }
 
   function signOut() {
+    haptic.error();
     goto("/auth");
   }
 
   function editJob() {
+    haptic.confirm();
     goto(`/job/edit/${jobId}`);
   }
 </script>

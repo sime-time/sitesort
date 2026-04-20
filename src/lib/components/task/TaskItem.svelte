@@ -1,5 +1,6 @@
 <script lang="ts">
   import { toggleTask } from "$lib/client/crud/update-task";
+  import { haptic } from "$lib/utils/haptic";
 
   const {
     id,
@@ -28,6 +29,7 @@
     saving = true;
 
     try {
+      haptic();
       await toggleTask(id, nextCompleted);
     } catch (err) {
       console.error("Toggle task failed", err);

@@ -1,19 +1,74 @@
 <script lang="ts">
+  import { updateJobMaterialQuantity } from "$lib/client/crud/update-material";
+  import { haptic } from "$lib/utils/haptic";
   import {
     blockInvalidKeys,
     clampMin,
     sanitizeWholeNumber,
   } from "$lib/utils/sanitize-numeric-input";
 
-  let { name, quantity = 0 }: { name: string; quantity: number } = $props();
+  let {
+    id,
+    name,
+    quantity = 0,
+  }: { id: string; name: string; quantity: number } = $props();
 
   // svelte-ignore state_referenced_locally
   let count = $state<number>(clampMin(quantity));
+  let saving = $state<boolean>(false);
+
+  // keep local state "count" aligned with parent watcher "quantity"
+  $effect(() => {
+    count = clampMin(quantity);
+  });
+
+  async function commitQuantity(nextRaw: number) {
+    if (saving) return;
+
+    const next = clampMin(Math.trunc(nextRaw));
+    if (next === quantity) return;
+
+    count = next;
+    saving = true;
+
+    try {
+      await updateJobMaterialQuantity(id, next);
+    } catch (err) {
+      console.error("Update quantity failed", err);
+      count = quantity; // rollback to watcher value
+    } finally {
+      saving = false;
+    }
+  }
 
   function handleInput(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
     count = clampMin(sanitizeWholeNumber(input.value));
     input.value = String(count);
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    blockInvalidKeys(event);
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      (event.currentTarget as HTMLInputElement).blur();
+    }
+  }
+
+  async function updateQuantity(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    await commitQuantity(sanitizeWholeNumber(input.value));
+  }
+
+  async function incrementQuantity() {
+    await commitQuantity(count + 1);
+    haptic();
+  }
+
+  async function decrementQuantity() {
+    await commitQuantity(count - 1);
+    haptic();
   }
 </script>
 
@@ -53,7 +108,8 @@
     <button
       type="button"
       class="btn btn-square btn-lg bg-base-100 border"
-      onclick={() => count = clampMin(count - 1)}
+      onclick={decrementQuantity}
+      disabled={saving}
     >
       {@render MinusIcon()}
     </button>
@@ -64,17 +120,20 @@
         type="number"
         inputmode="numeric"
         oninput={handleInput}
-        onkeydown={blockInvalidKeys}
+        onkeydown={handleKeydown}
+        onblur={updateQuantity}
         step="1"
         min="0"
         class="font-heading text-xl font-semibold w-13 text-center no-spinner"
+        disabled={saving}
       >
     </div>
 
     <button
       type="button"
       class="btn btn-square btn-lg bg-base-100 border"
-      onclick={() => count = clampMin(count + 1)}
+      onclick={incrementQuantity}
+      disabled={saving}
     >
       {@render PlusIcon()}
     </button>
