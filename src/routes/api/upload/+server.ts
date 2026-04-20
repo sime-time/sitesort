@@ -9,6 +9,8 @@ import {
 } from "$env/static/private";
 import { db } from "$lib/server/db";
 import { handleJobEntry } from "$lib/server/handlers/handle-job";
+import { handleJobMaterialEntry } from "$lib/server/handlers/handle-job-material";
+import { handleMaterialEntry } from "$lib/server/handlers/handle-material";
 import { handleTaskEntry } from "$lib/server/handlers/handle-task";
 import {
   type CrudEntryType,
@@ -73,6 +75,8 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   }
 
+  console.log("rawBody", rawBody.crud[0].data);
+
   const bodyParsed = uploadBodySchema.safeParse(rawBody);
   if (!bodyParsed.success) {
     return json({
@@ -97,6 +101,12 @@ export const POST: RequestHandler = async ({ request }) => {
             break;
           case "tasks":
             await handleTaskEntry(tx, entry);
+            break;
+          case "materials":
+            await handleMaterialEntry(tx, entry);
+            break;
+          case "job_materials":
+            await handleJobMaterialEntry(tx, entry);
             break;
           default:
             break;

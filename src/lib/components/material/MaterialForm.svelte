@@ -1,6 +1,12 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import addCircleOutlineIcon from "@iconify-icons/material-symbols/add-circle-outline";
+  import { toast } from "svelte-sonner";
+  import {
+    createJobMaterial,
+    createJobMaterialSchema,
+    mapCreateJobMaterialErrors,
+  } from "$lib/client/crud/create-material";
   import type { SelectCategory } from "$lib/client/schema";
   import {
     blockInvalidKeys,
@@ -10,7 +16,7 @@
 
   type FormErrors = {
     name?: string;
-    quantity?: number;
+    quantity?: string;
     category?: string;
   };
 
@@ -34,9 +40,47 @@
     quantity = clampMin(sanitizeWholeNumber(input.value));
     input.value = String(quantity);
   }
+
+  async function handleSubmit(e: SubmitEvent) {
+    e.preventDefault();
+
+    const parsed = createJobMaterialSchema.safeParse({
+      job_id: jobId,
+      name: materialName,
+      quantity,
+      category_id: categoryId,
+    });
+
+    if (!parsed.success) {
+      errors = mapCreateJobMaterialErrors(parsed.error);
+      return;
+    }
+    errors = {};
+
+    try {
+      await createJobMaterial({
+        job_id: parsed.data.job_id,
+        name: parsed.data.name,
+        quantity: parsed.data.quantity,
+        category_id: parsed.data.category_id,
+      });
+    } catch (err) {
+      toast.error("Failed to create new material");
+      console.error("Error Create Job Material", err);
+      return;
+    }
+
+    // Reset form on success
+    toast.success("New material created");
+    materialName = "";
+    quantity = 0;
+    categoryId = "";
+
+    onSuccess?.(); // close modal from parent
+  }
 </script>
 
-<form class="flex flex-col gap-3">
+<form class="flex flex-col gap-3" onsubmit={handleSubmit}>
   <legend class="font-heading font-medium text-2xl uppercase">
     New Material
   </legend>
@@ -85,8 +129,8 @@
     >
       Category
     </label>
-    <select class="select w-full">
-      <option disabled selected>Type of material</option>
+    <select class="select w-full" bind:value={categoryId}>
+      <option value="" disabled selected>Type of material</option>
       {#each categories as category}
         <option value={category.id}>{category.name}</option>
       {/each}

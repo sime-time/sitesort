@@ -19,7 +19,7 @@ export function watchJobTasks(
 ) {
   const watched = powerSyncDb
     .query({
-      sql: "select * from tasks where job_id = ? order by 'order'",
+      sql: `select * from tasks where job_id = ? order by "order", created_at`,
       parameters: [jobId],
     })
     .watch();
