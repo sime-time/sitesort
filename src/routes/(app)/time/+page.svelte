@@ -288,11 +288,7 @@
   </div>
 </section>
 
-<dialog
-  bind:this={editDialogEl}
-  class="modal modal-bottom sm:modal-middle"
-  onclose={closeEdit}
->
+<dialog bind:this={editDialogEl} class="modal modal-middle" onclose={closeEdit}>
   <div class="modal-box">
     <h3 class="font-bold text-lg">Edit Time Entry</h3>
 

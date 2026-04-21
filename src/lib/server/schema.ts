@@ -8,7 +8,11 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 
 const timestamps = () => ({
   created_at: timestamp({ withTimezone: true, mode: "string" })
@@ -97,6 +101,7 @@ export type SelectTask = typeof tasks.$inferSelect;
 // Zod Validation Schemas
 export const jobInsertSchema = createInsertSchema(jobs);
 export const jobSelectSchema = createSelectSchema(jobs);
+export const jobUpdateSchema = createUpdateSchema(jobs);
 export const jobMaterialInsertSchema = createInsertSchema(job_materials);
 export const jobMaterialSelectSchema = createSelectSchema(job_materials);
 export const materialInsertSchema = createInsertSchema(materials);

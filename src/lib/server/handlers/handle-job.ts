@@ -1,5 +1,10 @@
 import { and, eq } from "drizzle-orm";
-import { type InsertJob, jobInsertSchema, jobs } from "$lib/server/schema";
+import {
+  type InsertJob,
+  jobInsertSchema,
+  jobs,
+  jobUpdateSchema,
+} from "$lib/server/schema";
 import { UnauthorizedUploadError } from "$lib/utils/error-handling";
 import { normalizeBool } from "$lib/utils/normalize-bool";
 import type { CrudEntryType, DbTransaction } from "./upload-schema";
@@ -61,7 +66,7 @@ export async function handleJobEntry(
         completed: normalizeBool(raw.completed),
       };
 
-      const parsed = jobInsertSchema.partial().parse(normalized);
+      const parsed = jobUpdateSchema.parse(normalized);
       const patch: Partial<InsertJob> = {
         ...parsed,
         updated_at: parsed.updated_at ?? new Date().toISOString(),
