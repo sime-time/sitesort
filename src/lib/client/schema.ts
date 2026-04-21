@@ -1,10 +1,6 @@
 import { DrizzleAppSchema } from "@powersync/drizzle-driver";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import {
-  createInsertSchema,
-  createSelectSchema,
-  createUpdateSchema,
-} from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const jobs = sqliteTable("jobs", {
   id: text().primaryKey().notNull(),

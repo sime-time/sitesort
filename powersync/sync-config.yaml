@@ -18,11 +18,8 @@ streams:
   user_materials:
     auto_subscribe: true
     queries:
-      - SELECT DISTINCT materials.*
+      - SELECT *
         FROM materials
-        JOIN job_materials ON job_materials.material_id = materials.id
-        JOIN jobs ON jobs.id = job_materials.job_id
-        WHERE jobs.user_id = auth.user_id()
   user_tasks:
     auto_subscribe: true
     queries:

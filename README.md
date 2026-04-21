@@ -64,8 +64,12 @@ npm run preview
 - Do not manually add `src/index.html`; fallback is generated at build time.
 - Keep backend signing keys and sync secrets out of this frontend repository.
 
-## Current Focus
+## Clear local client database
 
-Phase 1 objective is fully offline local create/list behavior before PowerSync sync wiring.
+```js
+const { powerSyncDb } = await import("/src/lib/client/db.ts");
+await powerSyncDb.disconnectAndClear();
+location.reload();
+```
 
 See `AGENTS.md` for project context, architectural constraints, and implementation tickets.
