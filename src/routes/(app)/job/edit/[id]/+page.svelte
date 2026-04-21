@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import deleteOutlineIcon from "@iconify-icons/material-symbols/delete-outline";
   import saveIcon from "@iconify-icons/material-symbols/save";
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
@@ -11,6 +10,7 @@
     updateJob,
     updateJobSchema,
   } from "$lib/client/crud/update-job";
+  import DeleteJob from "$lib/components/DeleteJob.svelte";
   import type { PageProps } from "./$types";
 
   type FormErrors = {
@@ -96,15 +96,14 @@
     }
 
     // Reset job form on success
-    toast.success("Changes saved");
+    toast.success("Job changes saved");
     name = "";
     address = "";
     startDate = "";
     endDate = "";
     completed = false;
 
-    if (history.length > 1) history.back();
-    else goto("/");
+    goto("/");
   }
 </script>
 
@@ -214,11 +213,5 @@
     <Icon icon={saveIcon} />
     <span class="text-base">Save Changes</span>
   </button>
-  <button
-    type="button"
-    class="btn-error w-full btn btn-xl uppercase font-heading tracking-widest"
-  >
-    <Icon icon={deleteOutlineIcon} />
-    <span class="text-base">Delete Job</span>
-  </button>
+  <DeleteJob {jobId} />
 </form>

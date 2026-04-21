@@ -297,7 +297,7 @@
         <label class="label" for="clock-in-input">Clock In</label>
         <input
           id="clock-in-input"
-          type="datetime-local"
+          type="time"
           class="input input-bordered w-full"
           bind:value={editClockInValue}
         >
@@ -307,7 +307,7 @@
         <label class="label" for="clock-out-input">Clock Out</label>
         <input
           id="clock-out-input"
-          type="datetime-local"
+          type="time"
           class="input input-bordered w-full"
           bind:value={editClockOutValue}
         >

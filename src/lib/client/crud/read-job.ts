@@ -22,6 +22,27 @@ export function watchUserJobs(
   return dispose;
 }
 
+export function watchJob(
+  jobId: string,
+  userId: string,
+  onJob: (jobs: SelectJob[]) => void,
+  onError?: (error: unknown) => void,
+) {
+  const watched = powerSyncDb
+    .query({
+      sql: "select * from jobs where id = ? and user_id = ?",
+      parameters: [jobId, userId],
+    })
+    .watch();
+
+  const dispose = watched.registerListener({
+    onData: (data) => onJob(data as SelectJob[]),
+    onError: (error) => onError?.(error),
+  });
+
+  return dispose;
+}
+
 export async function getUserJob(userId: string, jobId: string) {
   const job: SelectJob[] = await db
     .select()

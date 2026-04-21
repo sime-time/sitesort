@@ -6,6 +6,7 @@
   import movedLocationIcon from "@iconify-icons/material-symbols/moved-location";
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
+  import { haptic } from "$lib/utils/haptic";
 
   let {
     id,
@@ -24,6 +25,7 @@
   } = $props();
 
   function openJob() {
+    haptic.confirm();
     goto(`/job/${id}`);
   }
 
