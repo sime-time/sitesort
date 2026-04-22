@@ -11,16 +11,46 @@
   let { children } = $props();
 
   async function detectSWUpdate() {
+    if (!("serviceWorker" in navigator)) return;
+
     const registration = await navigator.serviceWorker.ready;
 
+    const promptAndActivate = (waitingWorker: ServiceWorker) => {
+      if (!confirm("New update available! Reload to update?")) return;
+
+      let reloaded = false;
+
+      const onControllerChange = () => {
+        if (reloaded) return;
+        reloaded = true;
+        window.location.reload();
+      };
+
+      navigator.serviceWorker.addEventListener(
+        "controllerchange",
+        onControllerChange,
+        { once: true },
+      );
+
+      waitingWorker.postMessage({ type: "SKIP_WAITING" });
+    };
+
+    const maybePromptForWaiting = () => {
+      if (registration.waiting) {
+        promptAndActivate(registration.waiting);
+      }
+    };
+
+    // Case 1: update already downloaded before this page loaded
+    maybePromptForWaiting();
+
+    // Case 2: update found while this page is open
     registration.addEventListener("updatefound", () => {
       const newSW = registration.installing;
-      newSW?.addEventListener("statechange", () => {
-        if (newSW.state === "installed") {
-          if (confirm("New update available! Reload to update?")) {
-            newSW.postMessage({ type: "SKIP_WAITING" });
-            window.location.reload();
-          }
+      if (!newSW) return;
+      newSW.addEventListener("statechange", () => {
+        if (newSW.state === "installed" && registration.waiting) {
+          promptAndActivate(registration.waiting);
         }
       });
     });

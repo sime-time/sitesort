@@ -59,7 +59,7 @@
       try {
         await initTimeState();
       } catch (err) {
-        console.error("Time clock init failed", err);
+        console.warn("Time clock init failed (non-fatal)", err);
         timeState.hydrated = true;
       }
 
@@ -69,8 +69,6 @@
           if (!alive) return;
           if (data?.user?.id) {
             localStorage.setItem(LAST_KNOWN_USER_ID_KEY, data.user.id);
-          } else if (navigator.onLine) {
-            localStorage.removeItem(LAST_KNOWN_USER_ID_KEY);
           }
         })
         .catch((err) => {

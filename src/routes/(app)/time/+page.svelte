@@ -131,7 +131,6 @@
   }
 
   function closeEdit() {
-    haptic();
     editDialogEl?.close();
     editingId = null;
     editClockInValue = "";
@@ -141,6 +140,7 @@
   }
 
   async function saveEdit() {
+    haptic();
     if (!editingId) return;
 
     const nextClockIn = combineDayKeyAndTime(editingDayKey, editClockInValue);
@@ -177,6 +177,7 @@
   }
 
   async function deleteEditingEntry() {
+    haptic();
     if (!editingId) return;
 
     try {
