@@ -4,6 +4,7 @@
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
   import { deleteJob } from "$lib/client/crud/delete-job";
+  import { haptic } from "$lib/utils/haptic";
 
   let { jobId }: { jobId?: string } = $props();
 
@@ -16,6 +17,7 @@
   }
 
   async function handleDelete() {
+    haptic.error();
     try {
       if (!jobId) throw new Error("Job Id not found");
       await deleteJob(jobId);

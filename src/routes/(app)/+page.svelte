@@ -6,6 +6,7 @@
   import { watchUserJobs } from "$lib/client/crud/read-job";
   import type { SelectJob } from "$lib/client/schema";
   import JobCard from "$lib/components/JobCard.svelte";
+  import { haptic } from "$lib/utils/haptic";
 
   let { data } = $props();
 
@@ -45,7 +46,7 @@
 					? "tab-active text-primary"
 					: "text-base-content/60"
 				}`}
-      onclick={() => (activeTab = "in-progress")}
+      onclick={() => {haptic(); activeTab = "in-progress"}}
     >
       <Icon icon={pendingIcon} class="text-base" />
       <span>In Progress</span>
@@ -59,7 +60,7 @@
 					? "tab-active text-primary"
 					: "text-base-content/60"
 				}`}
-      onclick={() => (activeTab = "completed")}
+      onclick={() => {haptic(); activeTab = "completed"}}
     >
       <Icon icon={checkCircleIcon} class="text-base" />
       <span>Completed</span>

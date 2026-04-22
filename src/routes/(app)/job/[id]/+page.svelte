@@ -16,6 +16,7 @@
   import MaterialForm from "$lib/components/material/MaterialForm.svelte";
   import TaskForm from "$lib/components/task/TaskForm.svelte";
   import TaskItem from "$lib/components/task/TaskItem.svelte";
+  import { haptic } from "$lib/utils/haptic";
 
   const jobId = $derived(page.params.id);
 
@@ -105,7 +106,7 @@
 					? "tab-active text-primary"
 					: "text-base-content/60"
 				}`}
-      onclick={() => (activeTab = "materials")}
+      onclick={() => {haptic(); activeTab = "materials"}}
     >
       <Icon icon={serviceToolboxIcon} class="text-base" />
       <span>Materials</span>
@@ -119,7 +120,7 @@
 					? "tab-active text-primary"
 					: "text-base-content/60"
 				}`}
-      onclick={() => (activeTab = "checklist")}
+      onclick={() => {haptic(); activeTab = "checklist"}}
     >
       <Icon icon={checklistIcon} class="text-base" />
       <span>Checklist</span>

@@ -11,6 +11,7 @@
     updateJobSchema,
   } from "$lib/client/crud/update-job";
   import DeleteJob from "$lib/components/DeleteJob.svelte";
+  import { haptic } from "$lib/utils/haptic";
   import type { PageProps } from "./$types";
 
   type FormErrors = {
@@ -55,6 +56,7 @@
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
+    haptic.confirm();
 
     if (startDate && endDate && startDate > endDate) {
       errors = {
