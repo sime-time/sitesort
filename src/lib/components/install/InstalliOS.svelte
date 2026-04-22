@@ -6,9 +6,7 @@
 
 <section class="space-y-3">
   <div class="alert alert-info">
-    <span class="text-sm"
-      >On iPhone, this is manual. Follow these 3 quick taps.</span
-    >
+    <span class="text-sm">On iPhone, follow these 3 quick taps.</span>
   </div>
 
   <div class="space-y-2">
@@ -16,7 +14,7 @@
       <div class="flex items-start gap-3">
         <div class="avatar placeholder mt-0.5">
           <div
-            class="w-10 rounded-full border border-base-300 bg-base-200 text-base-content"
+            class="w-10 rounded-full border border-base-300 bg-base-200 text-base-content grid place-items-center"
           >
             <svg
               viewBox="0 0 24 24"
@@ -44,7 +42,7 @@
       <div class="flex items-start gap-3">
         <div class="avatar placeholder mt-0.5">
           <div
-            class="w-10 rounded-full border border-base-300 bg-base-200 text-base-content"
+            class="w-10 rounded-full border border-base-300 bg-base-200 text-base-content grid place-items-center"
           >
             <Icon icon={iosShareIcon} class="size-5" />
           </div>
@@ -62,7 +60,7 @@
       <div class="flex items-start gap-3">
         <div class="avatar placeholder mt-0.5">
           <div
-            class="w-10 rounded-full border border-base-300 bg-base-200 text-base-content"
+            class="w-10 rounded-full border border-base-300 bg-base-200 text-base-content grid place-items-center"
           >
             <Icon icon={addBoxOutlineIcon} class="size-5" />
           </div>

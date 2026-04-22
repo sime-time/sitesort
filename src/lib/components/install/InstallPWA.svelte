@@ -138,7 +138,7 @@
   <div class="modal-box max-w-md border border-base-300">
     <div class="space-y-2">
       <h2
-        class="font-heading text-2xl uppercase tracking-wider text-base-content"
+        class="font-heading font-semibold text-2xl uppercase tracking-wider text-base-content"
       >
         Install SiteSort
       </h2>
@@ -154,17 +154,25 @@
         <InstallAndroid {canOneTapInstall} onInstall={triggerInstall} />
       {:else}
         <p class="text-sm leading-6 text-base-content/80">
-          Mobile install instructions component will render here next.
+          Mobile phone platform not detected
         </p>
       {/if}
     </div>
 
     <div class="mt-5 flex items-center justify-end gap-2">
-      <button type="button" class="btn btn-ghost" onclick={remindLater}>
-        Not now
+      <button
+        type="button"
+        class="btn btn-error btn-ghost"
+        onclick={neverShowAgain}
+      >
+        Don't remind me
       </button>
-      <button type="button" class="btn btn-outline" onclick={neverShowAgain}>
-        Don&apos;t remind me
+      <button
+        type="button"
+        class="btn btn-error btn-soft"
+        onclick={remindLater}
+      >
+        Not now
       </button>
     </div>
   </div>
