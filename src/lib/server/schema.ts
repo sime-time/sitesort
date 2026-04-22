@@ -97,6 +97,8 @@ export type InsertMaterial = typeof materials.$inferInsert;
 export type SelectMaterial = typeof materials.$inferSelect;
 export type InsertTask = typeof tasks.$inferInsert;
 export type SelectTask = typeof tasks.$inferSelect;
+export type InsertTimeEntry = typeof time_entries.$inferInsert;
+export type SelectTimeEntry = typeof time_entries.$inferSelect;
 
 // Zod Validation Schemas
 export const jobInsertSchema = createInsertSchema(jobs);
@@ -108,3 +110,6 @@ export const materialInsertSchema = createInsertSchema(materials);
 export const materialSelectSchema = createSelectSchema(materials);
 export const taskInsertSchema = createInsertSchema(tasks);
 export const taskSelectSchema = createSelectSchema(tasks);
+export const timeEntryInsertSchema = createInsertSchema(time_entries);
+export const timeEntryUpdateSchema = createUpdateSchema(time_entries);
+export const timeEntrySelectSchema = createSelectSchema(time_entries);

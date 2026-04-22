@@ -6,24 +6,35 @@
   import pauseCircleOutlineIcon from "@iconify-icons/material-symbols/pause-circle-outline";
   import playCircleOutlineIcon from "@iconify-icons/material-symbols/play-circle-outline";
   import timerOutlineIcon from "@iconify-icons/material-symbols/timer-outline";
+  import { toast } from "svelte-sonner";
   import {
+    closeOpenEntry,
+    createClockIn,
+    deleteTimeEntry,
+    findOpenEntry,
+    updateTimeEntry,
+  } from "$lib/client/crud/time-entries";
+  import { haptic } from "$lib/utils/haptic";
+  import {
+    combineDayKeyAndTime,
     formatDayHeading,
     formatDuration,
     formatTimeLabel,
     getEntryDuration,
     getLocalDayKey,
-    parseLocalDatetime,
+    refreshTimeEntries,
     type TimeEntry,
     timeState,
-    toDatetimeLocalValue,
-  } from "$lib/client/time-state.svelte";
-  import { haptic } from "$lib/utils/haptic";
+    toTimeInputValue,
+  } from "$lib/utils/time-state.svelte";
 
   let editDialogEl = $state<HTMLDialogElement | null>(null);
   let editingId = $state<string | null>(null);
   let editClockInValue = $state<string>("");
   let editClockOutValue = $state<string>("");
   let editError = $state<string>("");
+  let editingDayKey = $state<string>("");
+  let toggleInFlight = $state(false);
 
   const activeEntry = $derived(
     timeState.entries.find((entry) => entry.clockOutAt === null),
@@ -68,46 +79,51 @@
     }));
   });
 
-  function handleToggleClock() {
+  function getErrorMessage(error: unknown, fallback: string): string {
+    return error instanceof Error && error.message ? error.message : fallback;
+  }
+
+  async function handleToggleClock() {
+    if (toggleInFlight) return;
+    toggleInFlight = true;
     haptic.confirm();
-    if (activeEntry) {
-      clockOut(activeEntry.id);
+    try {
+      if (activeEntry) {
+        await clockOut(activeEntry.id);
+        return;
+      }
+      await clockIn();
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update clock status"));
+    } finally {
+      toggleInFlight = false;
+    }
+  }
+
+  async function clockIn() {
+    const openEntry = await findOpenEntry();
+    if (openEntry) {
+      await refreshTimeEntries();
       return;
     }
-    clockIn();
+
+    const nowIso = new Date().toISOString();
+    await createClockIn(nowIso);
+    await refreshTimeEntries();
   }
 
-  function clockIn() {
+  async function clockOut(entryId: string) {
     const nowIso = new Date().toISOString();
-
-    const newEntry: TimeEntry = {
-      id: crypto.randomUUID(),
-      clockInAt: nowIso,
-      clockOutAt: null,
-      createdAt: nowIso,
-      updatedAt: nowIso,
-    };
-
-    timeState.entries = [newEntry, ...timeState.entries];
-  }
-
-  function clockOut(entryId: string) {
-    const nowIso = new Date().toISOString();
-    timeState.entries = timeState.entries.map((entry) => {
-      if (entry.id !== entryId) return entry;
-      return {
-        ...entry,
-        clockOutAt: nowIso,
-        updatedAt: nowIso,
-      };
-    });
+    await closeOpenEntry(entryId, nowIso);
+    await refreshTimeEntries();
   }
 
   function openEdit(entry: TimeEntry) {
     editingId = entry.id;
-    editClockInValue = toDatetimeLocalValue(entry.clockInAt);
+    editingDayKey = getLocalDayKey(entry.clockInAt);
+    editClockInValue = toTimeInputValue(entry.clockInAt);
     editClockOutValue = entry.clockOutAt
-      ? toDatetimeLocalValue(entry.clockOutAt)
+      ? toTimeInputValue(entry.clockOutAt)
       : "";
     editError = "";
     editDialogEl?.showModal();
@@ -119,19 +135,20 @@
     editClockInValue = "";
     editClockOutValue = "";
     editError = "";
+    editingDayKey = "";
   }
 
-  function saveEdit() {
+  async function saveEdit() {
     if (!editingId) return;
 
-    const nextClockIn = parseLocalDatetime(editClockInValue);
+    const nextClockIn = combineDayKeyAndTime(editingDayKey, editClockInValue);
     if (!nextClockIn) {
       editError = "Clock-in time is required";
       return;
     }
 
     const nextClockOut = editClockOutValue
-      ? parseLocalDatetime(editClockOutValue)
+      ? combineDayKeyAndTime(editingDayKey, editClockOutValue)
       : null;
 
     if (editClockOutValue && !nextClockOut) {
@@ -139,32 +156,34 @@
       return;
     }
 
-    if (nextClockOut && nextClockOut < nextClockIn) {
-      editError = "Clock-out must be after clock-in";
-      return;
+    if (nextClockOut) {
+      const clockInTime = new Date(nextClockIn).getTime();
+      const clockOutTime = new Date(nextClockOut).getTime();
+      if (clockOutTime < clockInTime) {
+        editError = "Clock-out must be after clock-in";
+        return;
+      }
     }
 
-    const updatedAt = new Date().toISOString();
-
-    timeState.entries = timeState.entries.map((entry) => {
-      if (entry.id !== editingId) return entry;
-      return {
-        ...entry,
-        clockInAt: nextClockIn,
-        clockOutAt: nextClockOut,
-        updatedAt,
-      };
-    });
-
-    closeEdit();
+    try {
+      await updateTimeEntry(editingId, nextClockIn, nextClockOut);
+      await refreshTimeEntries();
+      closeEdit();
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to save time entry"));
+    }
   }
 
-  function deleteEditingEntry() {
+  async function deleteEditingEntry() {
     if (!editingId) return;
-    timeState.entries = timeState.entries.filter(
-      (entry) => entry.id !== editingId,
-    );
-    closeEdit();
+
+    try {
+      await deleteTimeEntry(editingId);
+      await refreshTimeEntries();
+      closeEdit();
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to delete time entry"));
+    }
   }
 </script>
 
@@ -190,6 +209,7 @@
 
       <button
         type="button"
+        disabled={toggleInFlight}
         class={`btn btn-xl w-full font-heading uppercase tracking-widest ${
           activeEntry ? "btn-error" : "btn-primary"
         }`}

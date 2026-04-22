@@ -12,6 +12,7 @@ import { handleJobEntry } from "$lib/server/handlers/handle-job";
 import { handleJobMaterialEntry } from "$lib/server/handlers/handle-job-material";
 import { handleMaterialEntry } from "$lib/server/handlers/handle-material";
 import { handleTaskEntry } from "$lib/server/handlers/handle-task";
+import { handleTimeEntry } from "$lib/server/handlers/handle-time-entry";
 import {
   type CrudEntryType,
   type DbTransaction,
@@ -105,6 +106,9 @@ export const POST: RequestHandler = async ({ request }) => {
             break;
           case "job_materials":
             await handleJobMaterialEntry(tx, entry);
+            break;
+          case "time_entries":
+            await handleTimeEntry(tx, entry, auth.user_id);
             break;
           default:
             break;

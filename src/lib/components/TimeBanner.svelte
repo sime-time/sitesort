@@ -5,7 +5,7 @@
     formatDuration,
     formatTimeLabel,
     timeState,
-  } from "$lib/client/time-state.svelte";
+  } from "$lib/utils/time-state.svelte";
 
   const activeEntry = $derived(
     timeState.entries.find((entry) => entry.clockOutAt === null),

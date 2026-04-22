@@ -2,17 +2,17 @@
   import { onMount } from "svelte";
   import { authClient } from "$lib/client/auth";
   import { initPowerSyncLocal, setupPowerSync } from "$lib/client/db";
-  import {
-    initTimeState,
-    startClock,
-    stopClock,
-    timeState,
-  } from "$lib/client/time-state.svelte";
   import Dock from "$lib/components/Dock.svelte";
   import TimeBanner from "$lib/components/TimeBanner.svelte";
   import TopBar from "$lib/components/TopBar.svelte";
   import ViewTransition from "$lib/components/ViewTransition.svelte";
   import { LAST_KNOWN_USER_ID_KEY } from "$lib/utils/last-known-user";
+  import {
+    initTimeState,
+    startClock,
+    stopClock,
+    timeState,
+  } from "$lib/utils/time-state.svelte";
 
   const activeEntry = $derived(
     timeState.entries.find((entry) => entry.clockOutAt === null),
@@ -30,7 +30,6 @@
   });
 
   onMount(() => {
-    initTimeState();
     let alive = true;
 
     const tryConnect = async () => {
@@ -55,6 +54,13 @@
       } catch (err) {
         console.error("Local DB init failed", err);
         return;
+      }
+
+      try {
+        await initTimeState();
+      } catch (err) {
+        console.error("Time clock init failed", err);
+        timeState.hydrated = true;
       }
 
       void authClient
@@ -90,7 +96,7 @@
   <ViewTransition />
   <TopBar />
 
-  {#if dbReady}
+  {#if dbReady && timeState.hydrated}
     {@render children()}
   {:else}
     <section class="flex flex-1 min-h-0 p-3 justify-center items-center">
