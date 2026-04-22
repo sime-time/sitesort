@@ -18,7 +18,7 @@
   let isInstalled = $state(false);
   let showModal = $state(false);
   let canOneTapInstall = $state(false);
-  let disabled = $state(false);
+  let disabled = $state(true);
 
   let deferredPrompt = $state<DeferredInstallPrompt | null>(null);
 
@@ -98,14 +98,14 @@
   }
 
   onMount(() => {
-    platform = detectPlatform();
     isInstalled = detectInstalled();
-
     if (isInstalled) {
       disabled = true;
       showModal = false;
       return;
     }
+    disabled = false;
+    platform = detectPlatform();
 
     const onBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
@@ -133,8 +133,8 @@
   });
 </script>
 
-{#if !disabled}
-  <div class={`modal modal-middle ${showModal ? "modal-open" : ""}`}>
+{#if !disabled && showModal}
+  <div class="modal model-open modal-middle">
     <div class="modal-box max-w-md border border-base-300">
       <div class="space-y-2">
         <h2
@@ -181,7 +181,7 @@
       type="button"
       class="modal-backdrop"
       aria-label="Close install modal"
-      onsubmit={remindLater}
+      onclick={remindLater}
     ></button>
   </div>
 {/if}
