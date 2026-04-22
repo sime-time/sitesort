@@ -1,7 +1,6 @@
 import { listTimeEntries } from "$lib/client/crud/time-entries";
 import type { SelectTimeEntry } from "$lib/client/schema";
 
-// src/lib/client/time-state.svelte.ts
 export type TimeEntry = {
   id: string;
   clockInAt: string;
@@ -30,9 +29,9 @@ export async function refreshTimeEntries() {
 
 export async function initTimeState() {
   if (initialized) return;
-  initialized = true;
   await refreshTimeEntries();
   timeState.hydrated = true;
+  initialized = true;
 }
 
 export const timeState = $state({

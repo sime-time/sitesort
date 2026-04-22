@@ -119,6 +119,7 @@
   }
 
   function openEdit(entry: TimeEntry) {
+    haptic();
     editingId = entry.id;
     editingDayKey = getLocalDayKey(entry.clockInAt);
     editClockInValue = toTimeInputValue(entry.clockInAt);
@@ -130,6 +131,7 @@
   }
 
   function closeEdit() {
+    haptic();
     editDialogEl?.close();
     editingId = null;
     editClockInValue = "";
@@ -310,7 +312,9 @@
 
 <dialog bind:this={editDialogEl} class="modal modal-middle" onclose={closeEdit}>
   <div class="modal-box">
-    <h3 class="font-bold text-lg">Edit Time Entry</h3>
+    <h3 class="font-heading font-semibold text-lg uppercase tracking-wider">
+      Edit Time Entry
+    </h3>
 
     <div class="mt-4 flex flex-col gap-3">
       <fieldset class="fieldset">
@@ -344,7 +348,7 @@
     <div class="modal-action justify-between">
       <button
         type="button"
-        class="btn btn-error btn-soft"
+        class="btn btn-error btn-soft font-heading uppercase tracking-wider"
         onclick={deleteEditingEntry}
       >
         <Icon icon={deleteOutlineIcon} class="size-5" />
@@ -353,9 +357,18 @@
 
       <div class="flex gap-2">
         <form method="dialog">
-          <button type="submit" class="btn">Cancel</button>
+          <button
+            type="submit"
+            class="btn font-heading uppercase tracking-wider"
+          >
+            Cancel
+          </button>
         </form>
-        <button type="button" class="btn btn-primary" onclick={saveEdit}>
+        <button
+          type="button"
+          class="btn btn-primary font-heading uppercase tracking-wider"
+          onclick={saveEdit}
+        >
           Save
         </button>
       </div>
