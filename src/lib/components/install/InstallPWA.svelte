@@ -14,8 +14,6 @@
   const NEVER_SHOW_KEY = "sitesort.pwa.install.neverShow";
   const REMIND_AFTER_MS = 3 * 24 * 60 * 60 * 1000;
 
-  let modal: HTMLDialogElement | undefined;
-
   let platform = $state<Platform>("desktop");
   let isInstalled = $state(false);
   let showModal = $state(false);
@@ -62,14 +60,10 @@
   }
 
   function openModal() {
-    if (!modal || showModal) return;
-    modal.showModal();
     showModal = true;
   }
 
   function closeModal() {
-    if (!modal || !showModal) return;
-    modal.close();
     showModal = false;
   }
 
@@ -139,12 +133,8 @@
   });
 </script>
 
-{#if disabled}
-  <dialog
-    bind:this={modal}
-    class="modal modal-middle"
-    onclose={() => (showModal = false)}
-  >
+{#if !disabled}
+  <div class={`modal modal-middle ${showModal ? "modal-open" : ""}`}>
     <div class="modal-box max-w-md border border-base-300">
       <div class="space-y-2">
         <h2
@@ -187,8 +177,11 @@
       </div>
     </div>
 
-    <form method="dialog" class="modal-backdrop" onsubmit={remindLater}>
-      <button type="submit">close</button>
-    </form>
-  </dialog>
+    <button
+      type="button"
+      class="modal-backdrop"
+      aria-label="Close install modal"
+      onsubmit={remindLater}
+    ></button>
+  </div>
 {/if}
