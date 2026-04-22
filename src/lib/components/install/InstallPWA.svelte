@@ -98,9 +98,6 @@
   }
 
   onMount(() => {
-    disabled = true;
-    showModal = false;
-    return;
     const standalone = detectInstalled();
     if (standalone) {
       disabled = true;
