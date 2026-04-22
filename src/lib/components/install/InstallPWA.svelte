@@ -134,7 +134,7 @@
 </script>
 
 {#if !disabled && showModal}
-  <div class="modal model-open modal-middle">
+  <div class="modal modal-open modal-middle">
     <div class="modal-box max-w-md border border-base-300">
       <div class="space-y-2">
         <h2
