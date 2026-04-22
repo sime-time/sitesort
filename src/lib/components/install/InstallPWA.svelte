@@ -98,38 +98,48 @@
   }
 
   onMount(() => {
-    isInstalled = detectInstalled();
-    if (isInstalled) {
+    try {
+      isInstalled = detectInstalled();
+      if (isInstalled) {
+        disabled = true;
+        showModal = false;
+        return;
+      }
+      disabled = false;
+      platform = detectPlatform();
+
+      const onBeforeInstallPrompt = (event: Event) => {
+        event.preventDefault();
+        deferredPrompt = event as DeferredInstallPrompt;
+        canOneTapInstall = true;
+      };
+
+      const onInstalled = () => {
+        isInstalled = true;
+        closeModal();
+        localStorage.setItem(NEVER_SHOW_KEY, "1");
+      };
+
+      window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+      window.addEventListener("appinstalled", onInstalled);
+
+      if (isMobile && !isInstalled && !shouldSuppressModal()) {
+        setTimeout(openModal, 500);
+      }
+
+      return () => {
+        window.removeEventListener(
+          "beforeinstallprompt",
+          onBeforeInstallPrompt,
+        );
+        window.removeEventListener("appinstalled", onInstalled);
+      };
+    } catch (err) {
+      console.warn("InstallPWA disabled due to runtime error", err);
       disabled = true;
       showModal = false;
       return;
     }
-    disabled = false;
-    platform = detectPlatform();
-
-    const onBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      deferredPrompt = event as DeferredInstallPrompt;
-      canOneTapInstall = true;
-    };
-
-    const onInstalled = () => {
-      isInstalled = true;
-      closeModal();
-      localStorage.setItem(NEVER_SHOW_KEY, "1");
-    };
-
-    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
-    window.addEventListener("appinstalled", onInstalled);
-
-    if (isMobile && !isInstalled && !shouldSuppressModal()) {
-      setTimeout(openModal, 500);
-    }
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
-      window.removeEventListener("appinstalled", onInstalled);
-    };
   });
 </script>
 
