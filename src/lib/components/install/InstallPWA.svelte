@@ -16,7 +16,7 @@
 
   let platform = $state<Platform>("desktop");
   let isInstalled = $state(false);
-  let showModal = $state(false);
+  let showModal = $state(true);
   let canOneTapInstall = $state(false);
   let disabled = $state(true);
 
