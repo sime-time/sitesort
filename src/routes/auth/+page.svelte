@@ -7,7 +7,6 @@
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
   import { authClient } from "$lib/client/auth";
-  import InstallPWA from "$lib/components/install/InstallPWA.svelte";
   import { LAST_KNOWN_USER_ID_KEY } from "$lib/utils/last-known-user";
 
   let session = $state<BetterAuthSession | null>(null);
@@ -69,7 +68,6 @@
   }
 </script>
 
-<InstallPWA />
 <div class="w-full h-100 flex items-center justify-center gap-1">
   {#if loading}
     <span class="loading loading-spinner loading-sm"></span>

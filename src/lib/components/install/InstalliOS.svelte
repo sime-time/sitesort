@@ -6,7 +6,7 @@
 
 <section class="space-y-3">
   <div class="alert alert-info">
-    <span class="text-sm">On iPhone, follow these 3 quick taps.</span>
+    <span class="text-sm">On iPhone, follow these 3 steps.</span>
   </div>
 
   <div class="space-y-2">

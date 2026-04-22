@@ -4,6 +4,7 @@
   import "@fontsource-variable/space-grotesk/wght.css";
   import "@fontsource-variable/work-sans/wght.css";
   import { onMount } from "svelte";
+  import InstallPWA from "$lib/components/install/InstallPWA.svelte";
   import { Toaster } from "$lib/components/sonner";
 
   import "../app.css";
@@ -75,6 +76,7 @@
 </svelte:head>
 
 <Toaster />
+<InstallPWA />
 <main class="w-full min-h-dvh flex justify-center">
   <div class="w-full max-w-120 min-h-dvh">{@render children()}</div>
 </main>
