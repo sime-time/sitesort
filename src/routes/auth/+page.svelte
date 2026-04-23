@@ -7,6 +7,7 @@
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
   import { authClient } from "$lib/client/auth";
+  import { haptic } from "$lib/utils/haptic";
   import { LAST_KNOWN_USER_ID_KEY } from "$lib/utils/last-known-user";
 
   let session = $state<BetterAuthSession | null>(null);
@@ -46,6 +47,7 @@
 
   async function handleGoogleSignIn(e: SubmitEvent) {
     e.preventDefault();
+    haptic();
     try {
       await authClient.signIn.social({
         provider: "google",
@@ -58,6 +60,7 @@
   }
 
   async function handleSignOut() {
+    haptic.error();
     try {
       await authClient.signOut();
     } finally {
@@ -83,7 +86,7 @@
       <div class="flex justify-between">
         <button
           type="button"
-          onclick={() => goto("/")}
+          onclick={() => {haptic.confirm(); goto("/")}}
           class="btn btn-lg btn-secondary font-heading font-medium uppercase tracking-wider"
         >
           Go to App
