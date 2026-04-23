@@ -15,12 +15,10 @@
   const REMIND_AFTER_MS = 3 * 24 * 60 * 60 * 1000;
 
   let platform = $state<Platform>("desktop");
-  let isInstalled = $state(false);
-  let showModal = $state(false);
   let canOneTapInstall = $state(false);
-  let disabled = $state(true);
 
   let deferredPrompt = $state<DeferredInstallPrompt | null>(null);
+  let dialogEl: HTMLDialogElement | null = null;
 
   const isMobile = $derived(platform !== "desktop");
   const isIos = $derived(platform === "ios");
@@ -59,22 +57,14 @@
     return Date.now() - lastDismissedAt < REMIND_AFTER_MS;
   }
 
-  function openModal() {
-    showModal = true;
-  }
-
-  function closeModal() {
-    showModal = false;
-  }
-
   function remindLater() {
     localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    closeModal();
+    dialogEl?.close();
   }
 
   function neverShowAgain() {
     localStorage.setItem(NEVER_SHOW_KEY, "1");
-    closeModal();
+    dialogEl?.close();
   }
 
   async function triggerInstall() {
@@ -88,7 +78,7 @@
       await prompt.prompt();
       const result = await prompt.userChoice;
       if (result.outcome === "accepted") {
-        closeModal();
+        dialogEl?.close();
       } else {
         remindLater();
       }
@@ -98,13 +88,8 @@
   }
 
   onMount(() => {
-    const standalone = detectInstalled();
-    if (standalone) {
-      disabled = true;
-      showModal = false;
-      return;
-    }
-    disabled = false;
+    if (detectInstalled()) return;
+
     platform = detectPlatform();
 
     const onBeforeInstallPrompt = (event: Event) => {
@@ -114,16 +99,15 @@
     };
 
     const onInstalled = () => {
-      isInstalled = true;
-      closeModal();
+      dialogEl?.close();
       localStorage.setItem(NEVER_SHOW_KEY, "1");
     };
 
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
     window.addEventListener("appinstalled", onInstalled);
 
-    if (isMobile && !isInstalled && !shouldSuppressModal()) {
-      setTimeout(openModal, 500);
+    if (isMobile && !shouldSuppressModal()) {
+      setTimeout(() => dialogEl?.showModal(), 500);
     }
 
     return () => {
@@ -133,55 +117,57 @@
   });
 </script>
 
-{#if !disabled && showModal}
-  <div class="modal modal-open modal-middle">
-    <div class="modal-box max-w-md border border-base-300">
-      <div class="space-y-2">
-        <h2
-          class="font-heading font-semibold text-2xl uppercase tracking-wider text-base-content"
-        >
-          Install SiteSort
-        </h2>
-        <p class="text-base text-base-content/80">
-          Add SiteSort to your home screen so it opens like a normal app.
-        </p>
-      </div>
-
-      <div class="mt-4 rounded-box border border-base-300 bg-base-200/40 p-3">
-        {#if isIos}
-          <InstalliOS />
-        {:else if isAndroid}
-          <InstallAndroid {canOneTapInstall} onInstall={triggerInstall} />
-        {:else}
-          <p class="text-sm leading-6 text-base-content/80">
-            Mobile phone platform not detected
-          </p>
-        {/if}
-      </div>
-
-      <div class="mt-5 flex items-center justify-end gap-2">
-        <button
-          type="button"
-          class="btn btn-error btn-ghost"
-          onclick={neverShowAgain}
-        >
-          Don't remind me
-        </button>
-        <button
-          type="button"
-          class="btn btn-error btn-soft"
-          onclick={remindLater}
-        >
-          Not now
-        </button>
-      </div>
+<dialog
+  class="modal modal-middle"
+  bind:this={dialogEl}
+  oncancel={(event) => {
+    event.preventDefault();
+    remindLater();
+  }}
+>
+  <div class="modal-box max-w-md border border-base-300">
+    <div class="space-y-2">
+      <h2
+        class="font-heading font-semibold text-2xl uppercase tracking-wider text-base-content"
+      >
+        Install SiteSort
+      </h2>
+      <p class="text-base text-base-content/80">
+        Add SiteSort to your home screen so it opens like a normal app.
+      </p>
     </div>
 
-    <button
-      type="button"
-      class="modal-backdrop"
-      aria-label="Close install modal"
-      onclick={remindLater}
-    ></button>
+    <div class="mt-4 rounded-box border border-base-300 bg-base-200/40 p-3">
+      {#if isIos}
+        <InstalliOS />
+      {:else if isAndroid}
+        <InstallAndroid {canOneTapInstall} onInstall={triggerInstall} />
+      {:else}
+        <p class="text-sm leading-6 text-base-content/80">
+          Mobile phone platform not detected
+        </p>
+      {/if}
+    </div>
+
+    <div class="mt-5 flex items-center justify-end gap-2">
+      <button
+        type="button"
+        class="btn btn-error btn-ghost"
+        onclick={neverShowAgain}
+      >
+        Don't remind me
+      </button>
+      <button
+        type="button"
+        class="btn btn-error btn-soft"
+        onclick={remindLater}
+      >
+        Not now
+      </button>
+    </div>
   </div>
-{/if}
+
+  <form method="dialog" class="modal-backdrop" onsubmit={remindLater}>
+    <button type="submit" aria-label="Close install modal">close</button>
+  </form>
+</dialog>
