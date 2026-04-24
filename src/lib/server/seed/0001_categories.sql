@@ -1,9 +1,12 @@
 INSERT INTO categories (name, "order") VALUES
-  ('Lighting', 1),
-  ('Receptacles', 2),
-  ('Switches', 3),
-  ('Detectors', 4),
-  ('Boxes', 5),
-  ('Covers / Plates', 6),
-  ('Ventilation', 7),
-  ('Miscellaneous', 8);
+  ('Devices - Receptacles', 1),
+  ('Devices - Switches & Controls', 2),
+  ('Lighting - Fixtures & Trim', 3),
+  ('Lighting - Tape Systems', 4),
+  ('Fans & Ventilation', 5),
+  ('Detection & Safety', 6),
+  ('Circuits - Home Runs', 7),
+  ('Panels & Service', 8),
+  ('Low Voltage', 9),
+  ('Boxes & Covers', 10),
+  ('Miscellaneous', 11);

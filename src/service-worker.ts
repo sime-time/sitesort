@@ -74,11 +74,11 @@ self.addEventListener("fetch", (event) => {
         const response = await fetch(event.request);
         return response;
       } catch {
-        const shell = await cache.match(APP_SHELL);
-        if (shell) return shell;
-
         const offline = await cache.match(OFFLINE_FALLBACK);
         if (offline) return offline;
+
+        const shell = await cache.match(APP_SHELL);
+        if (shell) return shell;
 
         return new Response("Offline", { status: 503 });
       }
