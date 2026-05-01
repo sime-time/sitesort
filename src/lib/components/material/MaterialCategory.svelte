@@ -1,26 +1,35 @@
 <script lang="ts">
   import type { JobMaterial } from "$lib/client/crud/read-material";
+  import type { UpdateJobMaterial } from "$lib/client/crud/update-material";
   import MaterialItem from "./MaterialItem.svelte";
 
   let {
     title,
     items,
+    onOpenNote,
   }: {
     title: string;
     items: JobMaterial[];
+    onOpenNote: (material: UpdateJobMaterial) => void;
   } = $props();
 </script>
 
-<div class="collapse collapse-arrow bg-base-100 border-b border-base-300">
-  <input type="checkbox" name="material-accordion" checked={false}>
-  <div
-    class="collapse-title font-semibold font-heading uppercase tracking-wider text-lg"
-  >
-    {title}
-  </div>
-  <div class="collapse-content flex flex-col gap-1">
-    {#each items as item (item.id)}
-      <MaterialItem id={item.id} name={item.name} quantity={item.quantity} />
-    {/each}
-  </div>
-</div>
+<tbody>
+  <tr>
+    <th
+      colspan="3"
+      class="font-heading uppercase tracking-wide text-xs text-base-content/70"
+    >
+      {title}
+    </th>
+  </tr>
+  {#each items as item (item.id)}
+    <MaterialItem
+      id={item.id}
+      name={item.name}
+      quantity={item.quantity}
+      note={item.note}
+      onOpenNote={() => onOpenNote({ id: item.id, name: item.name, note: item.note})}
+    />
+  {/each}
+</tbody>

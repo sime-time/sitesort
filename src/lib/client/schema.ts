@@ -1,6 +1,10 @@
 import { DrizzleAppSchema } from "@powersync/drizzle-driver";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 
 export const jobs = sqliteTable("jobs", {
   id: text().primaryKey().notNull(),
@@ -23,6 +27,7 @@ export const job_materials = sqliteTable("job_materials", {
     .references(() => materials.id)
     .notNull(),
   quantity: integer().default(0).notNull(),
+  note: text(),
   created_at: text().notNull(),
   updated_at: text().notNull(),
 });
@@ -97,6 +102,7 @@ export const jobInsertSchema = createInsertSchema(jobs);
 export const jobSelectSchema = createSelectSchema(jobs);
 export const jobMaterialInsertSchema = createInsertSchema(job_materials);
 export const jobMaterialSelectSchema = createSelectSchema(job_materials);
+export const jobMaterialUpdateSchema = createUpdateSchema(job_materials);
 export const materialInsertSchema = createInsertSchema(materials);
 export const materialSelectSchema = createSelectSchema(materials);
 export const taskInsertSchema = createInsertSchema(tasks);

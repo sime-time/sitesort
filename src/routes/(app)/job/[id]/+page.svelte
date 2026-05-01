@@ -14,6 +14,7 @@
   import type { SelectCategory, SelectTask } from "$lib/client/schema";
   import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
   import MaterialForm from "$lib/components/material/MaterialForm.svelte";
+  import MaterialNoteForm from "$lib/components/material/MaterialNoteForm.svelte";
   import TaskForm from "$lib/components/task/TaskForm.svelte";
   import TaskItem from "$lib/components/task/TaskItem.svelte";
   import { haptic } from "$lib/utils/haptic";
@@ -27,6 +28,10 @@
   let activeTab = $state<"materials" | "checklist">("materials");
 
   let addModal: HTMLDialogElement | undefined;
+  let noteModal: HTMLDialogElement | undefined;
+  let selectedJobMaterialId = $state<string | null>(null);
+  let selectedMaterialName = $state<string>("");
+  let selectedMaterialNote = $state<string>("");
 
   function openModalForm() {
     addModal?.showModal();
@@ -34,6 +39,24 @@
 
   function closeModalForm() {
     addModal?.close();
+  }
+
+  function openNoteModal(material: {
+    id: string;
+    name: string;
+    note: string | null;
+  }) {
+    selectedJobMaterialId = material.id;
+    selectedMaterialName = material.name;
+    selectedMaterialNote = material.note || "";
+    noteModal?.showModal();
+  }
+
+  function closeNoteModal() {
+    selectedJobMaterialId = null;
+    selectedMaterialName = "";
+    selectedMaterialNote = "";
+    noteModal?.close();
   }
 
   const materialsByCategory = $derived.by(() => {
@@ -133,9 +156,24 @@
       class="flex-1 min-h-0 overflow-y-auto overscroll-contain pt-3 pb-20 no-scrollbar"
     >
       {#if activeTab === "materials"}
-        {#each Array.from(materialsByCategory.entries()) as [ category, items ]}
-          <MaterialCategory title={category} {items} />
-        {/each}
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead>
+              <tr>
+                <th>Quantity</th>
+                <th>Name</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            {#each Array.from(materialsByCategory.entries()) as [ category, items ]}
+              <MaterialCategory
+                title={category}
+                {items}
+                onOpenNote={openNoteModal}
+              />
+            {/each}
+          </table>
+        </div>
       {:else}
         {#each tasks as task}
           <TaskItem
@@ -176,6 +214,35 @@
             <MaterialForm {jobId} {categories} onSuccess={closeModalForm} />
           {:else}
             <TaskForm {jobId} onSuccess={closeModalForm} />
+          {/if}
+        </div>
+      </dialog>
+
+      <!-- Note Modal -->
+      <dialog
+        bind:this={noteModal}
+        class="modal modal-bottom sm:modal-middle"
+        onclose={closeNoteModal}
+      >
+        <div class="modal-box">
+          <!-- Close Note Modal Button -->
+          <form method="dialog">
+            <button
+              type="submit"
+              class="btn btn-sm btn-circle btn-neutral btn-soft absolute right-2 top-2"
+            >
+              <Icon icon={closeIcon} class="size-6" />
+            </button>
+          </form>
+
+          <!-- Note Modal Form -->
+          {#if activeTab === "materials" && selectedJobMaterialId !== null}
+            <MaterialNoteForm
+              jobMaterialId={selectedJobMaterialId}
+              materialName={selectedMaterialName}
+              materialNote={selectedMaterialNote}
+              onSuccess={closeNoteModal}
+            />
           {/if}
         </div>
       </dialog>

@@ -6,6 +6,7 @@ export type JobMaterial = {
   id: string;
   name: string;
   quantity: number;
+  note: string | null;
   category: string;
 };
 
@@ -15,6 +16,7 @@ export async function listJobMaterials(jobId: string) {
       id: job_materials.id,
       name: materials.name,
       quantity: job_materials.quantity,
+      note: job_materials.note,
       category: categories.name,
       category_id: categories.id,
     })
@@ -39,6 +41,7 @@ export function watchJobMaterials(
           jm.id as id,
           m.name as name,
           jm.quantity as quantity,
+					jm.note as note,
           c.name as category
         from job_materials jm
         join materials m on jm.material_id = m.id

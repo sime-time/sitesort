@@ -27,6 +27,7 @@ export async function handleJobMaterialEntry(
         job_id: parsed.job_id,
         material_id: parsed.material_id,
         quantity: parsed.quantity,
+        note: parsed.note,
         created_at: parsed.created_at,
         updated_at: parsed.updated_at,
       };
@@ -40,6 +41,7 @@ export async function handleJobMaterialEntry(
             job_id: row.job_id,
             material_id: row.material_id,
             quantity: row.quantity,
+            note: row.note,
             created_at: row.created_at,
             updated_at: row.updated_at,
           },

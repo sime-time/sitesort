@@ -50,6 +50,7 @@ export const job_materials = pgTable("job_materials", {
     .references(() => materials.id)
     .notNull(),
   quantity: integer().default(0).notNull(),
+  note: text(),
   ...timestamps(),
 });
 
