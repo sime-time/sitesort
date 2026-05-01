@@ -7,6 +7,7 @@
     createTaskSchema,
     mapCreateTaskErrors,
   } from "$lib/client/crud/create-task";
+  import { haptic } from "$lib/utils/haptic";
 
   const { jobId, onSuccess }: { jobId?: string; onSuccess?: () => void } =
     $props();
@@ -22,6 +23,7 @@
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
+    haptic.confirm();
 
     const parsed = createTaskSchema.safeParse({
       job_id: jobId,

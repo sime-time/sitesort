@@ -4,6 +4,7 @@
   import { toast } from "svelte-sonner";
   import { updateJobMaterialNote } from "$lib/client/crud/update-material";
   import { jobMaterialUpdateSchema } from "$lib/client/schema";
+  import { haptic } from "$lib/utils/haptic";
 
   type FormErrors = {
     note?: string;
@@ -27,6 +28,7 @@
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
+    haptic.confirm();
 
     const parsed = jobMaterialUpdateSchema.safeParse({
       note: note,

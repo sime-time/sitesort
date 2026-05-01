@@ -8,6 +8,7 @@
     mapCreateJobMaterialErrors,
   } from "$lib/client/crud/create-material";
   import type { SelectCategory } from "$lib/client/schema";
+  import { haptic } from "$lib/utils/haptic";
   import {
     blockInvalidKeys,
     clampMin,
@@ -43,6 +44,7 @@
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
+    haptic.confirm();
 
     const parsed = createJobMaterialSchema.safeParse({
       job_id: jobId,

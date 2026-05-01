@@ -98,7 +98,7 @@
     <button
       type="button"
       class={`btn btn-square ${note ? "btn-info" : "btn-accent"}`}
-      onclick={() => onOpenNote({id, name, note})}
+      onclick={() => {haptic(); onOpenNote({id, name, note})}}
     >
       <Icon icon={note ? editNoteIcon : addNotesIcon} class="size-6" />
     </button>
