@@ -24,8 +24,9 @@
   let { data }: PageProps = $props();
 
   let jobName = $state<string>("");
-  let jobDate = $state<CalendarDate>(today(getLocalTimeZone()));
   let jobAddress = $state<string>("");
+  let jobContractor = $state<string>("");
+  let jobDate = $state<CalendarDate>(today(getLocalTimeZone()));
   let errors = $state<FormErrors>({});
 
   async function handleSubmit(e: SubmitEvent) {
@@ -34,8 +35,9 @@
     const parsed = createJobSchema.safeParse({
       user_id: data.user_id,
       name: jobName,
-      start_date: jobDate.toDate(getLocalTimeZone()),
       address: jobAddress,
+      contractor: jobContractor,
+      start_date: jobDate.toDate(getLocalTimeZone()),
     });
 
     if (!parsed.success) {
@@ -47,8 +49,10 @@
     try {
       await createJob({
         user_id: data.user_id,
+        template_id: parsed.data.template_id,
         name: parsed.data.name,
         address: parsed.data.address,
+        contractor: parsed.data.contractor,
         start_date: parsed.data.start_date,
       });
     } catch (error) {

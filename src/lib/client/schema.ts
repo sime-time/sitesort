@@ -8,9 +8,11 @@ import {
 
 export const jobs = sqliteTable("jobs", {
   id: text().primaryKey().notNull(),
+  template_id: text().notNull(),
   user_id: text().notNull(),
   name: text().notNull(),
-  address: text().notNull(),
+  address: text(),
+  contractor: text(),
   start_date: text().notNull(),
   end_date: text(),
   completed: integer({ mode: "boolean" }).default(false).notNull(),
@@ -62,6 +64,39 @@ export const tasks = sqliteTable("tasks", {
   updated_at: text().notNull(),
 });
 
+export const job_templates = sqliteTable("job_templates", {
+  id: text().primaryKey().notNull(),
+  name: text().notNull(),
+  order: integer().notNull().default(0),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
+});
+
+export const template_tasks = sqliteTable("template_tasks", {
+  id: text().primaryKey().notNull(),
+  template_id: text()
+    .references(() => job_templates.id)
+    .notNull(),
+  description: text().notNull(),
+  order: integer().notNull().default(0),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
+});
+
+export const template_materials = sqliteTable("template_materials", {
+  id: text().primaryKey().notNull(),
+  template_id: text()
+    .references(() => job_templates.id)
+    .notNull(),
+  material_id: text()
+    .references(() => materials.id)
+    .notNull(),
+  default_quantity: integer().default(0).notNull(),
+  default_note: text(),
+  created_at: text().notNull(),
+  updated_at: text().notNull(),
+});
+
 export const time_entries = sqliteTable("time_entries", {
   id: text().primaryKey().notNull(),
   user_id: text().notNull(),
@@ -73,10 +108,13 @@ export const time_entries = sqliteTable("time_entries", {
 
 export const drizzleSchema = {
   jobs,
-  materials,
-  tasks,
-  job_materials,
   categories,
+  materials,
+  job_materials,
+  tasks,
+  job_templates,
+  template_tasks,
+  template_materials,
   time_entries,
 };
 

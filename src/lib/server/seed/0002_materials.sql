@@ -12,7 +12,7 @@ JOIN (
     ('Devices - Receptacles', 'GFCI Receptacle'),
     ('Devices - Receptacles', 'USB (Type A/C) Receptacle'),
     ('Devices - Receptacles', 'Weatherproof Receptacle'),
-    ('Devices - Receptacles', '240V (30A/50A) Receptacle'),
+    ('Devices - Receptacles', '240V Receptacle'),
 
     -- Devices - Switches & Controls
     ('Devices - Switches & Controls', 'Single Pole Switch'),
@@ -24,37 +24,37 @@ JOIN (
 
     -- Lighting - Fixtures & Trim
     ('Lighting - Fixtures & Trim', 'Can Light Trims'),
-    ('Lighting - Fixtures & Trim', 'LED Can or Canless Light 4"'),
-    ('Lighting - Fixtures & Trim', 'LED Can or Canless Light 6"'),
+    ('Lighting - Fixtures & Trim', 'Can Light'),
+    ('Lighting - Fixtures & Trim', 'Canless Light'),
     ('Lighting - Fixtures & Trim', 'Closet Lights'),
-    ('Lighting - Fixtures & Trim', 'Light Bulbs'),
-    ('Lighting - Fixtures & Trim', 'Light Fixture Rough-In'),
     ('Lighting - Fixtures & Trim', 'Light Fixture Install'),
-    ('Lighting - Fixtures & Trim', 'LED Puck Light'),
+    ('Lighting - Fixtures & Trim', 'Chandolier Rough-In'),
+    ('Lighting - Fixtures & Trim', 'Chandolier Install'),
+    ('Lighting - Fixtures & Trim', 'Puck Light'),
+    ('Lighting - Fixtures & Trim', 'Pendant Light'),
+    ('Lighting - Fixtures & Trim', 'Sconse Light'),
 
-    -- Lighting - Tape Systems
-    ('Lighting - Tape Systems', 'LED COB Tape Lighting Section (up to 4'')'),
-    ('Lighting - Tape Systems', 'LED Tape Lighting Additional Footage (ft)'),
+    -- Lighting - Low Voltage
+    ('Lighting - Low Voltage', 'COB Tape Lighting Section (up to 4")'),
+    ('Lighting - Low Voltage', 'Tape Lighting Additional Footage (ft)'),
 
     -- Fans & Ventilation
     ('Fans & Ventilation', 'Ceiling Fan Rough-In'),
-    ('Fans & Ventilation', 'Ceiling Fan Install'),
+    ('Fans & Ventilation', 'Ceiling Fan Box Install'),
     ('Fans & Ventilation', 'Bathroom Exhaust Fan/Light Combo 60 CFM'),
     ('Fans & Ventilation', 'Bathroom Exhaust Fan/Light Combo 100 CFM'),
-    ('Fans & Ventilation', 'Bathroom Exhaust Fan Ducting'),
-    ('Fans & Ventilation', 'Exhaust Fan Trim'),
 
     -- Detection & Safety
     ('Detection & Safety', 'Smoke Detector'),
     ('Detection & Safety', 'Smoke/CO2 Combo Detector'),
 
-    -- Circuits - Home Runs
-    ('Circuits - Home Runs', '15A 14-2 Home Run'),
-    ('Circuits - Home Runs', '20A 12-2 Home Run'),
-    ('Circuits - Home Runs', '30A 10-2 Home Run'),
-    ('Circuits - Home Runs', '30A 10-3 Home Run'),
-    ('Circuits - Home Runs', '50A 8-2 Home Run'),
-    ('Circuits - Home Runs', '50A 8-3 Home Run'),
+    -- Circuits
+    ('Circuits', '15A 14-2 Home Run'),
+    ('Circuits', '20A 12-2 Home Run'),
+    ('Circuits', '30A 10-2 Home Run'),
+    ('Circuits', '30A 10-3 Home Run'),
+    ('Circuits', '50A 8-2 Home Run'),
+    ('Circuits', '50A 8-3 Home Run'),
 
     -- Panels & Service
     ('Panels & Service', '60A Outdoor Disconnect'),
@@ -65,19 +65,19 @@ JOIN (
     ('Low Voltage', 'CAT6 Ethernet Run'),
     ('Low Voltage', 'RG6 Coaxial Cable Run'),
 
-    -- Boxes & Covers
-    ('Boxes & Covers', 'Round Cut-In Box'),
-    ('Boxes & Covers', '4" Pancake Box'),
-    ('Boxes & Covers', 'Receptacle Covers'),
-    ('Boxes & Covers', 'Single Gang Switch Covers'),
-    ('Boxes & Covers', '2-Gang Switch Covers'),
-    ('Boxes & Covers', '3-Gang Switch Covers'),
-    ('Boxes & Covers', '4-Gang Switch Covers'),
-    ('Boxes & Covers', 'Single Gang Blank Covers'),
-    ('Boxes & Covers', 'Blank Ceiling Box Covers'),
-    ('Boxes & Covers', 'Specialty Covers'),
+    -- Boxes
+    ('Boxes', 'Round Cut-In Box'),
+    ('Boxes', '4" Pancake Box'),
 
-    -- Custom / Miscellaneous
-    ('Miscellaneous', 'Custom Material')
+    -- Covers
+    ('Covers', 'Receptacle Covers'),
+    ('Covers', '1-Gang Blank Covers'),
+    ('Covers', '1-Gang Switch Covers'),
+    ('Covers', '2-Gang Switch Covers'),
+    ('Covers', '3-Gang Switch Covers'),
+    ('Covers', '4-Gang Switch Covers'),
+    ('Covers', 'Blank Ceiling Box Covers'),
+    ('Covers', 'Specialty Covers')
+
 ) AS m(category_name, name)
 ON c.name = m.category_name;

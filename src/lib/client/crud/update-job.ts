@@ -6,15 +6,14 @@ import { jobs } from "$lib/client/schema";
 export const updateJobSchema = z
   .object({
     id: z.uuid(),
-    name: z
-      .string()
-      .min(1, "Must include a job name")
-      .max(50, "Name must be less than 50 characters")
-      .optional(),
+    name: z.string().max(50, "Name must be less than 50 characters").optional(),
     address: z
       .string()
-      .min(1, "Must include a valid address")
       .max(100, "Address must be less than 100 characters")
+      .optional(),
+    contractor: z
+      .string()
+      .max(50, "Contractor name must be less than 50 characters")
       .optional(),
     completed: z.boolean().optional(),
     start_date: z.coerce.date().optional(),
@@ -48,7 +47,8 @@ export async function updateJob(input: UpdateJob) {
     .update(jobs)
     .set({
       name: input.name,
-      address: input.address,
+      address: input.address || undefined,
+      contractor: input.contractor || undefined,
       completed: input.completed,
       start_date: startDate,
       end_date: endDate,
@@ -76,6 +76,7 @@ export function mapUpdateJobErrors(error: ZodError<UpdateJob>) {
     start_date: flat.fieldErrors.start_date?.[0],
     end_date: flat.fieldErrors.end_date?.[0],
     address: flat.fieldErrors.address?.[0],
+    contractor: flat.fieldErrors.contractor?.[0],
     completed: flat.fieldErrors.completed?.[0],
   };
 }

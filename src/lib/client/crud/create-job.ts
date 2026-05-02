@@ -28,15 +28,20 @@ const DEFAULT_JOB_TASKS = [
 
 export const createJobSchema = z.object({
   user_id: z.string(),
+  template_id: z.string(),
   name: z
     .string()
     .min(1, "Must include a job name")
     .max(50, "Name must be less than 50 characters"),
-  start_date: z.coerce.date(),
   address: z
     .string()
-    .min(1, "Must include a valid address")
-    .max(100, "Address must be less than 100 characters"),
+    .max(100, "Address must be less than 100 characters")
+    .optional(),
+  contractor: z
+    .string()
+    .max(50, "Contractor name must be less than 50 characters")
+    .optional(),
+  start_date: z.coerce.date(),
 });
 
 export type CreateJobInput = z.infer<typeof createJobSchema>;
@@ -49,8 +54,10 @@ export async function createJob(input: CreateJobInput) {
     await tx.insert(jobs).values({
       id: jobId,
       user_id: input.user_id,
+      template_id: input.template_id,
       name: input.name,
-      address: input.address,
+      address: input.address || null,
+      contractor: input.contractor || null,
       start_date: input.start_date.toISOString(),
       end_date: null,
       completed: false,
@@ -94,5 +101,6 @@ export function mapCreateJobErrors(error: ZodError<CreateJobInput>) {
     name: flat.fieldErrors.name?.[0],
     start_date: flat.fieldErrors.start_date?.[0],
     address: flat.fieldErrors.address?.[0],
+    contractor: flat.fieldErrors.contractor?.[0],
   };
 }

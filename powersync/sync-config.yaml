@@ -32,10 +32,24 @@ streams:
     queries:
       - SELECT categories.*
         FROM categories
+  job_templates:
+    auto_subscribe: true
+    queries:
+      - SELECT job_templates.*
+        FROM job_templates
+  template_tasks:
+    auto_subscribe: true
+    queries:
+      - SELECT template_tasks.*
+        FROM template_tasks
+  template_materials:
+    auto_subscribe: true
+    queries:
+      - SELECT template_materials.*
+        FROM template_materials
   user_time_entries:
     auto_subscribe: true
     queries:
       - SELECT time_entries.*
         FROM time_entries 
         WHERE time_entries.user_id = auth.user_id()
-

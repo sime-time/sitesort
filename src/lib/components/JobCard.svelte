@@ -18,7 +18,7 @@
   }: {
     id: string;
     name: string;
-    address: string;
+    address?: string;
     completed: boolean;
     startDate: string;
     endDate?: string | null;
@@ -98,14 +98,16 @@
       {/if}
     </div>
 
-    <button
-      type="button"
-      class="btn btn-soft btn-info btn-xs w-fit"
-      onclick={(e) => openMap(e)}
-    >
-      <Icon icon={movedLocationIcon} class="size-4" />
-      <span class="font-heading uppercase tracking-widest">{address}</span>
-    </button>
+    {#if address}
+      <button
+        type="button"
+        class="btn btn-soft btn-info btn-xs w-fit"
+        onclick={(e) => openMap(e)}
+      >
+        <Icon icon={movedLocationIcon} class="size-4" />
+        <span class="font-heading uppercase tracking-widest">{address}</span>
+      </button>
+    {/if}
 
     <div class="card-actions flex justify-end items-center gap-1 text-primary">
       <span class="uppercase tracking-widest font-medium text-xs">

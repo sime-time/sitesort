@@ -28,9 +28,13 @@ export const jobs = pgTable(
   "jobs",
   {
     id: uuid().defaultRandom().primaryKey(),
+    template_id: uuid()
+      .notNull()
+      .references(() => job_templates.id),
     user_id: text().notNull().default(sql`auth.user_id ()`),
     name: text().notNull(),
-    address: text().notNull(),
+    contractor: text(),
+    address: text(),
     start_date: timestamp({ withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -40,6 +44,13 @@ export const jobs = pgTable(
   },
   (table) => [index("user_idx").on(table.user_id)],
 );
+
+export const job_templates = pgTable("job_templates", {
+  id: uuid().defaultRandom().primaryKey(),
+  name: text().notNull(),
+  order: integer().notNull().default(0),
+  ...timestamps(),
+});
 
 export const job_materials = pgTable("job_materials", {
   id: uuid().defaultRandom().primaryKey(),
@@ -78,6 +89,29 @@ export const tasks = pgTable("tasks", {
   description: text().notNull(),
   completed: boolean().default(false).notNull(),
   order: integer(),
+  ...timestamps(),
+});
+
+export const template_tasks = pgTable("template_tasks", {
+  id: uuid().defaultRandom().primaryKey(),
+  template_id: uuid()
+    .references(() => job_templates.id)
+    .notNull(),
+  description: text().notNull(),
+  order: integer().notNull().default(0),
+  ...timestamps(),
+});
+
+export const template_materials = pgTable("template_materials", {
+  id: uuid().defaultRandom().primaryKey(),
+  template_id: uuid()
+    .references(() => job_templates.id)
+    .notNull(),
+  material_id: uuid()
+    .references(() => materials.id)
+    .notNull(),
+  default_quantity: integer().default(0),
+  default_note: text(),
   ...timestamps(),
 });
 
