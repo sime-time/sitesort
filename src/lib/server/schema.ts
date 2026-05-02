@@ -42,15 +42,11 @@ export const jobs = pgTable(
     completed: boolean().default(false).notNull(),
     ...timestamps(),
   },
-  (table) => [index("user_idx").on(table.user_id)],
+  (table) => [
+    index("user_idx").on(table.user_id),
+    index("template_idx").on(table.template_id),
+  ],
 );
-
-export const job_templates = pgTable("job_templates", {
-  id: uuid().defaultRandom().primaryKey(),
-  name: text().notNull(),
-  order: integer().notNull().default(0),
-  ...timestamps(),
-});
 
 export const job_materials = pgTable("job_materials", {
   id: uuid().defaultRandom().primaryKey(),
@@ -89,6 +85,13 @@ export const tasks = pgTable("tasks", {
   description: text().notNull(),
   completed: boolean().default(false).notNull(),
   order: integer(),
+  ...timestamps(),
+});
+
+export const job_templates = pgTable("job_templates", {
+  id: uuid().defaultRandom().primaryKey(),
+  name: text().notNull(),
+  order: integer().notNull().default(0),
   ...timestamps(),
 });
 

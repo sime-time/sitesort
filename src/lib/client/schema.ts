@@ -134,6 +134,9 @@ export type InsertTask = typeof tasks.$inferInsert;
 export type SelectTask = typeof tasks.$inferSelect;
 export type InsertTimeEntry = typeof time_entries.$inferInsert;
 export type SelectTimeEntry = typeof time_entries.$inferSelect;
+export type SelectJobTemplate = typeof job_templates.$inferSelect;
+export type SelectTemplateTask = typeof template_tasks.$inferSelect;
+export type SelectTemplateMaterial = typeof template_materials.$inferSelect;
 
 // Zod Validation Schemas
 export const jobInsertSchema = createInsertSchema(jobs);

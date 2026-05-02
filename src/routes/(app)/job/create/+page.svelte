@@ -6,6 +6,7 @@
     getLocalTimeZone,
     today,
   } from "@internationalized/date";
+  import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
   import {
@@ -13,12 +14,16 @@
     createJobSchema,
     mapCreateJobErrors,
   } from "$lib/client/crud/create-job";
+  import { listJobTemplates } from "$lib/client/crud/read-template";
+  import type { SelectJobTemplate } from "$lib/client/schema";
   import type { PageProps } from "./$types";
 
   type FormErrors = {
     name?: string;
     date?: string;
     address?: string;
+    contractor?: string;
+    template?: string;
   };
 
   let { data }: PageProps = $props();
@@ -27,13 +32,26 @@
   let jobAddress = $state<string>("");
   let jobContractor = $state<string>("");
   let jobDate = $state<CalendarDate>(today(getLocalTimeZone()));
+  let jobTemplates = $state<SelectJobTemplate[]>([]);
+  let jobTemplateId = $state<string>("");
   let errors = $state<FormErrors>({});
+
+  onMount(async () => {
+    const templates = await listJobTemplates();
+    jobTemplates = templates;
+  });
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
+    if (!jobTemplateId) {
+      errors = { ...errors, template: "Select a job type" };
+      return;
+    }
+
     const parsed = createJobSchema.safeParse({
       user_id: data.user_id,
+      template_id: jobTemplateId,
       name: jobName,
       address: jobAddress,
       contractor: jobContractor,
@@ -95,21 +113,44 @@
     <p class="label text-error">{errors.name}</p>
   </fieldset>
 
-  <fieldset class="fieldset" data-invalid={errors.date ? "true" : undefined}>
+  <fieldset
+    class="fieldset"
+    data-invalid={errors.template ? "true" : undefined}
+  >
     <label
       class="label uppercase tracking-wide text-neutral font-medium text-sm"
-      for="job-date"
+      for="job-template"
     >
-      Deployment Date
+      Job Type
+    </label>
+    <select id="job-template" class="select w-full" bind:value={jobTemplateId}>
+      <option disabled value="">Select job type</option>
+      {#each jobTemplates as template (template.id)}
+        <option value={template.id}>{template.name}</option>
+      {/each}
+    </select>
+    <p class="label text-error">{errors.template}</p>
+  </fieldset>
+
+  <fieldset
+    class="fieldset"
+    data-invalid={errors.contractor ? "true" : undefined}
+  >
+    <label
+      class="label uppercase tracking-wide text-neutral font-medium text-sm"
+      for="job-contractor"
+    >
+      Contractor
     </label>
     <input
-      type="date"
-      id="job-date"
+      type="text"
+      id="job-contractor"
       class="input border w-full"
-      bind:value={jobDate}
-      aria-invalid={!!errors.address}
+      bind:value={jobContractor}
+      aria-invalid={!!errors.contractor}
+      placeholder="(Optional)"
     >
-    <p class="label text-error">{errors.date}</p>
+    <p class="label text-error">{errors.contractor}</p>
   </fieldset>
 
   <fieldset class="fieldset" data-invalid={errors.address ? "true" : undefined}>
@@ -125,8 +166,26 @@
       class="input border w-full"
       bind:value={jobAddress}
       aria-invalid={!!errors.address}
+      placeholder="(Optional)"
     >
     <p class="label text-error">{errors.address}</p>
+  </fieldset>
+
+  <fieldset class="fieldset" data-invalid={errors.date ? "true" : undefined}>
+    <label
+      class="label uppercase tracking-wide text-neutral font-medium text-sm"
+      for="job-date"
+    >
+      Deployment Date
+    </label>
+    <input
+      type="date"
+      id="job-date"
+      class="input border w-full"
+      bind:value={jobDate}
+      aria-invalid={!!errors.date}
+    >
+    <p class="label text-error">{errors.date}</p>
   </fieldset>
 
   <button

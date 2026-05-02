@@ -41,6 +41,7 @@ JOIN (
     -- Fans & Ventilation
     ('Fans & Ventilation', 'Ceiling Fan Rough-In'),
     ('Fans & Ventilation', 'Ceiling Fan Box Install'),
+    ('Fans & Ventilation', 'Ceiling Fan Install'),
     ('Fans & Ventilation', 'Bathroom Exhaust Fan/Light Combo 60 CFM'),
     ('Fans & Ventilation', 'Bathroom Exhaust Fan/Light Combo 100 CFM'),
 

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { type ZodError, z } from "zod";
 import { db } from "$lib/client/db";
 import {
@@ -8,27 +9,13 @@ import {
   jobs,
   materials,
   tasks,
+  template_materials,
+  template_tasks,
 } from "$lib/client/schema";
-
-const DEFAULT_JOB_TASKS = [
-  { order: 1, description: "Test all receptacles", completed: false },
-  {
-    order: 2,
-    description: "Test all GFCI's and protected receptacles",
-    completed: false,
-  },
-  { order: 3, description: "Test all switches", completed: false },
-  { order: 4, description: "Test smoke detectors", completed: false },
-  {
-    order: 5,
-    description: "Verify all circuits are turned on",
-    completed: false,
-  },
-] as const;
 
 export const createJobSchema = z.object({
   user_id: z.string(),
-  template_id: z.string(),
+  template_id: z.string().min(1, "Must select a job template"),
   name: z
     .string()
     .min(1, "Must include a job name")
@@ -49,12 +36,13 @@ export type CreateJobInput = z.infer<typeof createJobSchema>;
 export async function createJob(input: CreateJobInput) {
   const now = new Date().toISOString();
   const jobId = crypto.randomUUID();
+  const templateId = input.template_id;
 
   await db.transaction(async (tx) => {
     await tx.insert(jobs).values({
       id: jobId,
+      template_id: templateId,
       user_id: input.user_id,
-      template_id: input.template_id,
       name: input.name,
       address: input.address || null,
       contractor: input.contractor || null,
@@ -65,31 +53,43 @@ export async function createJob(input: CreateJobInput) {
       updated_at: now,
     } satisfies InsertJob);
 
-    const materialIds = await tx.select({ id: materials.id }).from(materials);
+    // Insert job materials from template
+    const materialTemplates = await tx
+      .select()
+      .from(template_materials)
+      .where(eq(template_materials.template_id, templateId));
 
-    if (materialIds.length > 0) {
-      const rows: InsertJobMaterial[] = materialIds.map((m) => ({
+    if (materialTemplates.length > 0) {
+      const rows: InsertJobMaterial[] = materialTemplates.map((m) => ({
         id: crypto.randomUUID(),
         job_id: jobId,
         material_id: m.id,
-        quantity: 0,
+        quantity: m.default_quantity ?? 0,
+        note: m.default_note ?? null,
         created_at: now,
         updated_at: now,
       }));
       await tx.insert(job_materials).values(rows);
     }
 
-    const taskRows: InsertTask[] = DEFAULT_JOB_TASKS.map((task) => ({
-      id: crypto.randomUUID(),
-      job_id: jobId,
-      order: task.order,
-      description: task.description,
-      completed: task.completed,
-      created_at: now,
-      updated_at: now,
-    }));
+    // Insert tasks from template
+    const taskTemplates = await tx
+      .select()
+      .from(template_tasks)
+      .where(eq(template_tasks.template_id, templateId));
 
-    await tx.insert(tasks).values(taskRows);
+    if (taskTemplates.length > 0) {
+      const rows: InsertTask[] = taskTemplates.map((task) => ({
+        id: crypto.randomUUID(),
+        job_id: jobId,
+        order: task.order,
+        description: task.description,
+        completed: false,
+        created_at: now,
+        updated_at: now,
+      }));
+      await tx.insert(tasks).values(rows);
+    }
   });
 
   return { success: true, id: jobId };
@@ -102,5 +102,6 @@ export function mapCreateJobErrors(error: ZodError<CreateJobInput>) {
     start_date: flat.fieldErrors.start_date?.[0],
     address: flat.fieldErrors.address?.[0],
     contractor: flat.fieldErrors.contractor?.[0],
+    template: flat.fieldErrors.template_id?.[0],
   };
 }
