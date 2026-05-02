@@ -256,7 +256,7 @@
       <!-- Note Modal -->
       <dialog
         bind:this={noteModal}
-        class="modal modal-bottom sm:modal-middle"
+        class="modal modal-middle"
         onclose={closeNoteModal}
       >
         <div class="modal-box">
