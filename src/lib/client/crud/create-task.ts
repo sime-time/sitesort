@@ -22,7 +22,7 @@ export async function createTask(input: CreateTask) {
     .where(eq(tasks.job_id, input.job_id))
     .orderBy(desc(tasks.order));
 
-  const highestOrder = jobOrder[0].order || 0;
+  const highestOrder = jobOrder[0]?.order ?? 0;
 
   await db.insert(tasks).values({
     id: id,
