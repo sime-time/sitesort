@@ -50,12 +50,16 @@
 <header class="p-6 h-18 border-b border-b-accent">
   {#if isJobDetail}
     <div class="flex items-center justify-between text-2xl">
-      <button type="button" class="flex items-center gap-3" onclick={goBack}>
-        <Icon icon={arrowLeftAltIcon} class="text-muted-foreground" />
-        <h1 class="text-lg font-medium">{title}</h1>
+      <button
+        type="button"
+        class="flex flex-1 items-center gap-2 min-w-0"
+        onclick={goBack}
+      >
+        <Icon icon={arrowLeftAltIcon} class="text-muted-foreground flex-none" />
+        <h1 class="text-lg font-medium truncate">{title}</h1>
       </button>
 
-      <div class="flex items-center justify-between gap-5">
+      <div class="flex items-center justify-between gap-4">
         <button
           type="button"
           class="btn btn-primary btn-outline btn-sm font-heading tracking-wider uppercase"
@@ -80,7 +84,7 @@
           SiteSort
         </h1>
       </div>
-      <div class="flex items-center justify-between gap-5">
+      <div class="flex items-center justify-between gap-4">
         <button
           type="button"
           class="btn btn-ghost btn-neutral btn-square btn-sm"

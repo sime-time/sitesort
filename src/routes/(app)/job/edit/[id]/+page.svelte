@@ -12,17 +12,15 @@
   } from "$lib/client/crud/update-job";
   import DeleteJob from "$lib/components/DeleteJob.svelte";
   import { haptic } from "$lib/utils/haptic";
-  import type { PageProps } from "./$types";
 
   type FormErrors = {
     name?: string;
     address?: string;
     completed?: string;
+    contractor?: string;
     start_date?: string;
     end_date?: string;
   };
-
-  let { data }: PageProps = $props();
 
   const jobId = $derived(page.params.id);
 
@@ -30,6 +28,7 @@
   let startDate = $state<string>("");
   let endDate = $state<string>("");
   let address = $state<string>("");
+  let contractor = $state<string>("");
   let completed = $state<boolean>(false);
   let errors = $state<FormErrors>({});
 
@@ -47,7 +46,8 @@
     void (async () => {
       const job = await getUserJob(userId, jobId);
       name = job.name;
-      address = job.address;
+      address = job.address ?? "";
+      contractor = job.contractor ?? "";
       completed = job.completed;
       startDate = toDateInput(job.start_date);
       endDate = toDateInput(job.end_date);
@@ -58,6 +58,11 @@
     e.preventDefault();
     haptic.confirm();
 
+    if (completed === true && !endDate) {
+      // YYYY-MM-DD
+      endDate = new Date().toISOString().slice(0, 10);
+    }
+
     if (startDate && endDate && startDate > endDate) {
       errors = {
         ...errors,
@@ -66,13 +71,20 @@
       return;
     }
 
+    // Normalizations allow user to save cleared fields as empty
+    const normalizedAddress =
+      address.trim() === "" ? undefined : address.trim();
+    const normalizedContractor =
+      contractor.trim() === "" ? undefined : contractor.trim();
+    const normalizedEndDate = endDate.trim() === "" ? undefined : endDate;
+
     const parsed = updateJobSchema.safeParse({
       id: jobId,
-      user_id: data.user_id,
-      name: name,
-      address: address,
-      start_date: startDate || undefined,
-      end_date: endDate || undefined,
+      name: name.trim(),
+      address: normalizedAddress,
+      contractor: normalizedContractor,
+      start_date: startDate ?? undefined,
+      end_date: normalizedEndDate,
       completed: completed,
     });
 
@@ -87,6 +99,7 @@
         id: parsed.data.id,
         name: parsed.data.name,
         address: parsed.data.address,
+        contractor: parsed.data.contractor,
         completed: parsed.data.completed,
         start_date: parsed.data.start_date,
         end_date: parsed.data.end_date,
@@ -101,6 +114,7 @@
     toast.success("Job changes saved");
     name = "";
     address = "";
+    contractor = "";
     startDate = "";
     endDate = "";
     completed = false;
@@ -134,6 +148,27 @@
     <p class="label text-error">{errors.name}</p>
   </fieldset>
 
+  <fieldset
+    class="fieldset"
+    data-invalid={errors.contractor ? "true" : undefined}
+  >
+    <label
+      class="label uppercase tracking-wide text-neutral font-medium text-sm"
+      for="job-contractor"
+    >
+      Contractor
+    </label>
+    <input
+      type="text"
+      id="job-contractor"
+      class="input border w-full"
+      bind:value={contractor}
+      aria-invalid={!!errors.contractor}
+      placeholder="(Optional)"
+    >
+    <p class="label text-error">{errors.contractor}</p>
+  </fieldset>
+
   <fieldset class="fieldset" data-invalid={errors.address ? "true" : undefined}>
     <label
       class="label uppercase tracking-wide text-neutral font-medium text-sm"
@@ -147,6 +182,7 @@
       class="input border w-full"
       bind:value={address}
       aria-invalid={!!errors.address}
+      placeholder="(Optional)"
     >
     <p class="label text-error">{errors.address}</p>
   </fieldset>

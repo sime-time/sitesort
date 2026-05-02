@@ -36,7 +36,7 @@
   let editClockInValue = $state<string>("");
   let editClockOutValue = $state<string>("");
   let editError = $state<string>("");
-  let editingDayKey = $state<string>("");
+  let editClockInDateValue = $state<string>("");
   let toggleInFlight = $state(false);
 
   const activeEntry = $derived(
@@ -125,7 +125,7 @@
     haptic();
     const now = new Date().toISOString();
     editingId = null;
-    editingDayKey = getLocalDayKey(now);
+    editClockInDateValue = getLocalDayKey(now);
     editClockInValue = toTimeInputValue(now);
     editClockOutValue = "";
     editError = "";
@@ -135,7 +135,7 @@
   function openEdit(entry: TimeEntry) {
     haptic();
     editingId = entry.id;
-    editingDayKey = getLocalDayKey(entry.clockInAt);
+    editClockInDateValue = getLocalDayKey(entry.clockInAt);
     editClockInValue = toTimeInputValue(entry.clockInAt);
     editClockOutValue = entry.clockOutAt
       ? toTimeInputValue(entry.clockOutAt)
@@ -150,20 +150,28 @@
     editClockInValue = "";
     editClockOutValue = "";
     editError = "";
-    editingDayKey = "";
+    editClockInDateValue = "";
   }
 
   async function saveEdit() {
     haptic();
 
-    const nextClockIn = combineDayKeyAndTime(editingDayKey, editClockInValue);
+    if (!editClockInDateValue) {
+      editError = "Clock-in date is required";
+      return;
+    }
+
+    const nextClockIn = combineDayKeyAndTime(
+      editClockInDateValue,
+      editClockInValue,
+    );
     if (!nextClockIn) {
       editError = "Clock-in time is required";
       return;
     }
 
     const nextClockOut = editClockOutValue
-      ? combineDayKeyAndTime(editingDayKey, editClockOutValue)
+      ? combineDayKeyAndTime(editClockInDateValue, editClockOutValue)
       : null;
 
     if (editClockOutValue && !nextClockOut) {
@@ -347,6 +355,16 @@
     </h3>
 
     <div class="mt-4 flex flex-col gap-3">
+      <fieldset class="fieldset">
+        <label class="label" for="clock-in-date-input">Clock In Date</label>
+        <input
+          id="clock-in-date-input"
+          type="date"
+          class="input input-bordered w-full"
+          bind:value={editClockInDateValue}
+        >
+      </fieldset>
+
       <fieldset class="fieldset">
         <label class="label" for="clock-in-input">Clock In</label>
         <input

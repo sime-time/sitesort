@@ -16,8 +16,8 @@ export const updateJobSchema = z
       .max(50, "Contractor name must be less than 50 characters")
       .optional(),
     completed: z.boolean().optional(),
-    start_date: z.coerce.date().optional(),
-    end_date: z.coerce.date().optional(),
+    start_date: z.coerce.date("Must use valid date").optional(),
+    end_date: z.coerce.date("Must use valid date").optional(),
   })
   .superRefine((data, ctx) => {
     if (data.start_date && data.end_date && data.start_date > data.end_date) {
@@ -34,6 +34,7 @@ export type UpdateJob = z.infer<typeof updateJobSchema>;
 export async function updateJob(input: UpdateJob) {
   const now = new Date().toISOString();
 
+  // Normalize dates to ISO strings
   let startDate: string | undefined;
   if (input.start_date) {
     startDate = new Date(input.start_date).toISOString();
@@ -47,11 +48,11 @@ export async function updateJob(input: UpdateJob) {
     .update(jobs)
     .set({
       name: input.name,
-      address: input.address || undefined,
-      contractor: input.contractor || undefined,
+      address: input.address ?? null,
+      contractor: input.contractor ?? null,
       completed: input.completed,
       start_date: startDate,
-      end_date: endDate,
+      end_date: endDate ?? null,
       updated_at: now,
     })
     .where(eq(jobs.id, input.id));
