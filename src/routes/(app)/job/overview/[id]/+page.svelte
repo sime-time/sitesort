@@ -1,8 +1,8 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import checkBoxIcon from "@iconify-icons/material-symbols/check-box-rounded";
   import contentCopyIcon from "@iconify-icons/material-symbols/content-copy";
   import descriptionIcon from "@iconify-icons/material-symbols/description";
+  import factCheckIcon from "@iconify-icons/material-symbols/fact-check";
   import inventory2Icon from "@iconify-icons/material-symbols/inventory-2";
   import { toast } from "svelte-sonner";
   import { page } from "$app/state";
@@ -257,7 +257,7 @@
           <h3
             class="font-heading uppercase tracking-wide text-sm text-success flex items-center gap-1.5"
           >
-            <Icon icon={checkBoxIcon} class="size-5" />
+            <Icon icon={factCheckIcon} class="size-5" />
             Completed Tasks
           </h3>
           <span class="badge badge-success badge-sm"
@@ -268,14 +268,22 @@
         {#if completedTasks.length === 0}
           <p class="text-sm text-base-content/60">No completed tasks yet.</p>
         {:else}
-          <ul class="space-y-1 text-sm leading-snug">
-            {#each completedTasks as task (task.id)}
-              <li class="flex items-start gap-2">
-                <span class="text-success mt-px">[x]</span>
-                <span>{task.description}</span>
-              </li>
-            {/each}
-          </ul>
+          <div class="overflow-x-auto">
+            <table class="table table-sm w-full">
+              <tbody>
+                {#each completedTasks as task (task.id)}
+                  <tr class="flex items-start gap-2">
+                    <td
+                      class="whitespace-nowrap pr-1 pl-0 border-0 text-success"
+                    >
+                      [x]
+                    </td>
+                    <td class="px-0">{task.description}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
         {/if}
       </div>
     </article>
