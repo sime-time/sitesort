@@ -30,10 +30,11 @@ export async function handleJobEntry(
 
       const row: InsertJob = {
         id: entry.id,
+        template_id: parsed.template_id,
         user_id: parsed.user_id,
         name: parsed.name,
-        address: parsed.address,
-        contractor: parsed.contractor,
+        address: parsed.address ?? null,
+        contractor: parsed.contractor ?? null,
         start_date: parsed.start_date,
         end_date: parsed.end_date ?? null,
         completed: parsed.completed,
@@ -48,6 +49,7 @@ export async function handleJobEntry(
           target: jobs.id,
           set: {
             user_id: row.user_id,
+            template_id: row.template_id,
             name: row.name,
             address: row.address,
             contractor: row.contractor,

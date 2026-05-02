@@ -257,7 +257,7 @@
         <button
           type="button"
           disabled={toggleInFlight}
-          class="btn btn-xl btn-soft border-dashed border-2 w-full font-heading uppercase tracking-widest"
+          class="btn btn-xl btn-soft border-2 w-full font-heading uppercase tracking-widest"
           onclick={openCreate}
         >
           <Icon icon={alarmAddIcon} class="size-6" />
