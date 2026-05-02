@@ -45,6 +45,11 @@
     haptic.confirm();
     goto(`/job/edit/${jobId}`);
   }
+
+  function shareJob() {
+    haptic.confirm();
+    goto(`/job/overview/${jobId}`);
+  }
 </script>
 
 <header class="p-6 h-18 border-b border-b-accent">
@@ -63,6 +68,7 @@
         <button
           type="button"
           class="btn btn-primary btn-outline btn-sm font-heading tracking-wider uppercase"
+          onclick={shareJob}
         >
           Share
         </button>
