@@ -59,6 +59,16 @@ export async function updateJob(input: UpdateJob) {
   return update;
 }
 
+export async function setJobCompleted(id: string, completed: boolean) {
+  const now = new Date().toISOString();
+  const update = await db
+    .update(jobs)
+    .set({ completed: completed, updated_at: now })
+    .where(eq(jobs.id, id));
+
+  return update;
+}
+
 export function mapUpdateJobErrors(error: ZodError<UpdateJob>) {
   const flat = z.flattenError(error);
   return {

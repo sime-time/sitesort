@@ -49,6 +49,9 @@
       disabled={saving}
       class="checkbox checkbox-xl checkbox-primary border border-primary size-10"
     >
-    <span class="font-medium text-base">{description}</span>
+    <span
+      class={`font-medium text-base ${localCompleted ? "line-through" : ""}`}
+      >{description}</span
+    >
   </label>
 </div>

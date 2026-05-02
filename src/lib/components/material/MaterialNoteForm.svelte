@@ -70,7 +70,11 @@
     >
       Note
     </label>
-    <textarea id="note" class="textarea w-full" bind:value={note}></textarea>
+    <textarea
+      id="note"
+      class="textarea textarea-lg w-full"
+      bind:value={note}
+    ></textarea>
     <p class="label text-error">{errors.note}</p>
   </fieldset>
 

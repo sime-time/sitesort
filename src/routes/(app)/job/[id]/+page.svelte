@@ -1,16 +1,21 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import addCircleOutlineIcon from "@iconify-icons/material-symbols/add-circle-outline";
+  import checkCircleOutlineIcon from "@iconify-icons/material-symbols/check-circle-outline";
   import checklistIcon from "@iconify-icons/material-symbols/checklist";
   import closeIcon from "@iconify-icons/material-symbols/close";
   import serviceToolboxIcon from "@iconify-icons/material-symbols/service-toolbox";
+  import { toast } from "svelte-sonner";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { listCategories } from "$lib/client/crud/read-category";
+  import { getUserJob } from "$lib/client/crud/read-job";
   import {
     type JobMaterial,
     watchJobMaterials,
   } from "$lib/client/crud/read-material";
   import { watchJobTasks } from "$lib/client/crud/read-task";
+  import { setJobCompleted } from "$lib/client/crud/update-job";
   import type { SelectCategory, SelectTask } from "$lib/client/schema";
   import MaterialCategory from "$lib/components/material/MaterialCategory.svelte";
   import MaterialForm from "$lib/components/material/MaterialForm.svelte";
@@ -26,6 +31,7 @@
   let categories = $state<SelectCategory[]>([]);
   let loading = $state(true);
   let activeTab = $state<"materials" | "checklist">("materials");
+  let isJobCompleted = $state<boolean>(false);
 
   let addModal: HTMLDialogElement | undefined;
   let noteModal: HTMLDialogElement | undefined;
@@ -75,9 +81,26 @@
     return groups;
   });
 
+  async function completeJob() {
+    if (!jobId) return;
+    haptic.confirm();
+    await setJobCompleted(jobId, true);
+    toast.success("Job completed");
+    goto("/");
+  }
+
   $effect(() => {
     if (!jobId) return;
     loading = true;
+
+    const userId = page.data?.user_id as string | undefined;
+
+    if (userId) {
+      void (async () => {
+        const job = await getUserJob(userId, jobId);
+        isJobCompleted = job?.completed;
+      })();
+    }
 
     void listCategories()
       .then((next) => {
@@ -195,6 +218,18 @@
           {activeTab === "materials" ? "New Material" : "New Task"}
         </span>
       </button>
+
+      <!-- Complete Job Button -->
+      {#if activeTab === "checklist" && !isJobCompleted}
+        <button
+          type="button"
+          class="mt-6 w-full uppercase font-heading tracking-widest btn btn-xl btn-success border border-success btn-soft"
+          onclick={completeJob}
+        >
+          <Icon icon={checkCircleOutlineIcon} />
+          <span class="text-base"> Complete Job </span>
+        </button>
+      {/if}
 
       <!-- Modal -->
       <dialog bind:this={addModal} class="modal modal-bottom sm:modal-middle">

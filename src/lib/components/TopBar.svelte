@@ -2,7 +2,6 @@
   import Icon from "@iconify/svelte";
   import arrowLeftAltIcon from "@iconify-icons/material-symbols/arrow-left-alt";
   import logoutSharpIcon from "@iconify-icons/material-symbols/logout-sharp";
-  import settingsIcon from "@iconify-icons/material-symbols/settings";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { getUserJob } from "$lib/client/crud/read-job";
@@ -54,13 +53,22 @@
         <h1 class="text-lg font-medium">{title}</h1>
       </button>
 
-      <button
-        type="button"
-        class="btn btn-sm btn-circle btn-ghost"
-        onclick={editJob}
-      >
-        <Icon icon={settingsIcon} class="size-6" />
-      </button>
+      <div class="flex items-center justify-between gap-5">
+        <button
+          type="button"
+          class="btn btn-primary btn-outline btn-sm font-heading tracking-wider uppercase"
+        >
+          Share
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-sm btn-info btn-outline font-heading tracking-wider uppercase"
+          onclick={editJob}
+        >
+          Edit job
+        </button>
+      </div>
     </div>
   {:else}
     <div class="flex justify-between text-primary text-2xl">
