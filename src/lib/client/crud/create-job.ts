@@ -7,7 +7,6 @@ import {
   type InsertTask,
   job_materials,
   jobs,
-  materials,
   tasks,
   template_materials,
   template_tasks,
@@ -60,12 +59,12 @@ export async function createJob(input: CreateJobInput) {
       .where(eq(template_materials.template_id, templateId));
 
     if (materialTemplates.length > 0) {
-      const rows: InsertJobMaterial[] = materialTemplates.map((m) => ({
+      const rows: InsertJobMaterial[] = materialTemplates.map((mt) => ({
         id: crypto.randomUUID(),
         job_id: jobId,
-        material_id: m.id,
-        quantity: m.default_quantity ?? 0,
-        note: m.default_note ?? null,
+        material_id: mt.material_id,
+        quantity: mt.default_quantity ?? 0,
+        note: mt.default_note ?? null,
         created_at: now,
         updated_at: now,
       }));
