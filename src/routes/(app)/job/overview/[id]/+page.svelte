@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import assignmentTurnedInIcon from "@iconify-icons/material-symbols/assignment-turned-in";
+  import checkBoxIcon from "@iconify-icons/material-symbols/check-box-rounded";
   import contentCopyIcon from "@iconify-icons/material-symbols/content-copy";
   import descriptionIcon from "@iconify-icons/material-symbols/description";
   import inventory2Icon from "@iconify-icons/material-symbols/inventory-2";
@@ -164,23 +164,37 @@
         <table class="table table-sm w-full">
           <tbody>
             <tr>
-              <td class="text-neutral/70 w-24 sm:w-28 px-0">Job:</td>
-              <td class="font-medium px-0 truncate">{jobName || "-"}</td>
-              <td class="text-neutral/70 w-24 sm:w-28 px-0">Contractor:</td>
-              <td class="font-medium px-0 truncate">
-                {jobContractor?.trim() || "-"}
+              <td class="px-0">
+                <span class="text-neutral/70">Job:</span>
+                <span class="font-medium truncate">{jobName || "-"}</span>
+              </td>
+              <td class="px-0">
+                <span class="text-neutral/70">Contractor:</span>
+                <span class="font-medium truncate">
+                  {jobContractor?.trim() || "-"}
+                </span>
               </td>
             </tr>
             <tr>
-              <td class="text-neutral/70 px-0">Start Date:</td>
-              <td class="font-medium px-0">{formatDate(jobStartDate)}</td>
-              <td class="text-neutral/70 px-0">End Date:</td>
-              <td class="font-medium px-0">{formatDate(jobEndDate)}</td>
+              <td class="px-0">
+                <span class="text-neutral/70">Start Date:</span>
+                <span class="font-medium truncate">
+                  {formatDate(jobStartDate)}
+                </span>
+              </td>
+              <td class="px-0">
+                <span class="text-neutral/70">End Date:</span>
+                <span class="font-medium truncate">
+                  {formatDate(jobEndDate)}
+                </span>
+              </td>
             </tr>
             <tr>
-              <td class="text-neutral/70 px-0">Address:</td>
-              <td class="font-medium px-0 truncate" colspan="3">
-                {jobAddress?.trim() || "-"}
+              <td class="px-0" colspan="2">
+                <span class="text-neutral/70">Address:</span>
+                <span class="font-medium truncate">
+                  {jobAddress?.trim() || "-"}
+                </span>
               </td>
             </tr>
           </tbody>
@@ -196,7 +210,7 @@
           <h3
             class="font-heading uppercase tracking-wide text-sm text-primary flex items-center gap-1.5"
           >
-            <Icon icon={inventory2Icon} />
+            <Icon icon={inventory2Icon} class="size-5" />
             Materials Used
           </h3>
           <span class="badge badge-primary badge-sm"
@@ -213,7 +227,7 @@
             <table class="table table-sm">
               <thead>
                 <tr>
-                  <th class="w-16">Qty</th>
+                  <th class="w-1 whitespace-nowrap pr-1">Qty</th>
                   <th>Material</th>
                   <th>Notes</th>
                 </tr>
@@ -221,7 +235,9 @@
               <tbody>
                 {#each usedMaterials as material (material.id)}
                   <tr>
-                    <td class="font-semibold">{material.quantity}x</td>
+                    <td class="font-semibold whitespace-nowrap pr-1">
+                      {material.quantity}x
+                    </td>
                     <td class="font-medium">{material.name}</td>
                     <td class="text-xs leading-snug text-base-content/75">
                       {material.note?.trim() || "-"}
@@ -241,7 +257,7 @@
           <h3
             class="font-heading uppercase tracking-wide text-sm text-success flex items-center gap-1.5"
           >
-            <Icon icon={assignmentTurnedInIcon} />
+            <Icon icon={checkBoxIcon} class="size-5" />
             Completed Tasks
           </h3>
           <span class="badge badge-success badge-sm"

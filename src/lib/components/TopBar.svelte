@@ -78,7 +78,7 @@
           class="btn btn-sm btn-info btn-outline font-heading tracking-wider uppercase"
           onclick={editJob}
         >
-          Edit job
+          Edit
         </button>
       </div>
     </div>
