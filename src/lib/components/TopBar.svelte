@@ -1,7 +1,9 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import arrowLeftAltIcon from "@iconify-icons/material-symbols/arrow-left-alt";
+  import exitToAppIcon from "@iconify-icons/material-symbols/exit-to-app";
   import logoutSharpIcon from "@iconify-icons/material-symbols/logout-sharp";
+  import refreshIcon from "@iconify-icons/material-symbols/refresh";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { getUserJob } from "$lib/client/crud/read-job";
@@ -53,7 +55,7 @@
         <h1 class="text-lg font-medium">{title}</h1>
       </button>
 
-      <div class="flex items-center justify-between gap-5">
+      <div class="flex items-center justify-between gap-4">
         <button
           type="button"
           class="btn btn-primary btn-outline btn-sm font-heading tracking-wider uppercase"
@@ -78,14 +80,23 @@
           SiteSort
         </h1>
       </div>
-      <button
-        type="button"
-        class="font-sans tracking-normal btn btn-soft btn-error btn-xs uppercase"
-        onclick={signOut}
-      >
-        <Icon icon={logoutSharpIcon} class="size-4" />
-        Sign Out
-      </button>
+      <div class="flex items-center justify-between gap-4">
+        <button
+          type="button"
+          class="btn btn-ghost btn-neutral btn-square btn-sm"
+          onclick={() => window.location.reload()}
+        >
+          <Icon icon={refreshIcon} class="size-5" />
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-ghost btn-error btn-square btn-sm"
+          onclick={signOut}
+        >
+          <Icon icon={exitToAppIcon} class="size-5" />
+        </button>
+      </div>
     </div>
   {/if}
 </header>

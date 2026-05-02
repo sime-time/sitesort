@@ -1,4 +1,3 @@
--- Finish Template
 INSERT INTO template_materials (
   template_id,
   material_id,
@@ -41,10 +40,9 @@ JOIN materials m
     'Blank Ceiling Box Covers',
     'Specialty Covers'
   )
-WHERE jt.name = 'Finish / Remodel';
+WHERE jt.name = 'New Construction';
 
 
--- New Construction Template
 INSERT INTO template_materials (
   template_id,
   material_id,
@@ -113,4 +111,4 @@ JOIN materials m
     'Tape Lighting Additional Footage (ft)',
     'Puck Light'
   )
-WHERE jt.name = 'New Construction';
+WHERE jt.name = 'Remodel';
