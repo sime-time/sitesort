@@ -1,10 +1,12 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import cancelIcon from "@iconify-icons/material-symbols/cancel";
   import checkCircleIcon from "@iconify-icons/material-symbols/check-circle";
   import pendingIcon from "@iconify-icons/material-symbols/pending";
   import { onMount } from "svelte";
   import { watchUserJobs } from "$lib/client/crud/read-job";
   import type { SelectJob } from "$lib/client/schema";
+  import EmptyStateCard from "$lib/components/EmptyStateCard.svelte";
   import JobCard from "$lib/components/JobCard.svelte";
   import { haptic } from "$lib/utils/haptic";
 
@@ -79,15 +81,23 @@
         bind:this={activeJobsListEl}
         class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-12 no-scrollbar"
       >
-        {#each activeJobs as job (job.id)}
-          <JobCard
-            id={job.id}
-            name={job.name}
-            address={job.address}
-            startDate={job.start_date}
-            completed={job.completed}
+        {#if activeJobs.length === 0}
+          <EmptyStateCard
+            icon={pendingIcon}
+            title="No active jobs yet"
+            description="Create a new job to get started."
           />
-        {/each}
+        {:else}
+          {#each activeJobs as job (job.id)}
+            <JobCard
+              id={job.id}
+              name={job.name}
+              address={job.address ?? ""}
+              startDate={job.start_date}
+              completed={job.completed}
+            />
+          {/each}
+        {/if}
       </div>
     {:else}
       <section class="w-full flex justify-between items-end my-4 shrink-0">
@@ -100,16 +110,24 @@
       <div
         class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-12 no-scrollbar"
       >
-        {#each completedJobs as job (job.id)}
-          <JobCard
-            id={job.id}
-            name={job.name}
-            address={job.address}
-            startDate={job.start_date}
-            endDate={job.end_date}
-            completed={job.completed}
+        {#if completedJobs.length === 0}
+          <EmptyStateCard
+            icon={cancelIcon}
+            title="No completed jobs yet"
+            description="Complete an active job."
           />
-        {/each}
+        {:else}
+          {#each completedJobs as job (job.id)}
+            <JobCard
+              id={job.id}
+              name={job.name}
+              address={job.address ?? ""}
+              startDate={job.start_date}
+              endDate={job.end_date}
+              completed={job.completed}
+            />
+          {/each}
+        {/if}
       </div>
     {/if}
   </div>

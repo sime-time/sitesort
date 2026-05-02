@@ -17,6 +17,7 @@
     findOpenEntry,
     updateTimeEntry,
   } from "$lib/client/crud/time-entries";
+  import EmptyStateCard from "$lib/components/EmptyStateCard.svelte";
   import { haptic } from "$lib/utils/haptic";
   import {
     combineDayKeyAndTime,
@@ -279,18 +280,11 @@
     class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-16 no-scrollbar"
   >
     {#if groupedEntries.length === 0}
-      <div class="card bg-base-100 border border-dashed border-accent">
-        <div class="card-body items-center text-center py-8">
-          <Icon
-            icon={nestClockFarsightAnalogOutlineIcon}
-            class="size-10 text-base-content/50"
-          />
-          <p class="font-medium">No time entries yet</p>
-          <p class="text-sm text-base-content/70">
-            Tap Clock In to start tracking.
-          </p>
-        </div>
-      </div>
+      <EmptyStateCard
+        icon={nestClockFarsightAnalogOutlineIcon}
+        title="No time entries yet"
+        description="Tap Clock In to start tracking."
+      />
     {:else}
       {#each groupedEntries as dayGroup (dayGroup.key)}
         <section class="mb-4">

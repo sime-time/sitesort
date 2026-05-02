@@ -64,7 +64,7 @@ export async function setJobCompleted(id: string, completed: boolean) {
   const now = new Date().toISOString();
   const update = await db
     .update(jobs)
-    .set({ completed: completed, updated_at: now })
+    .set({ completed: completed, end_date: now, updated_at: now })
     .where(eq(jobs.id, id));
 
   return update;
