@@ -55,7 +55,7 @@
         <h1 class="text-lg font-medium">{title}</h1>
       </button>
 
-      <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center justify-between gap-5">
         <button
           type="button"
           class="btn btn-primary btn-outline btn-sm font-heading tracking-wider uppercase"
@@ -80,13 +80,13 @@
           SiteSort
         </h1>
       </div>
-      <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center justify-between gap-5">
         <button
           type="button"
           class="btn btn-ghost btn-neutral btn-square btn-sm"
           onclick={() => window.location.reload()}
         >
-          <Icon icon={refreshIcon} class="size-5" />
+          <Icon icon={refreshIcon} class="size-6" />
         </button>
 
         <button
@@ -94,7 +94,7 @@
           class="btn btn-ghost btn-error btn-square btn-sm"
           onclick={signOut}
         >
-          <Icon icon={exitToAppIcon} class="size-5" />
+          <Icon icon={exitToAppIcon} class="size-6" />
         </button>
       </div>
     </div>
