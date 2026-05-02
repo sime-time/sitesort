@@ -1,7 +1,9 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
+  import alarmAddIcon from "@iconify-icons/material-symbols/alarm-add-outline";
   import chevronRightIcon from "@iconify-icons/material-symbols/chevron-right";
   import deleteOutlineIcon from "@iconify-icons/material-symbols/delete-outline";
+  import editIcon from "@iconify-icons/material-symbols/edit-square-outline";
   import nestClockFarsightAnalogOutlineIcon from "@iconify-icons/material-symbols/nest-clock-farsight-analog-outline";
   import pauseCircleOutlineIcon from "@iconify-icons/material-symbols/pause-circle-outline";
   import playCircleOutlineIcon from "@iconify-icons/material-symbols/play-circle-outline";
@@ -10,6 +12,7 @@
   import {
     closeOpenEntry,
     createClockIn,
+    createTimeEntry,
     deleteTimeEntry,
     findOpenEntry,
     updateTimeEntry,
@@ -118,6 +121,17 @@
     await refreshTimeEntries();
   }
 
+  async function openCreate() {
+    haptic();
+    const now = new Date().toISOString();
+    editingId = null;
+    editingDayKey = getLocalDayKey(now);
+    editClockInValue = toTimeInputValue(now);
+    editClockOutValue = "";
+    editError = "";
+    editDialogEl?.showModal();
+  }
+
   function openEdit(entry: TimeEntry) {
     haptic();
     editingId = entry.id;
@@ -141,7 +155,6 @@
 
   async function saveEdit() {
     haptic();
-    if (!editingId) return;
 
     const nextClockIn = combineDayKeyAndTime(editingDayKey, editClockInValue);
     if (!nextClockIn) {
@@ -167,12 +180,22 @@
       }
     }
 
-    try {
-      await updateTimeEntry(editingId, nextClockIn, nextClockOut);
-      await refreshTimeEntries();
-      closeEdit();
-    } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to save time entry"));
+    if (editingId) {
+      try {
+        await updateTimeEntry(editingId, nextClockIn, nextClockOut);
+        await refreshTimeEntries();
+        closeEdit();
+      } catch (error) {
+        toast.error(getErrorMessage(error, "Failed to save time entry"));
+      }
+    } else {
+      try {
+        await createTimeEntry(nextClockIn, nextClockOut);
+        await refreshTimeEntries();
+        closeEdit();
+      } catch (error) {
+        toast.error(getErrorMessage(error, "Failed to create new time entry"));
+      }
     }
   }
 
@@ -223,7 +246,7 @@
       </button>
 
       {#if activeEntry}
-        <div class="alert alert-info alert-soft py-2 min-h-15">
+        <div class="alert alert-info alert-soft py-2 rounded">
           <Icon icon={timerOutlineIcon} class="size-5" />
           <div class="flex flex-col">
             <span class="font-semibold">{activeElapsed}</span>
@@ -231,12 +254,15 @@
           </div>
         </div>
       {:else}
-        <div class="min-h-15 flex items-center">
-          <p class="text-sm text-base-content/70">
-            Clock in when work starts. <br>
-            Clock out for breaks and end of day.
-          </p>
-        </div>
+        <button
+          type="button"
+          disabled={toggleInFlight}
+          class="btn btn-xl btn-soft border-dashed border-2 w-full font-heading uppercase tracking-widest"
+          onclick={openCreate}
+        >
+          <Icon icon={alarmAddIcon} class="size-6" />
+          <span>Add Time Entry</span>
+        </button>
       {/if}
     </div>
   </div>
@@ -276,11 +302,12 @@
                 <div class="card-body p-4 gap-2">
                   <div class="flex items-start justify-between gap-3">
                     <div>
-                      <p class="font-medium text-base">
+                      <p class="font-medium text-base flex items-center gap-2">
                         {formatTimeLabel(entry.clockInAt)}
                         -
                         {#if entry.clockOutAt}
                           {formatTimeLabel(entry.clockOutAt)}
+                          <Icon icon={editIcon} class="size-4" />
                         {:else}
                           <i>Running</i>
                           <span class="loading loading-dots loading-xs"></span>
@@ -295,7 +322,9 @@
                     </div>
                   </div>
 
-                  <div class="card-actions justify-end text-primary">
+                  <div
+                    class="card-actions justify-end text-primary items-center"
+                  >
                     <span class="text-xs uppercase tracking-widest font-medium">
                       Edit
                     </span>
@@ -314,7 +343,7 @@
 <dialog bind:this={editDialogEl} class="modal modal-middle" onclose={closeEdit}>
   <div class="modal-box">
     <h3 class="font-heading font-semibold text-lg uppercase tracking-wider">
-      Edit Time Entry
+      {editingId ? "Edit Time Entry" : "Create Time Entry"}
     </h3>
 
     <div class="mt-4 flex flex-col gap-3">
@@ -337,7 +366,7 @@
           bind:value={editClockOutValue}
         >
         <p class="label text-base-content/65">
-          Leave empty to keep it running.
+          {editingId ? "Leave empty to keep it running." : ""}
         </p>
       </fieldset>
 
@@ -346,15 +375,19 @@
       {/if}
     </div>
 
-    <div class="modal-action justify-between">
-      <button
-        type="button"
-        class="btn btn-error btn-soft font-heading uppercase tracking-wider"
-        onclick={deleteEditingEntry}
-      >
-        <Icon icon={deleteOutlineIcon} class="size-5" />
-        Delete
-      </button>
+    <div
+      class={`modal-action ${editingId ? "justify-between" : "justify-end"}`}
+    >
+      {#if editingId}
+        <button
+          type="button"
+          class="btn btn-error btn-soft font-heading uppercase tracking-wider"
+          onclick={deleteEditingEntry}
+        >
+          <Icon icon={deleteOutlineIcon} class="size-5" />
+          Delete
+        </button>
+      {/if}
 
       <div class="flex gap-2">
         <form method="dialog">

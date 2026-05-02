@@ -52,6 +52,26 @@ export async function closeOpenEntry(
     .where(and(eq(time_entries.id, entryId), eq(time_entries.user_id, userId)));
 }
 
+export async function createTimeEntry(
+  clockInIso: string,
+  clockOutIso: string | null,
+) {
+  const userId = await getUserId();
+  const id = crypto.randomUUID();
+  const nowIso = new Date().toISOString();
+
+  await db.insert(time_entries).values({
+    id,
+    user_id: userId,
+    clock_in: clockInIso,
+    clock_out: clockOutIso,
+    updated_at: nowIso,
+    created_at: nowIso,
+  } satisfies InsertTimeEntry);
+
+  return { id };
+}
+
 export async function updateTimeEntry(
   entryId: string,
   clockInIso: string,
