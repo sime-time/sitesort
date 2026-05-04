@@ -1,9 +1,9 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-  import contentCopyIcon from "@iconify-icons/material-symbols/content-copy";
   import descriptionIcon from "@iconify-icons/material-symbols/description";
   import factCheckIcon from "@iconify-icons/material-symbols/fact-check";
   import inventory2Icon from "@iconify-icons/material-symbols/inventory-2";
+  import powerDrillIcon from "@iconify-icons/material-symbols/tools-power-drill-outline";
   import { toast } from "svelte-sonner";
   import { page } from "$app/state";
   import { getUserJob } from "$lib/client/crud/read-job";
@@ -13,6 +13,10 @@
   } from "$lib/client/crud/read-material";
   import { watchJobTasks } from "$lib/client/crud/read-task";
   import type { SelectTask } from "$lib/client/schema";
+  import {
+    generateJobSheetPdf,
+    type JobSheetInput,
+  } from "$lib/utils/generate-job-sheet";
   import { haptic } from "$lib/utils/haptic";
 
   const jobId = $derived(page.params.id);
@@ -43,10 +47,6 @@
     tasks.filter((task) => isCompletedTask(task)),
   );
 
-  const hasOverviewData = $derived(
-    usedMaterials.length > 0 || completedTasks.length > 0,
-  );
-
   function formatDate(dateString: string | null | undefined) {
     if (!dateString) return "-";
     const dateOnly = dateString.slice(0, 10);
@@ -54,40 +54,41 @@
     if (!year || !month || !day) return "-";
     return `${Number(month)}/${Number(day)}/${year}`;
   }
-
-  const summaryText = $derived.by(() => {
-    const lines = [
-      `Job: ${jobName || "-"}`,
-      `Address: ${jobAddress?.trim() || "-"}`,
-      `Contractor: ${jobContractor?.trim() || "-"}`,
-      `Start Date: ${formatDate(jobStartDate)}`,
-      `End Date: ${formatDate(jobEndDate)}`,
-      "--- Materials ---",
-      ...usedMaterials.map((material) => {
-        const note = material.note?.trim();
-        return `- ${material.quantity}x ${material.name}${note ? ` (${note})` : ""}`;
-      }),
-      "--- Tasks ---",
-      ...completedTasks.map((task) => `[x] ${task.description}`),
-    ];
-
-    return lines.join("\n");
-  });
-
-  async function copySummary() {
-    try {
-      await navigator.clipboard.writeText(summaryText);
-      haptic.confirm();
-      toast.success("Summary copied");
-    } catch (error) {
-      console.error("Copy summary failed", error);
-      toast.error("Unable to copy summary");
-    }
-  }
-
-  function sharePdf() {
+  async function sharePdf() {
     haptic();
-    toast.info("PDF export coming soon");
+
+    // Get all the input needed for the pdf
+    const materialsInput = usedMaterials.map((m) => ({
+      name: m.name,
+      quantity: m.quantity ?? null,
+      note: m.note ?? null,
+    }));
+
+    const tasksInput = completedTasks.map((t) => ({
+      description: t.description,
+      completed: t.completed,
+    }));
+
+    const jobInput: JobSheetInput = {
+      name: jobName,
+      contractor: jobContractor,
+      address: jobAddress,
+      materials: materialsInput,
+      tasks: tasksInput,
+    };
+
+    try {
+      const file = await generateJobSheetPdf(jobInput);
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ title: "jobsheet", files: [file] });
+        toast.info("PDF generated");
+      } else {
+        throw new Error("Cannot share pdf");
+      }
+    } catch (err) {
+      console.error("Job Sheet Generation Failed:", err);
+      toast.error("Job Sheet Generation Failed");
+    }
   }
 
   $effect(() => {
@@ -151,12 +152,13 @@
     <span>Share PDF</span>
   </button>
 
-  <section class="card bg-base-200 border border-base-300">
+  <section class="card border border-base-300">
     <div class="card-body p-3 gap-2">
       <div class="flex items-center justify-between gap-2">
         <h2
-          class="font-heading uppercase tracking-wide text-sm text-neutral/80"
+          class="font-heading uppercase tracking-wide text-sm text-neutral/80 flex items-center gap-1.5"
         >
+          <Icon icon={powerDrillIcon} class="size-5" />
           Job Summary
         </h2>
       </div>
@@ -285,26 +287,6 @@
             </table>
           </div>
         {/if}
-      </div>
-    </article>
-
-    <article class="card bg-base-200 border border-base-300">
-      <div class="card-body p-3 gap-2">
-        <button
-          type="button"
-          class="btn btn-neutral btn-soft btn-lg uppercase font-heading tracking-widest w-full"
-          onclick={copySummary}
-          disabled={loading || !hasOverviewData}
-        >
-          <Icon icon={contentCopyIcon} />
-          <span>Copy Text Summary</span>
-        </button>
-
-        <textarea
-          class="textarea textarea-bordered w-full h-28 text-xs leading-snug"
-          readonly
-          value={summaryText}
-        ></textarea>
       </div>
     </article>
   </section>
