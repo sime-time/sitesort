@@ -146,7 +146,7 @@ export async function generateJobSheetPdf(job: JobSheetInput): Promise<File> {
       end: { x: tableRight, y: y + 4 },
       thickness: 1,
     });
-    y -= 4;
+    y -= 14;
   };
 
   drawMaterialsHeader();
@@ -163,27 +163,34 @@ export async function generateJobSheetPdf(job: JobSheetInput): Promise<File> {
   } else {
     for (const m of usedMaterials) {
       const qtyText = `${Number(m.quantity ?? 0) || 0}x`;
+
       const nameLines = wrapText(
         m.name || "-",
         colNotes - colName - 8,
         font,
         FONT_SIZE,
       );
+
       const noteLines = wrapText(
         m.note?.trim() || "-",
         tableRight - colNotes,
         font,
         FONT_SIZE,
       );
+
       const rowLines = Math.max(nameLines.length, noteLines.length);
       const rowHeight = rowLines * LINE_HEIGHT + 2;
+
       if (y - rowHeight < MARGIN) {
         addPage();
         drawMaterialsHeader();
       }
+
       page.drawText(qtyText, { x: colQty, y, size: FONT_SIZE, font: bold });
+
       for (let i = 0; i < rowLines; i += 1) {
         const lineY = y - i * LINE_HEIGHT;
+
         if (nameLines[i])
           page.drawText(nameLines[i], {
             x: colName,
@@ -191,6 +198,7 @@ export async function generateJobSheetPdf(job: JobSheetInput): Promise<File> {
             size: FONT_SIZE,
             font,
           });
+
         if (noteLines[i])
           page.drawText(noteLines[i], {
             x: colNotes,
@@ -199,13 +207,15 @@ export async function generateJobSheetPdf(job: JobSheetInput): Promise<File> {
             font,
           });
       }
+
       y -= rowHeight;
+
       page.drawLine({
         start: { x: MARGIN, y: y + 4 },
         end: { x: tableRight, y: y + 4 },
         thickness: 0.5,
       });
-      y -= 4;
+      y -= 14;
     }
   }
 
