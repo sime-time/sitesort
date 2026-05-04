@@ -137,6 +137,7 @@ export async function generateJobSheetPdf(job: JobSheetInput): Promise<File> {
       end: { x: tableRight, y: y + 12 },
       thickness: 1,
     });
+    y -= 5;
     page.drawText("Qty", { x: colQty, y, size: FONT_SIZE, font: bold });
     page.drawText("Material", { x: colName, y, size: FONT_SIZE, font: bold });
     page.drawText("Notes", { x: colNotes, y, size: FONT_SIZE, font: bold });
@@ -235,11 +236,13 @@ export async function generateJobSheetPdf(job: JobSheetInput): Promise<File> {
       size: FONT_SIZE,
       font,
     });
+
     y -= LINE_HEIGHT;
   } else {
     const bulletX = MARGIN;
     const textX = MARGIN + 18;
     const textWidth = PAGE_WIDTH - MARGIN - textX;
+
     for (const task of completedTasks) {
       const lines = wrapText(
         task.description || "-",
@@ -247,9 +250,13 @@ export async function generateJobSheetPdf(job: JobSheetInput): Promise<File> {
         font,
         FONT_SIZE,
       );
+
       const blockHeight = lines.length * LINE_HEIGHT;
+
       ensureSpace(blockHeight + 2);
+
       page.drawText("[x]", { x: bulletX, y, size: FONT_SIZE, font: bold });
+
       for (let i = 0; i < lines.length; i += 1) {
         page.drawText(lines[i], {
           x: textX,
