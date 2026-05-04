@@ -230,7 +230,7 @@ export async function generateJobSheetPdf(job: JobSheetInput): Promise<File> {
 
   if (completedTasks.length === 0) {
     ensureSpace(LINE_HEIGHT);
-    page.drawText("No completed tasks.", {
+    page.drawText("No tasks.", {
       x: MARGIN,
       y,
       size: FONT_SIZE,
