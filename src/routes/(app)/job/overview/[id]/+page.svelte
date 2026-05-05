@@ -80,7 +80,7 @@
     try {
       const file = await generateJobSheetPdf(jobInput);
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ title: "jobsheet", files: [file] });
+        await navigator.share({ title: `Job: ${jobName}`, files: [file] });
         toast.info("PDF generated");
       } else {
         throw new Error("Cannot share pdf");

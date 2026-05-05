@@ -10,6 +10,7 @@ Core workflows:
 - Check off job site tasks
 - Mark jobs as complete/incomplete
 - Clock in/out and edit time entries
+- Generate/share a job overview PDF from the overview screen
 
 Primary product goal:
 - Field logging must be faster than paper with minimal typing and low-friction interactions.
@@ -121,6 +122,7 @@ Current limitation to keep in mind:
 - App auth/offline-grace load logic: `src/routes/(app)/+layout.ts`
 - Time page (DB-backed clock/edit/delete flows): `src/routes/(app)/time/+page.svelte`
 - Job create page (client-first submit): `src/routes/(app)/job/create/+page.svelte`
+- Job overview page with PDF share CTA and summary tables: `src/routes/(app)/job/overview/[id]/+page.svelte`
 - Client DB + connect guards: `src/lib/client/db.ts`
 - Time state + formatting helpers: `src/lib/utils/time-state.svelte.ts`
 - Time CRUD helpers: `src/lib/client/crud/time-entries.ts`
@@ -131,6 +133,7 @@ Current limitation to keep in mind:
 - Time upload handler: `src/lib/server/handlers/handle-time-entry.ts`
 - Shared server schema: `src/lib/server/schema.ts`
 - Time-entry server migration: `src/lib/server/migrations/0006_zippy_timesheet.sql`
+- PDF generation utility used by overview share flow: `src/lib/utils/generate-job-sheet.ts`
 
 ## Decisions to Preserve
 
