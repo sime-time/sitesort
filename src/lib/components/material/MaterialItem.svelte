@@ -123,7 +123,7 @@
   <td>
     <button
       type="button"
-      class={`card-title grow font-normal text-base w-full ${crossedOffLocal ? "line-through" : ""}`}
+      class={`card-title grow font-normal text-base ${crossedOffLocal ? "line-through" : ""}`}
       onclick={toggleCrossedOff}
     >
       {name}
