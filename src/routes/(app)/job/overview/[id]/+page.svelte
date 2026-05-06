@@ -54,8 +54,10 @@
     if (!year || !month || !day) return "-";
     return `${Number(month)}/${Number(day)}/${year}`;
   }
+
   async function sharePdf() {
     haptic();
+    loading = true;
 
     // Get all the input needed for the pdf
     const materialsInput = usedMaterials.map((m) => ({
@@ -81,13 +83,15 @@
       const file = await generateJobSheetPdf(jobInput);
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ title: `Job: ${jobName}`, files: [file] });
-        toast.info("PDF generated");
+        toast.info("PDF shared");
       } else {
         throw new Error("Cannot share pdf");
       }
     } catch (err) {
-      console.error("Job Sheet Generation Failed:", err);
-      toast.error("Job Sheet Generation Failed");
+      console.error("Job Sheet Share Failed:", err);
+      toast.error("PDF share canceled");
+    } finally {
+      loading = false;
     }
   }
 
