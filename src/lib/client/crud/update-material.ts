@@ -30,3 +30,17 @@ export async function updateJobMaterialNote(id: string, note: string) {
 
   return update;
 }
+
+export async function updateJobMaterialCrossedOff(
+  id: string,
+  crossedOff: boolean,
+) {
+  const now = new Date().toISOString();
+
+  const update = await db
+    .update(job_materials)
+    .set({ crossed_off: crossedOff, updated_at: now })
+    .where(eq(job_materials.id, id));
+
+  return update;
+}

@@ -58,6 +58,7 @@ export const job_materials = pgTable("job_materials", {
     .notNull(),
   quantity: integer().default(0).notNull(),
   note: text(),
+  crossed_off: boolean().default(false).notNull(),
   ...timestamps(),
 });
 

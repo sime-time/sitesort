@@ -29,6 +29,7 @@
       name={item.name}
       quantity={item.quantity}
       note={item.note}
+      crossedOff={item.crossed_off}
       onOpenNote={() => onOpenNote({ id: item.id, name: item.name, note: item.note})}
     />
   {/each}

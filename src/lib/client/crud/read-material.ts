@@ -7,6 +7,7 @@ export type JobMaterial = {
   name: string;
   quantity: number;
   note: string | null;
+  crossed_off: boolean | null;
   category: string;
 };
 
@@ -17,6 +18,7 @@ export async function listJobMaterials(jobId: string) {
       name: materials.name,
       quantity: job_materials.quantity,
       note: job_materials.note,
+      crossed_off: job_materials.crossed_off,
       category: categories.name,
       category_id: categories.id,
     })
@@ -42,6 +44,7 @@ export function watchJobMaterials(
           m.name as name,
           jm.quantity as quantity,
 					jm.note as note,
+					jm.crossed_off as crossed_off,
           c.name as category
         from job_materials jm
         join materials m on jm.material_id = m.id

@@ -30,6 +30,7 @@ export const job_materials = sqliteTable("job_materials", {
     .notNull(),
   quantity: integer().default(0).notNull(),
   note: text(),
+  crossed_off: integer({ mode: "boolean" }).default(false).notNull(),
   created_at: text().notNull(),
   updated_at: text().notNull(),
 });
