@@ -17,7 +17,7 @@ export async function handleJobMaterialEntry(
       const raw = entry.data ?? {};
       const normalized = {
         ...raw,
-        completed: normalizeBool(raw.completed),
+        crossed_off: normalizeBool(raw.crossed_off),
       };
 
       const parsed = jobMaterialInsertSchema.parse(normalized);
@@ -28,6 +28,7 @@ export async function handleJobMaterialEntry(
         material_id: parsed.material_id,
         quantity: parsed.quantity,
         note: parsed.note,
+        crossed_off: parsed.crossed_off ?? false,
         created_at: parsed.created_at,
         updated_at: parsed.updated_at,
       };
@@ -42,6 +43,7 @@ export async function handleJobMaterialEntry(
             material_id: row.material_id,
             quantity: row.quantity,
             note: row.note,
+            crossed_off: row.crossed_off,
             created_at: row.created_at,
             updated_at: row.updated_at,
           },
@@ -52,10 +54,11 @@ export async function handleJobMaterialEntry(
       const raw = entry.data ?? {};
       const normalized = {
         ...raw,
-        completed: normalizeBool(raw.completed),
+        crossed_off: normalizeBool(raw.crossed_off),
       };
 
       const parsed = jobMaterialInsertSchema.partial().parse(normalized);
+
       const patch: Partial<InsertJobMaterial> = {
         ...parsed,
         updated_at: parsed.updated_at ?? new Date().toISOString(),
@@ -66,10 +69,10 @@ export async function handleJobMaterialEntry(
         .set(patch)
         .where(eq(job_materials.id, entry.id))
         .returning({ id: job_materials.id });
-
       if (updated.length === 0) {
         throw new UnauthorizedUploadError();
       }
+
       break;
     }
     case "DELETE": {
