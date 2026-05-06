@@ -116,14 +116,14 @@
       onblur={updateQuantity}
       step="1"
       min="0"
-      class="font-heading text-xl font-semibold text-center no-spinner w-20 input input-accent bg-accent"
+      class="font-heading text-xl font-semibold text-center no-spinner w-16 input input-accent bg-accent"
       disabled={saving || crossedOffLocal}
     >
   </td>
   <td>
     <button
       type="button"
-      class={`card-title grow font-normal text-base ${crossedOffLocal ? "line-through" : ""}`}
+      class={`card-title grow font-normal text-base text-start ${crossedOffLocal ? "line-through" : ""}`}
       onclick={toggleCrossedOff}
     >
       {name}
